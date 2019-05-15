@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+    <link rel="stylesheet" href="../static/pages/css/ace.min.css" id="main-ace-style" />
+    <link rel="stylesheet" href="../static/pages/css/index.css">
+    <link rel="stylesheet" href="../static/pages/css/enroll.css">
+    <link rel="stylesheet" href="../static/pages/css/madal.css">
+    <link rel="stylesheet" href="../static/pages/css/newStudent.css">
+    <link rel="stylesheet" href="../static/pages/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../static/pages/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="../static/pages/css/kd.ui.plugin.css" />
+    <link rel="stylesheet" href="../static/pages/css/loading.css" />
+
+
+    <script src="../static/pages/js/jquery.min.js"></script>
+    <script src="../static/pages/js/bootstrap.min.js"> </script>
+    <script src="../static/pages/js/ace.min.js"> </script>
+    <script src="../static/pages/js/ace-elements.min.js"></script>
+    <script src="../static/pages/laydate/laydate.js"></script>
+    <script src="../static/pages/js/course-newlesson.js"></script>
+    <script src="../static/pages/js/kd.ui.plugin.js"></script>
+    <script src="../static/pages/js/jquery.validate17.min.js"></script>
+    <script src="../static/pages/js/additiona17l-methods.min.js"></script>
+    <script src="../static/pages/js/messages_zh.min.js"></script>
+    <script src="../static/pages/js/check.parameter.1.0.js"></script>
+    <script src="../static/pages/js/loading.js"></script>
+</head>
+
+<body>
+
+<div th:replace="layout::top"></div>
+<div class="main-container" id="main-container">
+    <div th:replace="layout::left('13','37')">
+    </div>
+    <div class="main-content" id="main-content">
+        <div class="breadcrumbs" id="breadcrumbs">
+            <img src="../static/pages/img/line1.png">
+            <span th:text="${typename}">新建课程</span>
+            <input id="typename" type="hidden" th:value="${typename}">
+            <img src="../static/pages/img/line.png">
+        </div>
+
+        <div id="control-position" class="form-box">
+            <form id="dJFrom" th:method="post">
+                <div class="main-form">
+                    <h3>课程基础信息</h3>
+                    <input type="hidden" id="courseId" name="id" th:value="${xbCourse?.id}">
+                    <input type="hidden" id="state" name="state" value="0">
+                        <!--课程类别-->
+                        <div class="form-group">
+                            <label><span>*</span>课程类别</label>
+                            <select th:if=" ${typename eq '新建课程'  || typename eq '修改课程'}" name="courseTypeId" id="courseTypeId" class="input-select">
+                                <option value="-1">--请选择--</option>
+                                <option th:each="cts,userStat:${coursetypelist}" th:selected="${cts.id == xbCourse?.courseTypeId}"
+                                        th:value="${cts.id}" th:text="${cts.courseTypeName}"></option>
+                            </select>
+                            <select th:if=" ${typename eq '新增定价标准'  }" disabled="disabled"
+                                    style="color: #848484 !important;background-color: #eee !important;"
+                                    name="courseTypeId" id="courseTypeId" class="input-select">
+                                <option value="-1">--请选择--</option>
+                                <option th:each="cts,userStat:${coursetypelist}" th:selected="${cts.id == xbCourse?.courseTypeId}"
+                                        th:value="${cts.id}" th:text="${cts.courseTypeName}"></option>
+                            </select>
+                            <!--<a href="#modal-table1"  data-toggle="modal">新建类别</a>-->
+                        </div>
+                        <!--科目-->
+                        <div  class="form-group">
+                            <label>科目</label>
+                            <select th:if=" ${typename eq '新建课程'  || typename eq '修改课程'}" name="subjectId" id="subjectId" class="input-select">
+                                <option value="-1">--请选择--</option>
+                                <option th:each="cts,userStat:${subjectlist}" th:selected="${cts.id == xbCourse?.subjectId}"
+                                        th:value="${cts.id}" th:text="${cts.subjectName}"></option>
+                            </select>
+                            <select th:if=" ${typename eq '新增定价标准'  }" disabled="disabled"
+                                    style="color: #848484 !important;background-color: #eee !important;"
+                                    name="subjectId" id="subjectId" class="input-select">
+                                <option value="-1">--请选择--</option>
+                                <option th:each="cts,userStat:${subjectlist}" th:selected="${cts.id == xbCourse?.subjectId}"
+                                        th:value="${cts.id}" th:text="${cts.subjectName}"></option>
+                            </select>
+                            <!-- <a href="#modal-table1"  data-toggle="modal">新建科目</a>-->
+                        </div>
+                        <!--课程名称-->
+                        <div th:if=" ${typename eq '新建课程'  || typename eq '修改课程'}" class="form-group">
+                            <label><span>*</span>课程名称</label>
+                            <input type="text" name="courseName" id="courseName" th:value="${xbCourse?.courseName}"
+                                placeholder="请输入课程名称">
+                        </div>
+                        <div th:if=" ${typename eq '新增定价标准'  }" class="form-group">
+                            <label><span>*</span>课程名称</label>
+                            <input type="text" name="courseName"
+                                   disabled="disabled"
+                                   id="courseName" th:value="${xbCourse?.courseName}"
+                                placeholder="请输入课程名称">
+                        </div>
+                        <!--授课模式-->
+                        <div th:if=" ${typename eq '新建课程'  }" class="form-group" >
+                            <label><span>*</span>授课模式</label>
+                            <input name="type" id="type" type="radio" checked="checked" class="ace" value="0" ><span
+                                class="lbl">班课</span>
+                            <input name="type" id="type" type="radio" class="ace" value="1" ><span
+                                class="lbl">一对一</span>
+                        </div>
+                        <div th:if=" ${typename eq '修改课程' || typename eq '新增定价标准' }" class="form-group" >
+                            <label><span>*</span>授课模式</label>
+                            <input name="type" id="type" type="radio" class="ace" value="0"
+                                   disabled="disabled"
+                                   th:checked="${xbCourse?.type=='0'}"><span
+                                class="lbl">班课</span>
+                            <input name="type" id="type" type="radio" class="ace" value="1"
+                                   disabled="disabled"
+                                   th:checked="${xbCourse?.type=='1'}"><span
+                                class="lbl">一对一</span>
+                        </div>
+                        <!--收费模式-->
+                        <div th:if=" ${typename eq '新建课程'  }" class="form-group" >
+                            <label><span>*</span>收费模式</label>
+                            <p><input type="radio" checked="checked" name="chargingMode" id="chargingMode" value="0"
+                                    th:onclick="|chargingModeClick('0')|">按课时</p>
+                            <p><input type="radio" name="chargingMode" value="2" id="chargingMode"
+                                  th:onclick="|chargingModeClick('2')|">按期</p>
+                        </div>
+                        <div th:if=" ${typename eq '修改课程' || typename eq '新增定价标准'} " class="form-group" >
+                            <label><span>*</span>收费模式</label>
+                            <p><input type="radio" checked="checked" th:name="chargingMode" id="chargingMode" th:value="0"
+                                      th:checked="${xbCourse?.chargingMode=='0'}"
+                                      disabled="disabled"
+                                      th:onclick="|chargingModeClick('0')|">按课时</p>
+                            <p><input type="radio" th:name="chargingMode" id="chargingMode" th:value="2"
+                                      th:checked="${xbCourse?.chargingMode=='2'}"
+                                      disabled="disabled"
+                                      th:onclick="|chargingModeClick('2')|">按期</p>
+                        </div>
+                        <!--开课校区-->
+                        <div class="form-group">
+                            <label><span>*</span>开课校区</label>
+                            <span th:if=" ${typename eq '新建课程' || typename eq '新增定价标准' } ">
+                                <p><input type="radio" name="openingType" id="openingType" value="0" checked="checked" th:onclick="|schoolType('0','${xbCourse?.id}')|">全部校区</p>
+                                <p><input type="radio" name="openingType" id="openingType" value="1" th:onclick="|schoolType('1','${xbCourse?.id}')|">指定校区</p>
+                            </span>
+                            <span th:if=" ${typename eq '修改课程'} "" >
+                                <p><input type="radio" name="openingType" id="openingType" value="0" disabled="disabled">全部校区</p>
+                                <p><input type="radio" name="openingType" id="openingType" value="1" checked="checked" disabled="disabled">指定校区</p>
+                            </span>
+                        </div>
+                        <!--校区选择-->
+                        <div id="zhidingSchool" class="form-group">
+                            <p th:each="sorg,sorgSta:${sorganList}">
+                                    <span th:if=" ${typename eq '新建课程' || typename eq '新增定价标准' }" style="display: none" >
+                                        <input type="checkbox" name="openingTypes" checked="checked"
+                                               th:onclick="|appointSchool('${sorgSta.index}','${sorg.organName}','${xbCourse?.id}','${sorg.id}',this)|"
+                                            th:value="${sorg.id}">
+                                        <span th:text="${sorg.organName}"></span>
+                                    </span>
+                                    <span th:if=" ${typename eq '修改课程'} " >
+                                        <input type="checkbox" name="openingTypes" disabled="disabled"
+                                               th:checked="${sorg.id} == ${pre.organIds}"
+                                            th:value="${sorg.id}">
+                                        <span th:text="${sorg.organName}"></span>
+                                    </span>
+                            </p>
+                        </div>
+                </div>
+            </form>
+            <div class="extend-form">
+                <h3>定价标准</h3>
+                <table id="dingjiaiform" class="table-bordered">
+                    <tr>
+                        <th>校区</th>
+                        <th>定价标准</th>
+                    </tr>
+                    <span th:if=" ${typename eq '新建课程' || typename eq '新增定价标准'} ">
+                            <tr id="delete_0">
+                                <td>全校</td>
+                                <input type="hidden" id="XbCoursePresetcourseId" name="XbCoursePresetcourseId" value="'+courseId+'" />
+                                <input type="hidden" id="XbCoursePresetorganIds" name="XbCoursePresetorganIds" value="" />
+                                <td>
+                                    <div class="extend-list">
+                                        <div class="form-group">
+                                            <label>按课时</label>
+                                            <div class="numCon">
+                                                <input id="XbCoursePresetperiodNum" name="XbCoursePresetperiodNum" type="text"
+                                                       value="0" />
+                                            </div>
+                                            <span class="txt">课时</span>
+                                            <span class="txt">=</span>
+                                            <div class="numCon">
+                                                <input id="XbCoursePresetmoney" name="money" type="text" value="0" />
+                                            </div>
+                                            <span class="txt">元</span>
+                                            <span class="glyphicon glyphicon-plus-sign" onclick="dingJiaBiaoZunAllAdd('','0',this)"></span>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </span>
+                    <span th:if=" ${typename eq '修改课程'} ">
+                            <tr>
+                                <td th:text="${pre.sysorgans.organName}"></td>
+                                <input type="hidden" id="XbCoursePresetcourseId" name="courseId" th:value="${pre?.courseId}" />
+                                <input type="hidden" id="XbCoursePresetorganIds" name="organIds" th:value="${pre?.organIds}" />
+                                <td th:if="${pre.xbCourse.chargingMode} eq '0'">
+                                    <div class="extend-list">
+                                        <div class="form-group">
+                                            <label>按课时</label>
+                                            <div class="numCon">
+                                                <input id="XbCoursePresetperiodNum" name="periodNum" type="text"
+                                                       th:value="${pre?.periodNum}" />
+                                            </div>
+                                            <span class="txt">课时</span>
+                                            <span class="txt">=</span>
+                                            <div class="numCon">
+                                                <input id="XbCoursePresetmoney" name="money" type="text" th:value="${#numbers.formatDecimal(pre?.money, 1, 2)}" />
+                                            </div>
+                                            <input type="hidden" id="preid" name="id" th:value="${pre?.id}" />
+                                            <span class="txt">元</span>
+                                            <!--<span class="glyphicon glyphicon-plus-sign"
+                                                  th:onclick="|appointSchooladd('${pre.sysorgans.organName}','${pre?.courseId}','${pre?.organIds}',this)|"></span>-->
+                                            <span class="glyphicon "></span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td th:if="${pre.xbCourse.chargingMode} eq '2'">
+                                    <div class="extend-list">
+                                        <div class="form-group">
+                                            <label>按期数</label>
+                                            <div class="numCon">
+                                                <input id="XbCoursePresetmoney" name="money" type="text" th:value="${#numbers.formatDecimal(pre?.money, 1, 2)}" />
+                                            </div>
+                                            <span class="txt">元/期</span>
+                                            <span class="txt">包含</span>
+                                            <div class="numCon">
+                                                <input id="XbCoursePresetperiodNum" name="periodNum" type="text" th:value="${pre?.periodNum}" />
+                                            </div>
+                                            <input type="hidden" id="preid" name="id" th:value="${pre?.id}" />
+                                            <span class="txt">课时</span>
+                                            <span class="glyphicon "></span>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </span>
+                </table>
+
+                </table>
+            </div>
+        </div>
+
+        <div class="enrollCon" style="margin-top:30px;">
+            <button class="save" onclick="saveCourse()">保存</button>
+            <button class="save" onclick="javascript:history.go(-1)" style="margin-right:22px;">返回</button>
+        </div>
+    </div>
+
+    <script type="text/javascript" th:inline="javascript">
+            var basePath = /*[[${#httpServletRequest.getScheme() + "://" + #httpServletRequest.getServerName() + ":" + #httpServletRequest.getServerPort() + #httpServletRequest.getContextPath()}]]*/ ;
+            //-----新建课程---麻烦版本---------------------------------------------------------------------
+            function saveCourse() {
+                var load = new Loading();
+                load.init({
+                    target: "#main-content"
+                });
+
+                if ($("#dJFrom").valid()) {
+
+                var datafrom = serializeObject("#dJFrom");
+                //操作类别
+                var typename = $("#typename").val();
+                if(typename=="修改课程" || typename=="新增定价标准"){
+                    datafrom.chargingMode =  $("input[name='chargingMode']:checked").val();
+                    datafrom.type =  $("input[name='type']:checked").val();
+                    datafrom.openingType =  $("input[name='openingType']:checked").val();
+                }
+                if(datafrom.courseTypeId=="-1"){
+                    $.kd.kdMsg("请选择课程类别");
+                    return false;
+                }
+                if(datafrom.subjectId=="-1"){
+                    $.kd.kdMsg("请选择科目");
+                    return false;
+                }
+                if(datafrom.courseName==""){
+                    $.kd.kdMsg("请填写课程名称");
+                    return false;
+                }
+                var list = [];
+                //全部校区
+                    var zero = false;
+                    var mon = false;
+                if (datafrom.openingType == "0") {
+                    /*$("#dingjiaiform tr:not(:first)").each(function () {
+                        $("input[name='openingTypes']:checked").each(function (j) {
+                            var obj = {};
+                            obj.courseId = $("#XbCoursePresetcourseId").val();
+                            obj.organIds = $(this).val();
+                            obj.periodNum = $("#XbCoursePresetperiodNum").val();
+                            obj.money = $("#XbCoursePresetmoney").val();
+                            list.push(obj);
+                        });
+                    });*/
+                    $("input[name='openingTypes']:checked").each(function (j) {
+                        var organIds = $(this).val();
+                        $("#dingjiaiform tr:not(:first)").each(function () {
+                            var $ele = $(this);
+                            var obj = {};
+                            var x = $ele.find("input");
+                            obj.courseId = x.eq(0).val();
+                            obj.organIds = organIds;
+                            if(datafrom.chargingMode=="0"){
+                                obj.periodNum = x.eq(2).val();
+                                obj.money = x.eq(3).val();
+                            }else if(datafrom.chargingMode=="2"){
+                                obj.periodNum = x.eq(3).val();
+                                obj.money = x.eq(2).val();
+                            }
+                            if(parseFloat(obj.periodNum) ==0  ){
+                                zero =true;
+                            }
+                            if(parseFloat(obj.money) ==0){
+                                mon = true;
+                            }
+                            obj.id = x.eq(4).val();
+                            list.push(obj);
+                        });
+                    });
+                    //指定校区
+                } else {
+                    $("#dingjiaiform tr:not(:first)").each(function () {
+                        var $ele = $(this);
+                        var obj = {};
+                        var x = $ele.find("input");
+                        obj.courseId = x.eq(0).val();
+                        obj.organIds = x.eq(1).val();
+                        if(datafrom.chargingMode=="0"){
+                            obj.periodNum = x.eq(2).val();
+                            obj.money = x.eq(3).val();
+                        }else if(datafrom.chargingMode=="2"){
+                            obj.periodNum = x.eq(3).val();
+                            obj.money = x.eq(2).val();
+                        }
+                        if(parseFloat(obj.periodNum) ==0 ){
+                            zero =true;
+
+                        }
+                        if(parseFloat(obj.money) ==0){
+                            mon = true;
+                        }
+                        obj.id = x.eq(4).val();
+                        list.push(obj);
+                   });
+                }
+                if(zero && datafrom.chargingMode=="0"){
+                        $.kd.kdMsg("课时不能为0");
+                        return ;
+                }
+                if(zero && datafrom.chargingMode=="2"){
+                    $.kd.kdMsg("按期课时不能为0");
+                    return ;
+                }
+                if(mon && datafrom.chargingMode=="0"){
+                    $.kd.kdMsg("按课时金额不能为0");
+                    return ;
+                }
+                if(mon && datafrom.chargingMode=="2"){
+                    $.kd.kdMsg("按期数金额不能为0");
+                    return ;
+                }
+                load.start();
+                datafrom.xbcoursepresetlist = list;
+                $.ajax({
+                    url: basePath + '/jwcentercourse/savecourse',
+                    type: 'get',
+                    dataType: 'json',
+                    contentType: "application/json;charset=UTF-8",
+                    data: {
+                        dataentity: JSON.stringify(datafrom),
+                        typename:typename
+                    },
+                    cache: false,
+                    async: true,
+                    success: function (data) {
+                        load.stop();
+                        console.log("回调成功")
+                        var status = data.status;
+                        var msg = data.msg;
+                        if (status == "0") {
+                            $.kd.kdAlert(data.msg,function(){
+                                load.start();
+                                window.location.href =
+                                    basePath + "/jwcentercourse/tocourse"
+                            });
+                        } else {
+                            $.kd.kdMsg(msg);
+                        }
+                    },
+                    error: function () {
+                        load.stop();
+                        console.log("回调失败")
+                    }
+                });
+                }
+            };
+
+            //删除课程类别
+            function subjectRemove(id) {
+                var load = new Loading();
+                load.init({
+                    target: "#control-position"
+                });
+                load.start();
+
+                $.ajax({
+                    url: basePath+'/jwcentercourse/removesubject',
+                    type: 'post',
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        id: id
+                    }),
+                    async: true,
+                    success: function (data) {
+                        load.stop();
+                        console.log("回调成功")
+                        var status = data.status;
+                        var msg = data.msg;
+                        if (status == "0") {
+                            var id = data.cousrtype.id;
+                            $("#" + id).parent().remove();
+                            $.kd.kdAlert(msg);
+                        } else {
+                            $.kd.kdAlert(msg);
+                        }
+                    },
+                    error: function () {
+                        load.stop();
+                        console.log("回调失败")
+                    }
+                });
+            }
+            function serializeObject(form) {
+                var o = {};
+                var a = $(form).serializeArray();
+                $.each(a, function () {
+                    if (o[this.name]) {
+                        if (!o[this.name].push) {
+                            o[this.name] = [o[this.name]];
+                        }
+                        o[this.name].push(this.value || '');
+                    } else {
+                        o[this.name] = this.value || '';
+                    }
+                });
+                return o;
+            };
+    </script>
+    <!--工具函数群-->
+    <script>
+        ! function () {
+            laydate.render({
+                elem: '#demo'
+            }); //绑定元素
+        }();
+        $(".glyphicon-remove-sign").click(function () {
+            $(this).parent().parent(".extend-list").hide();
+        });
+    /*function serializeObject(form) {
+        var o = {};
+        var a = $(form).serializeArray();
+        $.each(a, function () {
+            if (o[this.name]) {
+                if (!o[this.name].push) {
+                    o[this.name] = [o[this.name]];
+                }
+                o[this.name].push(this.value || '');
+            } else {
+                o[this.name] = this.value || '';
+            }
+        });
+        return o;
+    };*/
+</script>
+<script>
+    $(document).ready(function () {
+        //获得文本框对象
+        var t = $("#periodNum");
+        //初始化数量为1,并失效减
+        $("#min").attr({
+            "disabled": "disabled"
+        });
+
+        //$('#min').attr('disabled',true);
+        //数量增加操作
+        $("#add").click(function () {
+            // 给获取的val加上绝对值，避免出现负数
+            t.val(Math.abs(parseInt(t.val())) + 1);
+            if (parseInt(t.val()) != 1) {
+                $("#min").removeAttr("disabled");
+                // $('#min').attr('disabled',false);
+            };
+        })
+        //数量减少操作
+        $("#min").click(function () {
+            t.val(Math.abs(parseInt(t.val())) - 1);
+            if (parseInt(t.val()) == 1) {
+                $("#min").attr({
+                    "disabled": "disabled"
+                });
+                //$('#min').attr('disabled',true);
+            };
+        })
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        //获得文本框对象
+        var t = $("#money");
+        //初始化数量为1,并失效减
+        $('#min1').attr('disabled', true);
+        //数量增加操作
+        $("#add1").click(function () {
+            // 给获取的val加上绝对值，避免出现负数
+            t.val(Math.abs(parseInt(t.val())) + 1);
+            if (parseInt(t.val()) != 1) {
+                $('#min1').attr('disabled', false);
+            };
+        })
+        //数量减少操作
+        $("#min1").click(function () {
+            t.val(Math.abs(parseInt(t.val())) - 1);
+            if (parseInt(t.val()) == 1) {
+                $('#min1').attr('disabled', true);
+            };
+        })
+    });
+</script>
+</body>
+
+</html>

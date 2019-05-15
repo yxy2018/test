@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+    <link rel="stylesheet" href="../static/pages/css/ace.min.css" id="main-ace-style" />
+    <link rel="stylesheet" href="../static/pages/css/index.css">
+    <link rel="stylesheet" href="../static/pages/css/management.css">
+    <link rel="stylesheet" href="../static/pages/css/student.css">
+    <link rel="stylesheet" href="../static/pages/css/newStudent.css"/>
+    <link rel="stylesheet" href="../static/pages/css/madal.css">
+    <link rel="stylesheet" href="../static/pages/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../static/pages/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="../static/pages/css/kd.ui.plugin.css" />
+    <link rel="stylesheet" href="../static/pages/css/loading.css" />
+
+
+    <script src="../static/pages/js/jquery.min.js"></script>
+    <script src="../static/pages/js/bootstrap.min.js"> </script>
+    <script src="../static/pages/js/ace.min.js"> </script>
+    <script src="../static/pages/js/ace-elements.min.js"></script>
+    <script src="../static/pages/laydate/laydate.js"></script>
+    <script src="../static/pages/js/jquery.validate17.min.js"></script>
+    <script src="../static/pages/js/additiona17l-methods.min.js"></script>
+    <script src="../static/pages/js/messages_zh.min.js"></script>
+    <script src="../static/pages/js/kd.ui.plugin.js"></script>
+    <script src="../static/pages/js/check.parameter.1.0.js"></script>
+    <script src="../static/pages/js/loading.js"></script>
+
+</head>
+<body>
+<title>金字塔教育</title>
+<div th:replace="layout::top"></div>
+<div class="main-container" id="main-container">
+    <div th:replace="layout::left('13','37')">
+    </div>
+    <div id="main-content" class="main-content">
+        <div class="tabbable">
+            <ul class="nav nav-tabs" id="myTab">
+                <li class="active">
+                    <a data-toggle="tab" href="#studentList" class="studentList">课程列表</a>
+                </li>
+                <li>
+                    <a data-toggle="tab" href="#divideList" class="divideList">课程类别</a>
+                </li>
+                <li>
+                    <a data-toggle="tab" href="#expiryStu" class="expiryStu">科目设置</a>
+                </li>
+            </ul>
+            <!-- 上课列表 -->
+            <div class="tab-pane fade in active student course" id="studentList" >
+                <form id="searchform">
+                    <!-- 学员列表 -->
+                    <div class="screen">
+                        <a class="stdEnroll" th:href="@{/jwcentercourse/goaddcourse(type=newadd)}" >新建课程</a>
+                        <div class="screenTop">
+                            <select class="selectName" name="type">
+                                <option value="AZ" th:selected="${type eq 'AZ'}">课程名称</option>
+                                <!--<option value="AL" th:selected="${type eq 'AL'}">课时</option>-->
+                            </select>
+                            <div class="nav-search" id="nav-search">
+                                <form class="form-search">
+                                        <span class="input-icon">
+                                            <input type="text" placeholder="请输入课程名称" class="nav-search-input"
+                                                   name="searhname" th:value="${searhname}"
+                                                   id="nav-search-input" autocomplete="off">
+                                            <i class="ace-icon fa fa-search nav-search-icon"></i>
+                                        </span>
+                                </form>
+                            </div>
+                            <div class="form-group" style="display: inline;">
+                                <button type="button" th:onclick="'javascript:getOrgansListPage(\'\')'">搜索</button>
+                            </div>
+                        </div>
+                        <div id="control-position" class="control-position">
+                            <div class="control-group">
+                                <label class="control-label">课程类别</label>
+                                <input  th:attr ="checked=${typeId == '0'?true:false}"
+                                        name="typeId" type="radio" th:value="0" class="ace"
+                                        th:onclick="'javascript:getOrgansListPage(\'\')'">
+                                <span class="lbl" th:text="全部"></span>
+                                <div class="checkbox" th:each="types:${coursetypelist}">
+                                    <label>
+                                        <input th:attr ="checked=${typeId == types.id?true:false}"
+                                               name="typeId" type="radio" th:value="${types.id}" class="ace"
+                                               th:onclick="'javascript:getOrgansListPage(\'\')'">
+                                        <span class="lbl" th:text="${types.courseTypeName}"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">授课模式</label>
+                                <input  th:attr ="checked=${courtype == '-1'?true:false}"
+                                        name="courtype" type="radio" th:value="-1" class="ace"
+                                        th:onclick="'javascript:getOrgansListPage(\'\')'">
+                                <span class="lbl" th:text="全部"></span>
+                                <div class="checkbox"><label>
+                                    <input  th:attr ="checked=${courtype == '0'?true:false}"
+                                            name="courtype" type="radio" th:value="0" class="ace"
+                                            th:onclick="'javascript:getOrgansListPage(\'\')'">
+                                    <span class="lbl" th:text="班课"></span>
+                                </label></div>
+                                <div class="checkbox"><label>
+                                    <input  th:attr ="checked=${courtype == '1'?true:false}"
+                                            name="courtype" type="radio" th:value="1" class="ace"
+                                            th:onclick="'javascript:getOrgansListPage(\'\')'">
+                                    <span class="lbl" th:text="一对一"></span>
+                                </label></div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">校区</label>
+                                <input  th:attr ="checked=${organId == '0'?true:false}"
+                                        name="organId" type="radio" th:value="0" class="ace"
+                                        th:onclick="'javascript:getOrgansListPage(\'\')'">
+                                <span class="lbl" th:text="全部"></span>
+                                <div class="checkbox" th:each="orgs:${organsList}">
+                                    <label>
+                                        <input th:attr ="checked=${organId == orgs.id?true:false}"
+                                               name="organId" type="radio" th:value="${orgs.id}" class="ace"
+                                               th:onclick="'javascript:getOrgansListPage(\'\')'">
+                                        <span class="lbl" th:text="${orgs.organName}"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="orderCon">
+                                <!--<div class="export">
+                                    <button type="button" class="btn btn-primary">批量下载</button>
+                                    <button type="button" class="btn btn-primary">批量删除</button>
+                                </div>-->
+                                <div class="result">
+                                    当前结果：共计<span th:text="${prelist.getTotalElements()}"></span>个课程，<span th:text="${xbcstatesize}"></span>个课程正在开课/班
+                                </div>
+                                <div class="orderTable">
+                                    <table  class="table table-hover">
+                                        <tr>
+                                            <th>
+                                                <input type="checkbox" id="sel_1" onchange="selectAll()">
+                                            </th>
+                                            <th>
+                                                序号
+                                            </th>
+                                            <th>课程名称
+                                                <div class="sort">
+                                                    <span class="glyphicon glyphicon-triangle-top"></span>
+                                                    <span class="glyphicon glyphicon-triangle-bottom"></span>
+                                                </div>
+                                            </th>
+                                            <th>课程类别</th>
+                                            <th>授课模式</th>
+                                            <!--<th>开班数</th>-->
+                                            <th>收费模式</th>
+                                            <th>开课校区</th>
+                                            <th>课时</th>
+                                            <th>金额</th>
+                                            <th>创建日期</th>
+                                            <th>课程状态</th>
+                                            <div class="sort">
+                                                <span class="glyphicon glyphicon-triangle-top"></span>
+                                                <span class="glyphicon glyphicon-triangle-bottom"></span>
+                                            </div>
+                                            </th>
+                                            <th>操作</th>
+                                            <th>
+                                                <span href="#modal-table"  data-toggle="modal" class="glyphicon glyphicon-option-vertical" aria-hidden="true"></span>
+                                            </th>
+                                        </tr>
+                                        <tbody id="courseList_tbodyid">
+                                        <th:block th:if="${prelist.content}" th:fragment="courselist">
+                                            <tr id="choose" class="choose" th:each="obj,iterStat:${prelist.content}" th:if="${prelist.content} != null">
+                                                <td><input type="checkbox"></td>
+                                                <input th:id="${obj.id}" type="hidden" >
+                                                <td th:text="${iterStat.count}+${prelist.getNumber()}*10"></td>
+                                                <td th:text="${obj.xbCourse.courseName}"></td>
+                                                <td th:text="${obj.xbCourse.xbcoursetype.courseTypeName}"></td>
+                                                <td th:switch="${obj.xbCourse.type}">
+                                                    <span th:case="0">班课</span>
+                                                    <span th:case="1">一对一</span>
+                                                </td>
+                                               <!-- <td th:text="10">开班数</td>-->
+                                                <td th:switch="${obj.xbCourse.chargingMode}">
+                                                    <span th:case="0">按课时</span>
+                                                    <span th:case="1">按时间</span>
+                                                    <span th:case="2">按期</span>
+                                                </td>
+                                                <td th:text="${obj.sysorgans.organName}">开课校区</td>
+                                                <td th:text="${obj.periodNum}">课时</td>
+                                                <td th:switch="${obj.xbCourse.chargingMode}">
+                                                    <span th:case="0" th:text="${#numbers.formatDecimal(obj.money, 1, 2)}+'/课时'"></span>
+                                                    <span th:case="2" th:text="${#numbers.formatDecimal(obj.money, 1, 2)}+'/期'"></span>
+                                                </td>
+
+                                                <td th:text="${obj.xbCourse.createDate}">创建日期</td>
+                                                <td th:switch="${obj.xbCourse.state}">
+                                                    <span th:case="0">开课中</span>
+                                                    <span th:case="1">停课中</span>
+                                                </td>
+                                                <td>
+                                                    <div class="btn-group">
+                                                        <p data-toggle="dropdown" class="down" aria-expanded="false">
+                                                            操作
+                                                            <span class="ace-icon fa fa-caret-down icon-on-right"></span>
+                                                        </p>
+                                                        <ul class="dropdown-menu dropdown-default">
+                                                            <li th:switch="${obj.xbCourse.state}">
+                                                                <a th:case="1" style="cursor:pointer" th:onclick="|kaiketingke('${obj.xbCourse.id}','0')|">开课</a>
+                                                                <a th:case="0" style="cursor:pointer" th:onclick="|kaiketingke('${obj.xbCourse.id}','1')|">停课</a>
+                                                            </li>
+                                                            <li th:if="${obj.xbCourse.state} eq '0'">
+                                                                <a th:href="@{/jwcentercourse/goaddcourse(type=update,courseId=${obj.xbCourse.id},presetid=${obj.id})}"  >编辑</a>
+                                                            </li>
+                                                            <li th:if="${obj.xbCourse.state} eq '0'">
+                                                                <a th:href="@{/jwcentercourse/goaddcourse(type=add,courseId=${obj.xbCourse.id},presetid=${obj.id})}"  >新增定价标准</a>
+                                                            </li>
+                                                            <li>
+                                                                <a style="cursor:pointer" th:onclick="|sourceRemove('${obj.id}','${prelist.getNumber()}')|">删除</a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </td>
+                                                <td></td>
+                                            </tr>
+                                        </th:block>
+                                        </tbody>
+                                    </table>
+                                    <div class="orderPage">
+                                        <div class="page">
+                                            单页显示：
+                                            <select id="size" name="size" onchange="getOrgansListPage('')">
+                                                <option value="5">5条/页</option>
+                                                <option value="20">20条/页</option>
+                                                <option value="10">10条/页</option>
+                                                <option value="15">15条/页</option>
+                                            </select>
+                                            <input type="hidden" id="prelistsize" th:value="${prelistsize}"/>
+                                        </div>
+                                        <!--<ul class="pagination" th:if="${prelist.getTotalPages() gt 0}" >
+                                            <li class="disabled">
+                                                <a href="#" th:onclick="'javascript:getOrgansListPage(\''+0+'\')'">首页</a>
+                                            </li>
+                                            <li class="disabled" th:if="${prelist.getNumber()-1} ge 0">
+                                                <a href="#" th:onclick="'javascript:getOrgansListPage(\''+${prelist.getNumber()-1}+'\')'">
+                                                    <i class="ace-icon fa fa-angle-double-left"></i>
+                                                </a>
+                                            </li>
+                                            <li th:class="${i} eq ${prelist.getNumber()+1}?'active':''" th:each="i:${#numbers.sequence(1,prelist.getTotalPages())}">
+                                                <a  th:onclick="'javascript:getOrgansListPage(\''+${i}+'\')'" th:text="${i}"></a>
+                                            </li>
+                                            <li th:if="${prelist.getTotalPages()} ge ${prelist.getNumber()+2} ">
+                                                <a href="#" th:onclick="'javascript:getOrgansListPage(\''+${prelist.getNumber()+2}+'\')'">
+                                                    <i class="ace-icon fa fa-angle-double-right"></i>
+                                                </a>
+                                            </li>
+                                        </ul>-->
+                                        <ul class="pagination" th:if="${prelist.getTotalPages()>0}">
+                                            <!-- 上一页 -->
+                                            <li th:if="${prelist.getNumber()+1 == 1}"><span>上一页</span></li>
+                                            <li th:if="${prelist.getNumber()+1 > 1}">
+                                                <a  th:onclick="'javascript:getOrgansListPage(\''+${prelist.getNumber()-1}+'\')'">
+                                                    <i class="ace-icon fa ">上一页</i>
+                                                </a>
+                                            </li>
+                                            <!-- 首页 -->
+                                            <li th:if="${prelist.getNumber()+1 == 1}" class="active"><span>1</span></li>
+                                            <li th:if="${prelist.getNumber()+1 > 1}">
+                                                <a  th:onclick="'javascript:getOrgansListPage(\''+${0}+'\')'">1</a>
+                                            </li>
+
+                                            <th:block th:if="${prelist.getTotalPages()>2 && prelist.getTotalPages()<=10}">
+                                                <th:block th:each="i:${#numbers.sequence(2,prelist.getTotalPages()-1)}">
+                                                    <li th:if="${prelist.getNumber()+1 == i}"  class="active"><span th:text="${i}">页码</span></li>
+                                                    <li th:if="${prelist.getNumber()+1 != i}"><a  th:onclick="'javascript:getOrgansListPage(\''+${i-1}+'\')'" th:text="${i}"></a></li>
+                                                </th:block>
+                                            </th:block>
+                                            <th:block th:if="${prelist.getTotalPages() > 10}">
+                                                <th:block th:if="${(prelist.getNumber()+1-(5/2)) <= 2}" th:each="i:${#numbers.sequence(2,2+5-1)}">
+                                                    <li th:if="${prelist.getNumber()+1 == i}"  class="active"><span th:text="${i}">页码</span></li>
+                                                    <li th:if="${prelist.getNumber()+1 != i}"><a  th:onclick="'javascript:getOrgansListPage(\''+${i-1}+'\')'" th:text="${i}"></a></li>
+                                                </th:block>
+                                                <!-- ... -->
+                                                <li th:if="${(prelist.getNumber()+1-(5/2))>2}"><span>...</span></li>
+
+                                                <th:block th:if="${((prelist.getNumber()+1-(5/2))>2) && ((prelist.getNumber()+1+(5/2)-(5%2==0?1:0)) < (prelist.getTotalPages()-1))}"
+                                                          th:each="i:${#numbers.sequence(prelist.getNumber()+1-(5/2),prelist.getNumber()+1+(5/2)-(5%2==0?1:0))}">
+                                                    <li th:if="${prelist.getNumber()+1 == i}"  class="active"><span th:text="${i}">页码</span></li>
+                                                    <li th:if="${prelist.getNumber()+1 != i}"><a  th:onclick="'javascript:getOrgansListPage(\''+${i-1}+'\')'" th:text="${i}"></a></li>
+                                                </th:block>
+
+                                                <!-- ... -->
+                                                <li th:if="${(prelist.getNumber()+1+(5/2)-(5%2==0?1:0)) < (prelist.getTotalPages()-1)}"><span>...</span></li>
+                                                <th:block th:if="${(prelist.getNumber()+1+(5/2)-(5%2==0?1:0)) >= (prelist.getTotalPages()-1)}" th:each="i:${#numbers.sequence(prelist.getTotalPages()-5,prelist.getTotalPages()-1)}">
+                                                    <li th:if="${prelist.getNumber()+1 == i}"  class="active"><span th:text="${i}">页码</span></li>
+                                                    <li th:if="${prelist.getNumber()+1 != i}"><a  th:onclick="'javascript:getOrgansListPage(\''+${i-1}+'\')'" th:text="${i}"></a></li>
+                                                </th:block>
+                                            </th:block>
+                                            <!-- 最后一页 -->
+                                            <li th:if="${prelist.getTotalPages()>1 && prelist.getNumber()+1 == prelist.getTotalPages()}" class="active"><span th:text="${prelist.getTotalPages()}">页码</span></li>
+                                            <li th:if="${prelist.getTotalPages()>1 && prelist.getNumber()+1 != prelist.getTotalPages()}">
+
+                                                <a href="#" th:onclick="'javascript:getOrgansListPage(\''+${prelist.getTotalPages()-1}+'\')'"
+                                                   th:text="${prelist.getTotalPages()}"></a>
+                                            </li>
+                                            <!-- 下一页 -->
+                                            <li th:if="${prelist.getNumber()+1 >= prelist.getTotalPages()}"><span>下一页</span></li>
+                                            <li th:if="${prelist.getNumber()+1 < prelist.getTotalPages()}">
+                                                <a th:onclick="'javascript:getOrgansListPage(\''+${prelist.getNumber()+1}+'\')'">
+                                                    <i class="ace-icon fa ">下一页</i>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <span style="color: #020202;" th:text="'共'+${prelist.getTotalPages()}+'页/'+${prelist.getTotalElements()}+'条记录'"></span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <!-- 课程类别列表 -->
+            <div id="divideList" class="tab-pane fade student course">
+                <div class="screen" style="height:84px;">
+                    <a class="stdEnroll" href="#modal-table1"  data-toggle="modal">新建课程类别</a>
+                </div>
+                <div class="orderCon">
+                    <div class="orderTable">
+                        <table id="courseTypeList" class="table table-hover">
+                            <tr>
+                                <th>序号</th>
+                                <th>课程类别</th>
+                                <th>操作</th>
+                            </tr>
+                            <tbody id="coursetype_tbody_id">
+                            <th:block th:if="${coursetypelist}" th:fragment="coursetypefralist">
+                                <tr id="choosetype" class="choose" th:each="ctype,coursta:${coursetypelist}" th:if="${coursetypelist} != null">
+                                    <input type="hidden" th:id="${ctype.id}"/>
+                                    <td th:text="${ctype.layOrder}">序号</td>
+                                    <td th:text="${ctype.courseTypeName}">课程类别</td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <p data-toggle="dropdown" class="down" aria-expanded="false">
+                                                更多
+                                                <span class="ace-icon fa fa-caret-down icon-on-right"></span>
+                                            </p>
+                                            <ul class="dropdown-menu dropdown-default">
+                                                <li>
+                                                    <a  href="#modal-table1" data-toggle="modal"
+                                                        th:onclick="|javascript:sourceEdit('${ctype.id}','${ctype.layOrder}','${ctype.courseTypeName}')|">编辑</a>
+                                                </li>
+                                                <li>
+                                                    <a style="cursor:pointer"  th:onclick="|javascript:sourceTypeRemove('${ctype.id}')|">删除</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </th:block>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- 科目列表 -->
+            <div id="expiryStu" class="tab-pane fade student course">
+                <!-- 学员列表 -->
+                <div>
+                    <div class="screen" style="height:84px;">
+                        <a class="stdEnroll" href="#modal-table2"  data-toggle="modal">新建科目</a>
+                    </div>
+                    <div class="orderCon">
+                        <div class="orderTable">
+                            <table id="subjectList" class="table table-hover">
+                                <tr>
+                                    <th>科目名称</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                                <tbody id="subject_tbody_id">
+                                <th:block th:if="${subjectlist}" th:fragment="subjectfralist">
+                                    <tr id="choose" class="choose" class="choose"  th:each="sub,subStat:${subjectlist}">
+                                        <input type="hidden" th:id="${sub.id}"/>
+                                        <td th:text="${sub.subjectName}">科目名称</td>
+                                        <td th:switch="${sub.state}">
+                                            <span th:case="'0'">正常</span>
+                                            <span th:case="'1'">停用</span>
+                                        <td>
+                                            <div class="btn-group">
+                                                <p data-toggle="dropdown" class="down" aria-expanded="false">
+                                                    更多
+                                                    <span class="ace-icon fa fa-caret-down icon-on-right"></span>
+                                                </p>
+                                                <ul class="dropdown-menu dropdown-default">
+                                                    <li>
+                                                        <a href="#modal-table2"  data-toggle="modal" th:onclick="|javascript:subjectEdit('${sub.id}','${sub.subjectName}','${sub.state}')|">编辑</a>
+                                                    </li>
+                                                    <li>
+                                                        <a  th:onclick="|javascript:subjectRemove('${sub.id}')|">删除</a>
+                                                    </li>
+                                                    <!--<li>
+                                                        <a href="">停用</a>
+                                                    </li>-->
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </th:block>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 加载样式 -->
+    <!--<div id="jiazaiyanshi" style="width:200px; height:200px; position: fixed; top:50%; left:50%; margin-top:-100px; margin-left:-100px;">
+
+    </div>-->
+
+    <!-- 自定义选项弹窗 -->
+    <div id="modal-table" class="modal fade in" tabindex="-1" aria-hidden="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header no-padding">
+                    <div class="table-header">自定义选项</div>
+                </div>
+                <div class="modal-body no-padding">
+                    <div class="checkAll">
+                        <input type="checkbox" id="sel_2" onchange="selectAll()">全选
+                    </div>
+                    <div class="checkList">
+                        <span><input type="checkbox">渠道</span>
+                        <span><input type="checkbox">欠费</span>
+                        <span><input type="checkbox">积分</span>
+                        <span><input type="checkbox">微信号</span>
+                        <span><input type="checkbox">生日</span>
+                        <span><input type="checkbox">年龄</span>
+                        <span><input type="checkbox">公立学校</span>
+                        <span><input type="checkbox">公立校班级</span>
+                        <span><input type="checkbox">居住区域</span>
+                        <span><input type="checkbox">其他信息</span>
+                        <span><input type="checkbox">课程状态</span>
+                        <span><input type="checkbox">上课校区</span>
+                        <span><input type="checkbox">课时有校区</span>
+                    </div>
+                </div>
+
+
+                <div class="modal-footer no-margin-top">
+                    <button class="btn pull-left" data-dismiss="modal">
+                        取消
+                    </button>
+                    <button class="btn pull-right" data-dismiss="modal">
+                        确定
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 新建课程类别 -->
+    <div id="modal-table1" class="modal fade in" tabindex="-1" aria-hidden="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header no-padding">
+                    <div id="courtype_new" class="table-header">新建课程类别</div>
+                </div>
+                <form id="courstypeform">
+                    <div class="modal-body" style="padding:15px !important">
+                        <input id="courTypeId" name="id" type="hidden" value=""/>
+                        <div class="form-group" style="display: inline;">
+                            <label for="courseTypeLayOrder">序号</label>
+                            <input id="layOrder" name="layOrder" type="text" value="" placeholder="请输入序号">
+                            <input id="layOrder_bak" name="layOrder_bak" type="hidden" value="" placeholder="请输入序号">
+                        </div>
+                        <div class="form-group" style="display: inline; margin-left:20px;">
+                            <label for="courseTypeName">类别名称</label>
+                            <input id="courseTypeName" name="courseTypeName" type="text" placeholder="请输入课程类别">
+                        </div>
+                    </div>
+                </form>
+                <div class="modal-footer no-margin-top">
+                    <button id="courseType_cancel" class="btn pull-left" data-dismiss="modal">
+                        取消
+                    </button>
+                    <button class="btn pull-right"  onclick="saveCoruseType()" type="button">
+                        确定
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 新建科目 -->
+    <div id="modal-table2" class="modal fade in" tabindex="-1" aria-hidden="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header no-padding">
+                    <div class="table-header">新建科目</div>
+                </div>
+                <div class="modal-body" style="padding:15px !important">
+                    <input id="subjectId" type="hidden" value=""/>
+                    <div class="form-group" style="display: inline; margin-left:20px;">
+                        <label for="xbSubjectName">科目名称</label>
+                        <input id="xbSubjectName" type="text" placeholder="请填写科目名称">
+                    </div>
+                </div>
+                <div class="modal-footer no-margin-top">
+                    <button class="btn pull-left" data-dismiss="modal">
+                        取消
+                    </button>
+                    <button class="btn pull-right" data-dismiss="modal" onclick="saveSubject()">
+                        确定
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--课程函数群-->
+<script type="text/javascript" th:inline="javascript">
+    var basePath = /*[[${#httpServletRequest.getScheme() + "://" + #httpServletRequest.getServerName() + ":" + #httpServletRequest.getServerPort() + #httpServletRequest.getContextPath()}]]*/;
+    $(function(){
+        var a = $("#prelistsize").val();
+        if(a!=5){
+            $("#size").val(a);
+        }
+    });
+    //课程编辑赋值
+    function courseEdit(courseId){
+        var load = new Loading();
+        load.init({
+            target: "#control-position"
+        });
+        load.start();
+        $.ajax({
+            //url: [[@{/jwcentercourse/goaddcourse}]],
+            url: basePath+'/jwcentercourse/goaddcourse',
+            method: 'POST',
+            data: {"courseId":courseId},
+            success: function(data) {
+                load.stop();
+                console.log("回调成功");
+                var status = data.status;
+                var msg = data.msg;
+                if(status=="0"){
+                    $.kd.kdAlert(data.msg,function(){
+                        window.location.href=basePath+"/jwcentercourse/tocourse"
+                    });
+
+                }else{
+                    $.kd.kdMsg(msg);
+                }
+            },
+            error:function(){
+                load.stop();
+                console.log("回调失败")
+            }
+        });
+    }
+    //删除课程
+    function sourceRemove(id,page) {
+        var load = new Loading();
+        load.init({
+            target: "#control-position"
+        });
+        $.kd.kdConfirm("确定要删除该课程?",function(){
+            load.start();
+            $.ajax({
+                url: basePath + '/jwcentercourse/removecourse',
+                type: 'get',
+                contentType: 'application/json',
+                data: {id: id,page:page},
+                async: true,
+                success: function (data) {
+                    load.stop();
+                    console.log("回调成功")
+                    $.kd.kdAlert("删除成功",function(){
+                        $("#courseList_tbodyid").html("");
+                        $("#courseList_tbodyid").append(data);
+                    })
+
+                },
+                error: function () {
+                    load.stop();
+                    console.log("回调失败")
+                }
+            });
+        })
+
+    };
+    //课程上架下架
+    function kaiketingke(id,state) {
+        var msg = "停课";
+        if(state == '0'){
+            msg = "开课";
+        }
+        var load = new Loading();
+        load.init({
+            target: "#control-position"
+        });
+        $.kd.kdConfirm("确定是要"+msg+"吗？",function(){
+            load.start();
+            $.ajax({
+                url: basePath + '/jwcentercourse/statecourse',
+                type: 'get',
+                contentType: 'application/json',
+                data: {id: id,state:state},
+                async: true,
+                success: function (data) {
+                    load.stop();
+                    console.log("回调成功")
+                    $.kd.kdAlert(msg+"成功",function(){
+                        $("#courseList_tbodyid").html("");
+                        $("#courseList_tbodyid").append(data);
+                    });
+                },
+                error: function () {
+                    load.stop();
+                    console.log("回调失败")
+                }
+            });
+        })
+
+    };
+</script>
+<!--课程类别函数群-->
+<script type="text/javascript" th:inline="javascript">
+    //新建课程类别
+    function saveCoruseType(){
+        var load = new Loading();
+        load.init({
+            target: "#control-position"
+        });
+        if ($("#courstypeform").valid()) {
+            load.start();
+            var data= serializeObject("#courstypeform");
+            var courTypeId =  data.id;
+            $.ajax({
+                url: [[@{/jwcentercourse/savecoursetype}]],
+            type: 'post',
+                dataType: 'json',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                async: true,
+                success: function(data) {
+                load.stop();
+                console.log("回调成功")
+                var status = data.status;
+                var msg = data.msg;
+                if(status=="0"){
+                    var id = data.cousrtype.id;
+                    var courseTypeName = data.cousrtype.courseTypeName;
+                    var layOrder = data.cousrtype.layOrder;
+                    if(courTypeId==""){
+                        var html = [];
+                        html.push('<tr id="choose" class="choose" >');
+                        html.push('<input type="hidden" id="'+id+'"/>');
+                        html.push('     <td>'+layOrder+'</td>');
+                        html.push('     <td >'+courseTypeName+'</td>');
+                        html.push('     <td><div class="btn-group"><p data-toggle="dropdown" class="down" aria-expanded="false">更多<span class="ace-icon fa fa-caret-down icon-on-right"></span></p><ul class="dropdown-menu dropdown-default"><li><a href="#modal-table1"  data-toggle="modal" onclick="javascript:sourceEdit(\''+id+'\',\''+layOrder+'\',\''+courseTypeName+'\')">编辑</a></li><li><a onclick="javascript:sourceTypeRemove(\''+id+'\')">删除</a></li></ul></div></td>');
+                        html.push('</tr>');
+                        $("#courseTypeList").append(html.join(""))
+                        $.kd.kdAlert(msg);
+
+                    }else{
+                        $("#"+courTypeId).parent().remove();
+                        var html = [];
+                        html.push('<tr id="choose" class="choose" >');
+                        html.push('<input type="hidden" id="'+id+'"/>');
+                        html.push('     <td>'+layOrder+'</td>');
+                        html.push('     <td >'+courseTypeName+'</td>');
+                        html.push('     <td><div class="btn-group"><p data-toggle="dropdown" class="down" aria-expanded="false">更多<span class="ace-icon fa fa-caret-down icon-on-right"></span></p><ul class="dropdown-menu dropdown-default"><li><a href="#modal-table1"  data-toggle="modal" onclick="javascript:sourceEdit(\''+id+'\',\''+layOrder+'\',\''+courseTypeName+'\')">编辑</a></li><li><a  onclick="javascript:sourceTypeRemove(\''+id+'\')">删除</a></li></ul></div></td>');
+                        html.push('</tr>');
+                        $("#courseTypeList").append(html.join(""))
+                        $.kd.kdAlert("更新类别成功");
+                    }
+                }else{
+                    $.kd.kdAlert(msg);
+                }
+                $('#modal-table1').modal('hide')
+            },
+            error:function(){
+                load.stop();
+                console.log("回调失败")
+            }
+        });
+        }else {
+            console.log("验证失败")
+        }
+    };
+    //课程类别编辑赋值
+    function sourceEdit(id,layOrder,courseTypeName){
+        $("#courtype_new").text("编辑课程类别");
+        $("#courTypeId").val(id);
+        $("#layOrder").val(layOrder);
+        $("#layOrder_bak").val(layOrder);
+        $("#courseTypeName").val(courseTypeName);
+    }
+    //删除课程类别
+    function sourceTypeRemove(id){
+        var load = new Loading();
+        load.init({
+            target: "#control-position"
+        });
+        $.kd.kdConfirm("确定要删除该课程类别?",function(){
+            load.start();
+            $.ajax({
+                url: basePath + '/jwcentercourse/removecoursetype',
+                type: 'get',
+                contentType: 'application/json',
+                data: {id: id},
+                async: true,
+                success: function (data) {
+                    load.stop();
+                    console.log("回调成功")
+                    $.kd.kdAlert("删除类别成功");
+                    $("#coursetype_tbody_id").html("");
+                    $("#coursetype_tbody_id").append(data);
+                },
+                error: function () {
+                    load.stop();
+                    console.log("回调失败")
+                }
+            });
+        })
+    }
+
+</script>
+<!--科目函数群-->
+<script type="text/javascript" th:inline="javascript">
+    //新建科目
+    function saveSubject(){
+        var load = new Loading();
+        load.init({
+            target: "#control-position"
+        });
+        load.start();
+        var xbSubjectName =  $("#xbSubjectName").val();
+        var subjectId =  $("#subjectId").val();
+        $.ajax({
+            url: [[@{/jwcentercourse/savesubject}]],
+        type: 'post',
+            dataType: 'json',
+            contentType: 'application/json',
+            data: JSON.stringify({id:subjectId,subjectName:xbSubjectName}),
+            async: true,
+            success: function(data) {
+            console.log("回调成功")
+            var status = data.status;
+            var msg = data.msg;
+            if(status=="0"){
+                load.stop();
+                var id = data.cousrtype.id;
+                var subjectName = data.cousrtype.subjectName;
+                var state = data.cousrtype.state;
+                var html = [];
+                if(subjectId==""){
+                    html.push('<tr id="choose" class="choose"  >');
+                    html.push('<input type="hidden" id="'+id+'"/>');
+                    html.push(' <td >'+subjectName+'</td>');
+                    html.push('<td>');
+                    html.push('     <span>正常</span>');
+                    html.push('<td>');
+                    html.push('<div class="btn-group">');
+                    html.push('     <p data-toggle="dropdown" class="down" aria-expanded="false">更多');
+                    html.push('          <span class="ace-icon fa fa-caret-down icon-on-right"></span>');
+                    html.push('     </p>');
+                    html.push('<ul class="dropdown-menu dropdown-default">');
+                    html.push(' <li>');
+                    html.push('     <a href="#modal-table2"  data-toggle="modal" onclick="javascript:subjectEdit(\''+id+'\',\''+subjectName+'\',\''+state+'\')">编辑</a>');
+                    html.push('</li>');
+                    html.push('<li>');
+                    html.push('     <a onclick="javascript:subjectRemove(\''+id+'\')">删除</a>');
+                    html.push('</li>');
+                    html.push('</ul>');
+                    html.push('</div>');
+                    html.push('</td>');
+                    html.push('</tr>');
+                    $("#subjectList").append(html.join(""));
+                    $.kd.kdAlert(msg);
+                }else{
+                    $("#"+subjectId).parent().remove();
+                    html.push('<tr id="choose" class="choose"   >');
+                    html.push('<input type="hidden" id="'+id+'"/>');
+                    html.push(' <td >'+subjectName+'</td>');
+                    html.push('<td>');
+                    html.push('     <span>正常</span>');
+                    html.push('<td>');
+                    html.push('<div class="btn-group">');
+                    html.push('<p data-toggle="dropdown" class="down" aria-expanded="false">更多');
+                    html.push('<span class="ace-icon fa fa-caret-down icon-on-right"></span>');
+                    html.push('</p>');
+                    html.push('<ul class="dropdown-menu dropdown-default">');
+                    html.push(' <li>');
+                    html.push('     <a href="#modal-table2"  data-toggle="modal" onclick="javascript:subjectEdit(\''+id+'\',\''+subjectName+'\',\''+state+'\')">编辑</a>');
+                    html.push('</li>');
+                    html.push('<li>');
+                    html.push('     <a onclick="javascript:subjectRemove(\''+id+'\')">删除</a>');
+                    html.push('</li>');
+                    html.push('</ul>');
+                    html.push('</div>');
+                    html.push('</td>');
+                    html.push('</tr>');
+                    $("#subjectList").append(html.join(""));
+                    $("#subjectId").val("");
+                    $("#xbSubjectName").val("");
+                    $.kd.kdAlert("更新类别成功");
+                }
+            }else{
+                load.stop();
+                $.kd.kdAlert(msg);
+            }
+        },
+        error:function(){
+            load.stop();
+            console.log("回调失败")
+        }
+    });
+    };
+    //科目编辑赋值
+    function subjectEdit(id,xbSubjectName,state){
+        $("#subjectId").val(id);
+        $("#xbSubjectName").val(xbSubjectName);
+        /*if(state=="0"){
+            $("#xbSubjectState").val("正常");
+        }else{
+            $("#xbSubjectState").val("停用");
+        }*/
+
+    }
+    //删除科目
+    function subjectRemove(id){
+        var load = new Loading();
+        load.init({
+            target: "#control-position"
+        });
+        $.kd.kdConfirm("确定要删除该科目?",function(){
+            load.start();
+            $.ajax({
+                url: basePath + '/jwcentercourse/removesubject',
+                type: 'get',
+                contentType: 'application/json',
+                data: {id: id},
+                async: true,
+                success: function (data) {
+                    load.stop();
+                    console.log("删除科目回调成功");
+                    $.kd.kdAlert("删除科目成功")
+                    $("#subject_tbody_id").html("");
+                    $("#subject_tbody_id").append(data);
+                },
+                error: function () {
+                    load.stop();
+                    console.log("删除科目回调失败")
+                }
+            });
+        });
+    }
+</script>
+<!--动态样式函数群-->
+<script>
+    $(function(){
+        laydate.render({elem: '#demo'});//绑定元素
+        $(".btn-down").click(function(){
+            $(this).siblings(".dropdown-menu").toggle();
+        });
+        $(".tag .close").click(function(){
+            $(this).parent(".tag").hide();
+        });
+        function selectAll(){
+            var isCheck=$("#sel_1").is(':checked');  //获得全选复选框是否选中
+            $(".choose input[type='checkbox']").each(function() {
+                this.checked = isCheck;       //循环赋值给每个复选框是否选中
+            });
+
+            var isCheck=$("#sel_2").is(':checked');  //获得全选复选框是否选中
+            $(".checkList input[type='checkbox']").each(function() {
+                this.checked = isCheck;       //循环赋值给每个复选框是否选中
+            });
+        };
+        studentlistShow();
+        $(".studentList").click(function () {
+            studentlistShow();
+        });
+
+        $(".divideList").click(function () {
+            dividelistShow();
+        });
+
+        $(".expiryStu").click(function () {
+            expiryStulistShow();
+        });
+        //getOrgansListPage('');
+    });
+    function studentlistShow(){
+        $("#studentList").show();
+        $("#divideList").hide();
+        $("#expiryStu").hide();
+    }
+    function dividelistShow(){
+        $("#divideList").show();
+        $("#studentList").hide();
+        $("#expiryStu").hide();
+    }
+    function expiryStulistShow(){
+        $("#expiryStu").show();
+        $("#divideList").hide();
+        $("#studentList").hide();
+    }
+</script>
+<!--工具函数群-->
+<script type="text/javascript" th:inline="javascript">
+    //搜索
+    function getOrgansListPage(page){
+        var load = new Loading();
+        load.init({
+            target: "#main-container"
+        });
+        load.start();
+        var data= serializeObject("#searchform");
+        var size = $('#size option:selected').val();//选中的值
+        /*if(page){
+            page = page -1;
+        }*/
+        if(size){
+            size = "10";
+        }
+        window.location.href = basePath + '/jwcentercourse/tocourse?page='+page+'&size='+size+'&data='+JSON.stringify(data);
+    }
+    function serializeObject(form){
+        var o = {};
+        var a = $(form).serializeArray();
+        $.each(a, function() {
+            if (o[this.name]) {
+                if (!o[this.name].push) {
+                    o[this.name] = [o[this.name]];
+                }
+                o[this.name].push(this.value || '');
+            } else {
+                o[this.name] = this.value || '';
+            }
+        });
+        return o;
+    };
+</script>
+</body>
+</html>
+<style>
+    a{cursor:pointer}
+</style>

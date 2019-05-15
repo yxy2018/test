@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    
+    <link rel="stylesheet" href="../static/pages/css/ace.min.css" id="main-ace-style" />
+    <link rel="stylesheet" href="../static/pages/css/index.css">
+    <link rel="stylesheet" href="../static/pages/css/management.css">
+    <link rel="stylesheet" href="../static/pages/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../static/pages/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="../static/pages/css/kd.ui.plugin.css" />
+    <link rel="stylesheet" href="../static/pages/css/loading.css" />
+
+    <script src="../static/pages/js/jquery.min.js"></script>
+    <script src="../static/pages/js/bootstrap.min.js"> </script>
+    <script src="../static/pages/js/ace.min.js"> </script>
+    <script src="../static/pages/js/ace-elements.min.js"></script>
+    <script src="../static/pages/laydate/laydate.js"></script>
+    <script src="../static/pages/js/kd.ui.plugin.js"></script>
+    <script src="../static/pages/js/loading.js"></script>
+
+</head>
+<body>
+<div th:replace="layout::top"></div>
+<div class="main-container" id="main-container">
+    <div th:replace="layout::left('12','')">
+    </div>
+    <div class="main-content" id="main-content" th:if="${session.roleName!='教师'&&session.roleName!='运营助理'}">
+        <div class="breadcrumbs" id="breadcrumbs">
+            <img src="../static/pages/img/line1.png">
+            <span>办理中心</span>
+            <img src="../static/pages/img/line.png">
+        </div> 
+        <div class="managementIcon">
+            <ul>
+                <li>
+                    <a href="/student/getStudent">
+                        <span><img src="../static/pages/img/bf.png"></span>
+                        <p>报名/续费</p>
+                    </a>
+                </li>
+                <li >
+                    <a href="/feeRelated/changeClass" th:if="${session.roleName!='前台助理'}">
+                        <span><img src="../static/pages/img/fk.png"></span>
+                        <p>转班</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="/feeRelated/subsidy">
+                        <span><img src="../static/pages/img/bf.png"></span>
+                        <p>补费</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="/feeRelated/stopClass">
+                        <span><img src="../static/pages/img/tk.png"></span>
+                        <p>停课</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="/feeRelated/repeatClass">
+                        <span><img src="../static/pages/img/bf.png"></span>
+                        <p>复课</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="/feeRelated/cancelClass">
+                        <span><img src="../static/pages/img/fk.png"></span>
+                        <p>退费</p>
+                    </a>
+                </li>
+            </ul>
+        </div> 
+        <div class="screen">
+            <div class="screenTop">
+                <select class="selectName">
+                    <option value="AZ">学员姓名</option>
+                    <!--<option value="AL">订单号</option>-->
+                    <!--<option value="AK">学院名称</option>-->
+                </select>
+                <div class="nav-search" id="nav-search">
+                    <form class="form-search">
+                        <span class="input-icon">
+                            <input type="text" placeholder="请输入姓名" class="nav-search-input" id="userName">
+                            <i class="ace-icon fa fa-search nav-search-icon"></i>
+                        </span>
+                    </form>
+                </div>
+                <div class="form-group" style="display: inline;">
+                    <button type="button" th:onclick="'javascript:getFeeListPage(\'\')'">搜索</button>
+                </div>
+            </div>
+        </div>
+        <div class="orderCon">
+            <!--<div class="export">
+                <button type="button" class="btn btn-primary">导出当前结果</button>
+            </div> -->
+            <div class="result">
+                <!--当前结果：总计<span th:text="${XbSupplementFeePage.getTotalElements()}"></span>条记录，应收款项总计：<span>111</span>元，实收总计：<span>111</span>元 |  欠费总计：<span>111</span>元-->
+            </div>
+            <div class="orderTable">
+                <table class="table table-hover">
+                    <tr>
+                        <!--<th>订单号</th>-->
+                        <th>学员姓名</th>
+                        <th>订单类型</th>
+                        <th>交易内容</th>
+                        <th>应收</th>
+                        <th>实收</th>
+                        <th>报名费</th>
+                        <th>学员账户</th>
+                        <th>欠费</th>
+                        <th>运营助理</th>
+                        <th>经办人</th>
+                        <th>经办校区</th>
+                        <th>日期</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                      </tr>
+                      <tr th:each="ment:${XbSupplementFeePage.content}">
+                        <!--<td>11180</td>-->
+                        <td th:text="${ment.xbStudent.studentName}"></td>
+                        <td th:if="${ment.type} eq '0'">报名</td>
+                        <td th:if="${ment.type} eq '1'">转班</td>
+                        <td th:if="${ment.type} eq '2'">补费</td>
+                        <td th:if="${ment.type} eq '3'">停课</td>
+                        <td th:if="${ment.type} eq ''">报名</td>
+                        <td th:if="${ment.type} eq '4'">复课</td>
+                        <td th:if="${ment.type} eq '5'">退费</td>
+                        <td th:text="${ment.remarks}" class="orderTxt"></td>
+                        <td th:text="${ment.surplusMoney}"></td>
+                        <td th:text="${ment.paymentMoney}"></td>
+                        <td th:text="${ment.registratioFee}"></td>
+                        <td th:text="${ment.xbStudent.surplusMoney}"></td>
+                        <td th:text="${ment.xbStudent.paymentMoney}"></td>
+                        <td th:text="${ment.operationAssistant}"></td>
+                        <td th:text="${ment.handlePerson}"></td>
+                        <td th:text="${ment.xbStudent.sysOrgans.organName}"></td>
+                        <td th:text="${#dates.format(ment.paymentDate, 'yyyy-MM-dd')}"></td>
+                        <td><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span></td>
+                        <td>
+                            <div class="btn-group open" >
+                                <a  class="down"  href="#modal-table" data-toggle="modal"
+                                    th:onclick="|editManage('${ment.id}','${ment.registratioFee}','${ment.paymentMoney}','${ment.xbStudent.studentName}')|"
+                                    style="border: solid 1px;border-radius: 10px;width: 77px;color: #f0f1f3;
+                                               background: #8d05e0;height: 26px;font-weight: 900;margin-bottom: 2px;">
+                                    编辑
+                                </a>
+                            </div>
+                        </td>
+                      </tr>
+                </table>
+                <div class="orderPage">
+                    <div class="page">
+                        单页显示：
+                        <select id="size" name="size" onchange="getFeeListPage('');">
+                            <option th:selected="${feecurrentzise eq 20}" value="20">20条/页</option>
+                            <option th:selected="${feecurrentzise eq 5}" value="5">5条/页</option>
+                            <option th:selected="${feecurrentzise eq 10}" value="10">10条/页</option>
+                            <option th:selected="${feecurrentzise eq 15}" value="15">15条/页</option>
+                        </select>
+                    </div>
+                    <ul class="pagination" th:if="${XbSupplementFeePage.getTotalPages()>0}">
+                        <!-- 上一页 -->
+                        <li th:if="${XbSupplementFeePage.getNumber()+1 == 1}"><span>上一页</span></li>
+                        <li th:if="${XbSupplementFeePage.getNumber()+1 > 1}">
+                            <a  th:onclick="'javascript:getFeeListPage(\''+${XbSupplementFeePage.getNumber()-1}+'\')'">
+                                <i class="ace-icon fa ">上一页</i>
+                            </a>
+                        </li>
+                        <!-- 首页 -->
+                        <li th:if="${XbSupplementFeePage.getNumber()+1 == 1}" class="active"><span>1</span></li>
+                        <li th:if="${XbSupplementFeePage.getNumber()+1 > 1}">
+                            <a  th:onclick="'javascript:getFeeListPage(\''+${0}+'\')'">1</a>
+                        </li>
+
+                        <th:block th:if="${XbSupplementFeePage.getTotalPages()>2 && XbSupplementFeePage.getTotalPages()<=10}">
+                            <th:block th:each="i:${#numbers.sequence(2,XbSupplementFeePage.getTotalPages()-1)}">
+                                <li th:if="${XbSupplementFeePage.getNumber()+1 == i}"  class="active"><span th:text="${i}">页码</span></li>
+                                <li th:if="${XbSupplementFeePage.getNumber()+1 != i}"><a  th:onclick="'javascript:getFeeListPage(\''+${i-1}+'\')'" th:text="${i}"></a></li>
+                            </th:block>
+                        </th:block>
+                        <th:block th:if="${XbSupplementFeePage.getTotalPages() > 10}">
+                            <th:block th:if="${(XbSupplementFeePage.getNumber()+1-(5/2)) <= 2}" th:each="i:${#numbers.sequence(2,2+5-1)}">
+                                <li th:if="${XbSupplementFeePage.getNumber()+1 == i}"  class="active"><span th:text="${i}">页码</span></li>
+                                <li th:if="${XbSupplementFeePage.getNumber()+1 != i}"><a  th:onclick="'javascript:getFeeListPage(\''+${i-1}+'\')'" th:text="${i}"></a></li>
+                            </th:block>
+                            <!-- ... -->
+                            <li th:if="${(XbSupplementFeePage.getNumber()+1-(5/2))>2}"><span>...</span></li>
+
+                            <th:block th:if="${((XbSupplementFeePage.getNumber()+1-(5/2))>2) && ((XbSupplementFeePage.getNumber()+1+(5/2)-(5%2==0?1:0)) < (XbSupplementFeePage.getTotalPages()-1))}"
+                                      th:each="i:${#numbers.sequence(XbSupplementFeePage.getNumber()+1-(5/2),XbSupplementFeePage.getNumber()+1+(5/2)-(5%2==0?1:0))}">
+                                <li th:if="${XbSupplementFeePage.getNumber()+1 == i}"  class="active"><span th:text="${i}">页码</span></li>
+                                <li th:if="${XbSupplementFeePage.getNumber()+1 != i}"><a  th:onclick="'javascript:getFeeListPage(\''+${i-1}+'\')'" th:text="${i}"></a></li>
+                            </th:block>
+
+                            <!-- ... -->
+                            <li th:if="${(XbSupplementFeePage.getNumber()+1+(5/2)-(5%2==0?1:0)) < (XbSupplementFeePage.getTotalPages()-1)}"><span>...</span></li>
+                            <th:block th:if="${(XbSupplementFeePage.getNumber()+1+(5/2)-(5%2==0?1:0)) >= (XbSupplementFeePage.getTotalPages()-1)}" th:each="i:${#numbers.sequence(XbSupplementFeePage.getTotalPages()-5,XbSupplementFeePage.getTotalPages()-1)}">
+                                <li th:if="${XbSupplementFeePage.getNumber()+1 == i}"  class="active"><span th:text="${i}">页码</span></li>
+                                <li th:if="${XbSupplementFeePage.getNumber()+1 != i}"><a  th:onclick="'javascript:getFeeListPage(\''+${i-1}+'\')'" th:text="${i}"></a></li>
+                            </th:block>
+                        </th:block>
+                        <!-- 最后一页 -->
+                        <li th:if="${XbSupplementFeePage.getTotalPages()>1 && XbSupplementFeePage.getNumber()+1 == XbSupplementFeePage.getTotalPages()}" class="active"><span th:text="${XbSupplementFeePage.getTotalPages()}">页码</span></li>
+                        <li th:if="${XbSupplementFeePage.getTotalPages()>1 && XbSupplementFeePage.getNumber()+1 != XbSupplementFeePage.getTotalPages()}">
+
+                            <a href="#" th:onclick="'javascript:getFeeListPage(\''+${XbSupplementFeePage.getTotalPages()-1}+'\')'"
+                               th:text="${XbSupplementFeePage.getTotalPages()}"></a>
+                        </li>
+                        <!-- 下一页 -->
+                        <li th:if="${XbSupplementFeePage.getNumber()+1 >= XbSupplementFeePage.getTotalPages()}"><span>下一页</span></li>
+                        <li th:if="${XbSupplementFeePage.getNumber()+1 < XbSupplementFeePage.getTotalPages()}">
+                            <a th:onclick="'javascript:getFeeListPage(\''+${XbSupplementFeePage.getNumber()+1}+'\')'">
+                                <i class="ace-icon fa ">下一页</i>
+                            </a>
+                        </li>
+                        <li>
+                            <span style="color: #020202;" th:text="'共'+${XbSupplementFeePage.getTotalPages()}+'页/'+${XbSupplementFeePage.getTotalElements()}+'条记录'"></span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+<!-- 修改报名弹窗 -->
+<form id="iformAttendClass"  >
+    <div id="modal-table" class="modal fade in pk" tabindex="-1" aria-hidden="false">
+        <div class="modal-dialog">
+            <div class="modal-content" id="modal-content">
+                <div class="modal-header no-padding">
+                    <div id="newdayattend" class="table-header">修改报名信息</div>
+                </div>
+                <input id="id" name="id" type="hidden" value="" />
+                <div class="modal-body no-padding">
+                    <div id="classl" class="tab-pane fade in active" style="margin-left:10px;">
+                        <div class="grounInline">
+                            <div class="form-group">
+                                <label><i></i>学员姓名</label>
+                                <input id="studentName" name="studentName"  type="text"/>
+                                <input id="feeId" name="feeId"  type="hidden"/>
+                            </div>
+                            <div class="form-group">
+                                <label for="">报名费&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                                <input id="registratioFee" name="registratioFee" type="text">
+                            </div>
+                        </div>
+                        <div class="grounInline">
+                            <div class="form-group">
+                                <label><i></i>学费&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                                <input id="surplusMoney" name="surplusMoney"  type="text"/>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer no-margin-top">
+                            <button class="btn pull-left" data-dismiss="modal">
+                                取消
+                            </button>
+                            <button class="btn pull-right"  onclick="saveSupplementFee()" type="button">
+                                保存
+                            </button>
+                        </div>
+                        </th:block>
+                    </div>
+                </div>
+            </div>
+        </div>
+</form>
+
+<script>
+!function(){
+laydate.render({elem: '#demo'});//绑定元素
+}();
+
+$(".btn-down").click(function(){
+  $(this).siblings(".dropdown-menu").toggle();
+});
+$(".tag .close").click(function(){
+  $(this).parent(".tag").hide();
+});
+
+</script>
+<script type="text/javascript" th:inline="javascript">
+    var basePath = /*[[${#httpServletRequest.getScheme() + "://" + #httpServletRequest.getServerName() + ":" + #httpServletRequest.getServerPort() + #httpServletRequest.getContextPath()}]]*/ ;
+
+    function getFeeListPage(page) {
+        var userName = $("#userName").val();
+        var load = new Loading();
+        load.init({
+            target: "#main-content"
+        });
+        load.start();
+        var size = $('#size option:selected').val(); //选中的值
+        /*if (page) {
+            page = page - 1;
+        }*/
+        window.location.href = basePath + '/student/getManagementList?page=' + page + '&size=' + size+ '&userName=' + userName;
+    }
+
+    function editManage(feeId,registratioFee,surplusMoney,studentName){
+        var studentName = $("#studentName").val(studentName);
+        var surplusMoney = $("#surplusMoney").val(surplusMoney);
+        var registratioFee = $("#registratioFee").val(registratioFee);
+        var feeId = $("#feeId").val(feeId);
+     }
+
+    function saveSupplementFee(){
+        var studentName = $("#studentName").val();
+        var paymentMoney = $("#surplusMoney").val();
+        var registratioFee = $("#registratioFee").val();
+        var feeId = $("#feeId").val();
+        var load = new Loading();
+        load.init({
+            target: "#main-content"
+        });
+        load.start();
+        $.ajax({
+            type: 'get',
+            dataType: 'json',
+            url: basePath + '/student/updateManagement',
+            data: {studentName:studentName,paymentMoney:paymentMoney,registratioFee:registratioFee,feeId:feeId},
+            contentType: "application/json;charset=UTF-8",
+            cache: false,
+            async: true,
+            success: function (data) {
+                load.stop();
+                var status = data.status;
+                var msg = data.msg;
+                $.kd.kdAlert("编辑成功！",function () {
+                    window.location.href = basePath + '/student/getManagementList';
+                },"提示");
+            }
+        });
+    }
+</script>
+<style>
+    a{cursor:pointer}
+</style>
+</body>
+</html>

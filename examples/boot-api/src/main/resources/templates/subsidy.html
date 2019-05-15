@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    
+    <link rel="stylesheet" href="../static/pages/css/ace.min.css" id="main-ace-style" />
+    <link rel="stylesheet" href="../static/pages/css/index.css">
+    <link rel="stylesheet" href="../static/pages/css/enroll.css">
+    <link rel="stylesheet" href="../static/pages/css/madal.css">
+    <link rel="stylesheet" href="../static/pages/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../static/pages/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="../static/pages/css/kd.ui.plugin.css" />
+    <link rel="stylesheet" href="../static/pages/css/loading.css" />
+
+    <script src="../static/pages/js/jquery.min.js"></script>
+    <script src="../static/pages/js/bootstrap.min.js"> </script>
+    <script src="../static/pages/js/ace.min.js"> </script>
+    <script src="../static/pages/js/ace-elements.min.js"></script>
+    <script src="../static/pages/laydate/laydate.js"></script>
+    <script src="../static/pages/js/kd.ui.plugin.js"></script>
+    <script src="../static/pages/js/loading.js"></script>
+
+</head>
+<body>
+<div th:replace="layout::top"></div>
+<form id="subsidyForm">
+<div class="main-container" id="main-container">
+    <div th:replace="layout::left('12','')">
+    </div>
+    <div class="main-content">
+        <div class="breadcrumbs" id="breadcrumbs">
+            <img src="../static/pages/img/line1.png">
+            <span>补费</span>
+            <img src="../static/pages/img/line.png">
+        </div>     
+        <div class="enrollCon" id="subsidyId">
+            <button class="choiceStu" type="button" href="#modal-table" data-toggle="modal" id="chooseid" onclick="getStudentList()"
+                    style="margin-bottom:22px;">选择学员</button>
+            <th:block th:if="${xbStudent}" th:fragment="changeClassFragment">
+                <div class="chooseInfo">
+                    <p><span>学员姓名：</span>
+                        <th:block th:text="${xbStudent.studentName}"></th:block>
+                    </p>
+                    <p><span>联系方式：</span>
+                        <th:block th:text="${xbStudent.contactPhone}"></th:block>
+                        <input type="hidden" name="studentId" id="studentId" th:value="${xbStudent.id}"/>
+                    </p>
+                    <button href="#modal-table" data-toggle="modal" type="button" oninput="getStudentList()">重新选择</button>
+                </div>
+                <div class="orderTable">
+                    <table class="table table-hover">
+                        <tr>
+                            <th>
+                                <input type="checkbox" id="sel_3" onchange="chooseAll()">
+                            </th>
+                            <th>课程</th>
+                            <th>课程剩余金额</th>
+                            <th>课程剩余课时</th>
+                            <th>校区</th>
+                            <!--<th>上课时间</th>-->
+                            <th>报名时间</th>
+                        </tr>
+                        <tr id="chooses" th:each="studentrelations,stuSta:${xbStudentPage}">
+                            <td><input type="checkbox"></td>
+                            <td th:text="${studentrelations.xbCourse.courseName}"></td>
+                            <td th:text="${studentrelations.receivable}"></td>
+                            <td th:text="${studentrelations.periodNum}"></td>
+                            <td th:text="${studentrelations.sysOrgans.organName}"></td>
+                            <td th:if="${studentrelations.enrollDate!=null}" th:text="${#dates.format(studentrelations.enrollDate, 'yyyy-MM-dd')}"></td>
+                            <td th:if="${studentrelations.enrollDate==null}" th:text="${studentrelations.enrollDate}"></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="enrollCon payInfo">
+                    <h2>支付信息</h2>
+                    <div class="form-group" style="padding-top: 20px;">
+                        <label class="incomeAll"><img src="../static/pages/img/money.png">&nbsp;&nbsp;应收总计：</label>
+                        <input type="hidden" id="surplusMoney" name="surplusMoney" th:value="${xbStudent.paymentMoney}" th:text="${xbStudent.paymentMoney}"/>
+                    </div>
+                    <div class="form-group">
+                        <label class="incomeAll"><img src="../static/pages/img/money.png">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;实收：</label>
+                        <input type="text" name="paymentMoney" id="paymentMoney" th:value="0.00"/>元
+                    </div>
+                    <div class="form-group">
+                        <label>使用账户余额：</label>
+                        <input type="text" name="subsidyMoney" id="subsidyMoney" th:value="0.00"/>元 （当前可用<label th:text="${xbStudent.surplusMoney}"></label>元）
+                        <input type="hidden" id="xbStudentSurplusMoney" th:value="${xbStudent.surplusMoney}"/>
+                    </div>
+                </div>
+            </th:block>
+        </div>
+        <div class="enrollCon handleInfo subInfo">
+            <h3>经办信息</h3>
+            <div class="pad">
+                <!--<div class="form-group">
+                    <label class="col-sm-1">经办校区</label>
+                    <select name="organId" id="jborganId" onchange="getEmployee();">
+                        <option th:each="orgs:${sysOrgansList}"  th:value="${orgs.id}" th:text="${orgs.organName}"></option>
+                    </select>
+                </div>-->
+                <div class="form-group">
+                    <label class="col-sm-1">销售来源</label>
+                    <input type="text" name="salesSource" placeholder="请输入销售来源">
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-1">经办日期</label>
+                    <input class="laydate-icon" name="handleDate" id="demo" th:value="${#dates.format(new java.util.Date().getTime(), 'yyyy-MM-dd')}">
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-1">经办人</label>
+                    <input type="text" th:value="${sysEmployee.employeeName}" name="handlePerson" disabled="disabled">
+                </div>
+                <div class="form-group" style="margin-right:0 !important;">
+                    <label class="col-sm-1">运营助理</label>
+                    <select name="operationAssistant" id="salesPerson">
+                        <option th:each="emp:${employeeList}" th:value="${emp.employeeName}" th:text="${emp.employeeName}"></option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="enrollCon">
+            <button class="save" type="button" onclick="saveSubsidy();">保存</button>
+            <button class="save" type="button" onclick="javascript:history.go(-1)" style="margin-right:22px;">返回</button>
+        </div>
+        </form>
+    </div>
+
+    <!-- 选择已有学员 -->
+    <div id="modal-table" class="modal fade in subsidy" tabindex="-1" aria-hidden="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header no-padding">
+                    <div class="table-header">选择已有学员</div>
+                </div>
+                <div class="modalFrom">
+                    <div class="form-group" style="margin-right:0 !important;">
+                        <select name="" id="">
+                            <option value="">学员姓名</option>
+                            <!--<option value="">张三</option>
+                        <option value="">李四</option>-->
+                        </select>
+                    </div>
+                    <form class="form-search">
+                            <span class="input-icon">
+                                <input type="text" oninput="getStudentList()" id="studentName" placeholder="请输入学员名称">
+                                <!--<i class="ace-icon fa fa-search nav-search-icon"></i>-->
+                            </span>
+                    </form>
+                    <!--<div class="form-group">
+                        <label>校区</label>
+                        <select name="" id="">
+                            <option value="">全部校区</option>
+                            <option value="">111</option>
+                            <option value="">222</option>
+                        </select>
+                    </div>-->
+                </div>
+                <div class="modal-body no-padding" style="height: 200px;overflow-y: auto">
+                    <table class="table table-striped  table-hover no-margin-bottom no-border-top">
+                        <thead>
+                        <tr>
+                            <th></th>
+                            <th>姓名</th>
+                            <th>联系方式</th>
+                            <th>在读课程</th>
+                        </tr>
+                        </thead>
+                        <tbody style="display: none;">
+                        <!--<tr class="none">
+                    <td>
+                        <img src="img/none.png">
+                        <span>很抱歉，这里什么都没有</span>
+                    </td>
+                </tr>-->
+                        </tbody>
+                        <tbody th:id="userchoose">
+                        <th:block th:if="${xbStudentPage}" th:fragment="studentList">
+                            <tr th:each="stu : ${xbStudentPage.content}">
+                                <td>
+                                    <input name="form-field-checkbox" name="studio" type="radio" th:value="${stu.id}">
+                                </td>
+                                <td th:text="${stu.studentName}"><img src="../static/pages/img/boy.png"></td>
+                                <td th:text="${stu.contactPhone}"></td>
+                                <td></td>
+                                <!--<td><img src="../static/pages/img/ke.png">在读课程</td>-->
+                            </tr>
+                        </th:block>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="modal-footer no-margin-top">
+                    <button class="btn pull-left" data-dismiss="modal">
+                        取消
+                    </button>
+                    <button class="btn pull-right" data-dismiss="modal"  type="button" onclick="chooseUser();">
+                        确定
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div> 
+
+<script>
+!function(){
+laydate.render({elem: '#demo'});//绑定元素
+}();
+$(".more").click(function(){
+  $(".openInfo").toggle();
+});
+
+</script>
+
+<script type="text/javascript" th:inline="javascript">
+    var basePath = /*[[${#httpServletRequest.getScheme() + "://" + #httpServletRequest.getServerName() + ":" + #httpServletRequest.getServerPort() + #httpServletRequest.getContextPath()}]]*/ ;
+
+    function getStudentList() {
+        var load = new Loading();
+        load.init({
+            target: "#modal-table"
+        });
+        load.start();
+        $.ajax({
+            type: 'get',
+            //dataType: 'json',
+            url: basePath + '/feeRelated/getStudentList',
+            data: {
+                studentName: $("#studentName").val()
+            },
+            contentType: "application/json;charset=UTF-8",
+            cache: false,
+            async: true,
+            success: function (data) {
+                load.stop();
+                console.log(data);
+                $("#userchoose").html("");
+                $('#userchoose').append(data);
+            }
+        });
+    };
+
+    function chooseUser() {
+        var load = new Loading();
+        load.init({
+            target: "#modal-table"
+        });
+        var val = $('input:radio[name="studio"]:checked').val();
+        if (val == null) {
+            $.kd.kdAlert("什么也没选中!");
+            return false;
+        }
+        load.start();
+        $.ajax({
+            type: 'get',
+            dataType: 'text',
+            url: basePath + '/feeRelated/chooseSubsidyStudent',
+            data: {
+                studentId: val
+            },
+            contentType: "application/json;charset=UTF-8",
+            cache: false,
+            async: true,
+            success: function (data) {
+                load.stop();
+                console.log(data);
+                $("#subsidyId").html(data);
+            }
+        });
+    };
+
+    function saveSubsidy(){
+        var studentId = $('#studentId').val();
+        var surplusMoney = $('#surplusMoney').val();
+        var paymentMoney = $('#paymentMoney').val();
+        var subsidyMoney = $('#subsidyMoney').val();
+        var xbStudentSurplusMoney = $('#xbStudentSurplusMoney').val();
+        if(Number(xbStudentSurplusMoney)<Number(subsidyMoney)){
+            $.kd.kdAlert("当前可用金额不足！");
+            return;
+        }
+        if((Number(subsidyMoney)+Number(paymentMoney))>Number(surplusMoney)){
+            $.kd.kdAlert("补费金额不能大于应收总计！");
+            return;
+        }
+        if (studentId) {
+            var data= serializeObject("#subsidyForm");
+            console.log(data);
+            $.ajax({
+                type: 'get',
+                dataType: 'json',
+                url: basePath + '/feeRelated/saveSubsidy',
+                data: {studentEntity:JSON.stringify(data)},
+                contentType:"application/json;charset=UTF-8",
+                cache: false,
+                async: true,
+                success: function (data) {
+                    var status = data.status;
+                    var msg = data.msg;
+                    $.kd.kdAlert("补费成功！",function () {
+                        window.location.href = basePath + '/student/getManagementList';
+                    });
+                }
+            });
+        }else{
+            $.kd.kdAlert("请先选择学员！");
+        }
+    }
+
+    function serializeObject(form)
+    {
+        var o = {};
+        var a = $(form).serializeArray();
+        $.each(a, function() {
+            if (o[this.name]) {
+                if (!o[this.name].push) {
+                    o[this.name] = [o[this.name]];
+                }
+                o[this.name].push(this.value || '');
+            } else {
+                o[this.name] = this.value || '';
+            }
+        });
+        return o;
+    };
+</script>
+</body>
+</html>

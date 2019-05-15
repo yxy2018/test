@@ -1,0 +1,313 @@
+<!DOCTYPE html >
+<html lang="zh-CN" lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>课程表</title>
+      <link href="../static/pages/wechat_css/bootstrap.min.css" rel="stylesheet">
+      <link href="../static/pages/wechat_css/timetable.css" rel="stylesheet">
+      <link href="../static/pages/wechat_css/iscroll.css" rel="stylesheet">
+      <link href="../static/pages/wechat_css/style.css" rel="stylesheet">
+      <link rel="stylesheet" href="../static/pages/css/kd.ui.plugin.css" />
+      <link rel="stylesheet" href="../static/pages/css/loading.css" />
+      <script src="../static/pages/wechat_js/jquery.min.js"></script>
+      <script src="../static/pages/wechat_js/bootstrap.min.js"></script>
+      <script src="../static/pages/wechat_js/script.js"></script>
+      <script src="../static/pages/js/loading.js"></script>
+      <script src="../static/pages/js/kd.ui.plugin.js"></script>
+      <script src="../static/pages/wechat_js/iscroll.js"></script>
+  </head>
+<body>
+<div class="add" style="background: #2778ca;color: white;margin-bottom: 0px;font-size: 21px;line-height: 38px;">
+    <p style="margin: 0 0 2px;">课程表</p>
+</div>
+<div  style="max-width: 500px;margin:0 auto;border: solid 1px #ccc;">
+    <div class="bd_w jcalendar_week" id="jcalendar_week"></div>
+    <div class="pop_bd" id="pop" style="z-index: 1000;">
+        <div class="pop_con">
+            <span class="pop_close" onClick="$('#pop').hide();">&times;</span>
+            <h5>选择年份：</h5>
+            <div class="flex_i control">
+                <button onClick="$(this).next().val(parseInt($(this).next().val())-1)"><</button>
+                <input class="flex_auto control_val" type="text" id="setyear" value="- -" />
+                <button onClick="$(this).prev().val(parseInt($(this).prev().val())+1)">></button>
+            </div>
+            <h5>选择周：</h5>
+            <div class="flex_i control">
+                <button onClick="$(this).next().val(parseInt($(this).next().val())-1)"><</button>
+                <input class="flex_auto control_val" type="text" id="setweek" value="- -" />
+                <button onClick="$(this).prev().val(parseInt($(this).prev().val())+1)">></button>
+            </div>
+            <div class="flex_i">
+                <button class="setjc_btn nowweek_btn flex_auto" onClick="tonowweek()">本周</button>
+                <button class="setjc_btn flex_auto" onClick="jumpweek()">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+<p id="show"></p>
+<div id="wrapper" style="height: 67%;">
+    <div id="scroller">
+        <div id="pullDown">
+            <span class="pullDownIcon"></span><span class="pullDownLabel"></span>
+        </div>
+        <span id="xbAttendList_tbodyid">
+            <th:block th:if="${xbAttendList.content}" th:fragment="xbAttendListFra">
+                <input th:id="dda"  th:value="${dda}" type="hidden">
+                <input th:id="page" th:value="${xbAttendList.getNumber()}" type="hidden">
+                <input th:id="totalpage" th:value="${xbAttendList.getTotalPages()}" type="hidden">
+                <div class="con-box" id="xbattendlist_id" th:each="less,lessSta:${xbAttendList.content}" style="margin-top: 0px;">
+                    <div class="con-list" style="border-bottom: solid 1px #b3b5c3;">
+                        <p class="class-list" style="width: 30%;" >
+                            <span  th:text="${less.startDateTime}" style="text-align: center;width:122px"></span>
+                            <span  th:text="${less.timeInterval}" style="text-align: center;width:122px"></span>
+                        </p>
+                        <p class="class-list" style="width: 37%;" th:switch="${less.wayOfTeaching}">
+                            <span  th:text="${less.xbclass.sysOrgans.organName}+${less.xbclass.xbCourse.xbcoursetype.courseTypeName}" style="text-align: center;"></span>
+                            <span th:case="1"
+                            th:text="${less.xbclass.teacher.employeeName}+${less.xbclass.className}+'(一对一)'" style="text-align: center;"></span>
+                            <span th:case="0"
+                                  th:text="${less.xbclass.teacher.employeeName}+${less.xbclass.className}+'(班课)'" style="text-align: center;"></span>
+                        </p>
+                        <p class="class-list" style="width: 30%;" >
+                            <span  th:text="${less.xbclassroom.classroomName}" style="text-align: center;width:122px"></span>
+                        </p>
+                        <!--<a href="timetableMore.html">更多<Span class="glyphicon glyphicon-menu-right"></Span></a>-->
+                    </div>
+                </div>
+            </th:block>
+        </span>
+        <div id="pullUp" style="font-size: 15px;">
+            <span class="pullUpIcon"></span><span class="pullUpLabel">下拉加载...</span>
+        </div>
+    </div>
+    <div class="back" style="z-index: 1000">
+        <a onclick="javascript:history.go(-1)"><span class="glyphicon glyphicon-arrow-left"></span>返回工作台</a>
+    </div>
+</div>
+<script type="text/javascript" th:inline="javascript">
+      var basePath = /*[[${#httpServletRequest.getScheme() + "://" + #httpServletRequest.getServerName() + ":" + #httpServletRequest.getServerPort() + #httpServletRequest.getContextPath()}]]*/;
+      //调用周日历
+      var weekfn =  new jcalendar_week({
+          element: "#jcalendar_week",//填充日历的dom元素
+          dayaddclass:function(date){
+              //添加某天时给添加类名
+              return "";
+          },
+          //day点击事件
+          dayclick:function(date,obj){
+              $(obj).addClass("calendar_day_act").siblings().removeClass("calendar_day_act");
+              var load = new Loading();
+              load.init({
+                  target: "body"
+              });
+              load.start();
+              $.ajax({
+                  url: basePath+ '/recordClassWechat/findXbAttendClassPageListAll?sort=createDate,DESC&sort=createTime,DESC',
+                  type: 'get',
+                  contentType: 'application/json',
+                  data: {dda:date},
+                  async: true,
+                  success: function(data) {
+                      load.stop();
+                      console.log("查询排课回调成功")
+                      $("#xbAttendList_tbodyid").html("");
+                      $("#xbAttendList_tbodyid").append(data);
+                      myScroll.refresh();
+                  },
+                  error:function(){
+                      load.stop();
+                      console.log("查询排课回调失败")
+                  }
+              });
+          }
+      });
+      //获取周第一天
+      /*console.log(weekfn.weekfirstdate(2018,36));
+      //获取传入日期为当年第几周（注:这里的月份从0开始）
+      console.log(weekfn.getweeknum(2018,0,16));*/
+      //跳转到指定周
+      function jumpweek(){
+          var getyear=parseInt($("#setyear").val());
+          var getweek=parseInt($("#setweek").val());
+          weekfn.confirmweek(getyear,getweek);
+          $('#pop').hide();
+      }
+      //跳转到本周
+      function tonowweek(){
+          weekfn.nowweek();
+          $('#pop').hide();
+      }
+  </script>
+<script type="text/javascript" th:inline="javascript">
+    var basePath = /*[[${#httpServletRequest.getScheme() + "://" + #httpServletRequest.getServerName() + ":" + #httpServletRequest.getServerPort() + #httpServletRequest.getContextPath()}]]*/;
+
+    var myScroll,
+        pullDownEl,
+        pullDownOffset,
+        pullUpEl,
+        pullUpOffset,
+        generatedCount = 0;
+
+    function pullDownAction () {
+        setTimeout(function () {	// <-- Simulate network congestion, remove setTimeout from production!
+            /*var el, li, i;
+            el = document.getElementById('thelist');
+
+            for (i=0; i<5; i++) {
+                li = document.createElement('li');
+                li.innerText = 'Generated row ' + (++generatedCount);
+                el.insertBefore(li, el.childNodes[0]);
+            }
+            document.getElementById("pullUp").style.display="";*/
+            myScroll.refresh();
+        }, 1000);
+    }
+
+    function pullUpAction () {
+        var load = new Loading();
+        load.init({
+            target: "#wrapper"
+        });
+        load.start();
+        setTimeout(function () {
+            var page = parseInt($("#page").val())+1;
+            var totalpage = parseInt($("#totalpage").val())-1;
+            console.log(page)
+            var dda = $("#dda").val();
+            console.log(dda)
+            $.ajax({
+                url: basePath+ '/recordClassWechat/findXbAttendClassPageListAll?sort=createDate,DESC&sort=createTime,DESC&page='+page,
+                type: 'get',
+                contentType: 'application/json',
+                data: {dda:dda},
+                async: true,
+                success: function(data) {
+                    load.stop();
+                    console.log("查询排课回调成功");
+                    if(data!=""){
+                        $("#page").val(page);
+                        $("#xbAttendList_tbodyid").append(data);
+                    }
+                    if(page>=totalpage){
+                        $("#page").val(totalpage);
+                        $.kd.kdMsg("数据加载完成");
+                    }
+                    myScroll.refresh();
+                },
+                error:function(){
+                    load.stop();
+                    myScroll.refresh();
+                    console.log("查询排课回调失败")
+                }
+            });
+        }, 1000);
+    }
+
+    function loaded() {
+        pullDownEl = document.getElementById('pullDown');
+        pullDownOffset = pullDownEl.offsetHeight;
+        pullUpEl = document.getElementById('pullUp');
+        pullUpOffset = 10;
+        //pullUpOffset = pullUpEl.offsetHeight;
+        myScroll = new iScroll('wrapper', {
+            useTransition: true,
+            topOffset: pullDownOffset,
+            onRefresh: function () {
+                //that.maxScrollY = that.wrapperH - that.scrollerH + that.minScrollY;
+                //that.minScrollY = -that.options.topOffset || 0;
+                //alert(this.wrapperH);
+                //alert(this.scrollerH);
+                if (pullDownEl.className.match('loading')) {
+                    pullDownEl.className = '';
+                    pullDownEl.querySelector('.pullDownLabel').innerHTML = 'Pull down to refresh...';}
+                if (pullUpEl.className.match('loading')) {
+                    pullUpEl.className = '';
+                    pullUpEl.querySelector('.pullUpLabel').innerHTML = 'Pull up to load more...';
+                }
+
+                document.getElementById("pullUp").style.display="none";
+                document.getElementById("show").innerHTML="onRefresh: up["+pullUpEl.className+"],down["+pullDownEl.className+"],Y["+this.y+"],maxScrollY["+this.maxScrollY+"],minScrollY["+this.minScrollY+"],scrollerH["+this.scrollerH+"],wrapperH["+this.wrapperH+"]";
+            },
+            onScrollMove: function () {
+                document.getElementById("show").innerHTML="onScrollMove: up["+pullUpEl.className+"],down["+pullDownEl.className+"],Y["+this.y+"],maxScrollY["+this.maxScrollY+"],minScrollY["+this.minScrollY+"],scrollerH["+this.scrollerH+"],wrapperH["+this.wrapperH+"]";
+                if (this.y > 0) {
+                    pullDownEl.className = 'flip';
+                    pullDownEl.querySelector('.pullDownLabel').innerHTML = 'Release to refresh...';
+                    this.minScrollY = 0;
+                }
+                if (this.y < 0 && pullDownEl.className.match('flip')) {
+                    pullDownEl.className = '';
+                    pullDownEl.querySelector('.pullDownLabel').innerHTML = 'Pull down to refresh...';
+                    this.minScrollY = -pullDownOffset;
+                }
+
+                if ( this.scrollerH < this.wrapperH && this.y < (this.minScrollY-pullUpOffset) || this.scrollerH > this.wrapperH && this.y < (this.maxScrollY - pullUpOffset) ) {
+                    document.getElementById("pullUp").style.display="";
+                    pullUpEl.className = 'flip';
+                    pullUpEl.querySelector('.pullUpLabel').innerHTML = 'Release to refresh...';
+                }
+                if (this.scrollerH < this.wrapperH && this.y > (this.minScrollY-pullUpOffset) && pullUpEl.className.match('flip') || this.scrollerH > this.wrapperH && this.y > (this.maxScrollY - pullUpOffset) && pullUpEl.className.match('flip')) {
+                    document.getElementById("pullUp").style.display="none";
+                    pullUpEl.className = '';
+                    pullUpEl.querySelector('.pullUpLabel').innerHTML = 'Pull up to load more...';
+                }
+            },
+            onScrollEnd: function () {
+                document.getElementById("show").innerHTML="onScrollEnd: up["+pullUpEl.className+"],down["+pullDownEl.className+"],Y["+this.y+"],maxScrollY["+this.maxScrollY+"],minScrollY["+this.minScrollY+"],scrollerH["+this.scrollerH+"],wrapperH["+this.wrapperH+"]";
+                if (pullDownEl.className.match('flip')) {
+                    pullDownEl.className = 'loading';
+                    pullDownEl.querySelector('.pullDownLabel').innerHTML = 'Loading...';
+                    pullDownAction();	// Execute custom function (ajax call?)
+                }
+                if (pullUpEl.className.match('flip')) {
+                    pullUpEl.className = 'loading';
+                    pullUpEl.querySelector('.pullUpLabel').innerHTML = 'Loading...';
+                    pullUpAction();	// Execute custom function (ajax call?)
+                }
+            }
+        });
+
+        //setTimeout(function () { document.getElementById('wrapper').style.left = '0'; }, 800);
+    }
+
+    document.addEventListener('touchmove', function (e) {
+            e.preventDefault();
+        }, false
+    );
+
+    document.addEventListener('DOMContentLoaded', function () { setTimeout(loaded, 200); }, false);
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

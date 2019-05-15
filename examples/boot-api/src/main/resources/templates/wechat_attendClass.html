@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>记上课</title>
+    <link rel="stylesheet"href="../static/pages/wechat_css/bootstrap.min.css">
+    <link rel="stylesheet"href="../static/pages/wechat_css/timetable.css" >
+    <link rel="stylesheet" href="../static/pages/wechat_css/jHsDate.css" />
+    <link rel="stylesheet" href="../static/pages/css/kd.ui.plugin.css" />
+      <link rel="stylesheet" href="../static/pages/css/loading.css" />
+    <script src="../static/pages/wechat_js/jquery.js"></script>
+    <script src="../static/pages/wechat_js/bootstrap.min.js"></script>
+      <script src="../static/pages/laydate/laydate.js"></script>
+      <script src="../static/pages/js/kd.ui.plugin.js"></script>
+      <script src="../static/pages/js/loading.js"></script>
+  </head>
+<body>
+<div class="add" style="background: #2778ca;color: white;margin-bottom: 0px;font-size: 21px;line-height: 38px;">
+    <p style="margin: 0 0 2px;">记上课</p>
+</div>
+<div style="padding-bottom: 50px;">
+    <div class="class-content" >
+        <h2 th:text="${classes.sysOrgans.organName}+' '+${classes.className}+' '+${classes.xbCourse.courseName}"><img src="img/ban.png">校区+班级+课程</h2>
+        <div class="class-info">
+            <input type="hidden" id="organId" name="organId" th:value="${classes.sysOrgans.id}" />
+            <input type="hidden" id="classId" name="classId" th:value="${classes.id}" />
+            <input type="hidden" id="courseId" name="courseId" th:value="${classes.xbCourse.id}" />
+            <input type="hidden" id="attendId" name="attendId" th:value="${classes.id}" />
+            <ul>
+                <li>
+                    <span>上课日期</span>
+                    <p>
+                        <input type="text" id="demo" th:value="${#dates.format(new java.util.Date().getTime(), 'yyyy-MM-dd HH:mm:ss')}"/>
+                    </p>
+                </li>
+                <li>
+                    <span>上课教师</span>
+                    <p th:text="${classes.teacher.employeeName}"></p>
+                </li>
+                <li>
+                    <span>教师课时</span>
+                    <p th:text="${classes.teacherNum}"></p>
+                </li>
+            </ul>
+        </div>
+    </div>
+<form id="classForm">
+    <div class="personnel" th:each="stu,stuindex:${classPage.content}">
+        <input type="hidden" name="studentId" th:value="${stu.xbStudent.id}" />
+        <input type="hidden" name="studentRelationId" th:value="${stu.id}" />
+        <div class="per-list">
+                <div class="per-top">
+                <p class="name" th:text="${stu.xbStudent.studentName}"><img src="../static/pages/wechat_img/per.png">姓名</p>
+                <i th:text="'剩余'+${stu.periodNum}+'课时;总课时'+${stu.totalPeriodNum}+',单课时金额'+${stu.totalReceivable/stu.totalPeriodNum}"></i>
+            </div>
+            <div class="per-bot">
+                <ul>
+                    <li style="border-right:1px solid #e9edf3; padding-right:10px;">
+                        <span>扣除课时</span>
+                        <p><input type="text" value="1" name="deductPeriod" th:id="'redordIds'+${stuindex.index}"
+                                  style="width: 37px;padding:1px;text-align: center;">
+                        </p>
+                    </li>
+                    <li style="padding-left:10px;">
+                        <span>上课状态</span>
+                        <p>
+                            <select id="state" name="state" style="color:#555;" th:onchange="|javascript:change(this,'${stuindex.index}')|">
+                                <option value="0">上课</option>
+                                <option value="1">请假</option>
+                                <option value="2">旷课</option>
+                                <option value="3">补课</option>
+                                <option value="4">不记</option>
+                            </select>
+                        </p>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</form>
+</div>
+<div class="back">
+    <a onclick="javascript:history.go(-1)"><span class="glyphicon glyphicon-arrow-left"></span>返回上一级</a>
+</div>
+<div class="foot-btn">
+    <button class="btn" style="width: 100%;cursor: pointer;" onclick="saveRecordClass()">保存</button>
+</div>
+<script type="text/javascript" src="../static/pages/wechat_js/jHsDate.js"></script>
+
+<script type="text/javascript" th:inline="javascript">
+    var basePath = /*[[${#httpServletRequest.getScheme() + "://" + #httpServletRequest.getServerName() + ":" + #httpServletRequest.getServerPort() + #httpServletRequest.getContextPath()}]]*/ ;
+
+    function saveRecordClass() {
+        var load = new Loading();
+        load.init({
+            target: "body"
+        });
+        var classId = $("#classId").val();
+        var courseId = $("#courseId").val();
+        var organId = $("#organId").val();
+        var attendId = $("#attendId").val();
+        var data = serializeObject("#classForm");
+        if (data) {
+            console.log(data);
+            var list = [];
+            var aa = {
+                studentId: "",
+                studentRelationId: "",
+                state: "",
+                deductPeriod: "",
+                teacherLeave: "",
+                recordTimeTemp: "",
+                classId: "",
+                courseId: "",
+                organId:"",
+                attendId:""
+            };
+            if(isArrayFn(data.studentId)) {
+                for (var i = 0; i < data.studentId.length; i++) {
+                    aa = {};
+                    aa.studentId = data.studentId[i];
+                    aa.studentRelationId = data.studentRelationId[i];
+                    aa.state = data.state[i];
+                    aa.deductPeriod = data.deductPeriod[i];
+                    aa.teacherLeave = "";
+                    aa.recordTimeTemp = $("#demo").val();
+                    aa.classId = classId;
+                    aa.courseId = courseId;
+                    aa.organId = organId;
+                    aa.attendId = attendId;
+                    list.push(aa);
+                }
+            } else {
+                aa.studentId = data.studentId;
+                aa.studentRelationId = data.studentRelationId;
+                aa.state = $('#state option:selected').val();
+                aa.deductPeriod = data.deductPeriod;
+                aa.teacherLeave = "";
+                aa.recordTimeTemp = $("#demo").val();
+                aa.classId = classId;
+                aa.courseId = courseId;
+                aa.organId = organId;
+                aa.attendId = attendId;
+                list.push(aa);
+            }
+            load.start();
+            $.ajax({
+                type: 'post',
+                dataType: 'json',
+                url: basePath + '/recordClassWechat/save/recordClass',
+                data: JSON.stringify(list),
+                contentType: "application/json;charset=UTF-8",
+                cache: false,
+                async: true,
+                success: function (data) {
+                    load.stop();
+                    var status = data.status;
+                    var msg = data.msg;
+                    if(status=='1'){
+                        $.kd.kdAlert("记上课成功",function(){
+                            load.start();
+                            window.location.href = basePath + '/recordClassWechat/getRecordClassRecordListByClass';
+                        });
+                    }else{
+                        $.kd.kdMsg("记上课失败");
+                    }
+                }
+            });
+        }
+    }
+
+    function isArrayFn(value){
+        if (typeof Array.isArray === "function") {
+            return Array.isArray(value);
+        }else{
+            return Object.prototype.toString.call(value) === "[object Array]";
+        }
+    }
+
+    function serializeObject(form) {
+        var o = {};
+        var a = $(form).serializeArray();
+        $.each(a, function () {
+            if (o[this.name]) {
+                if (!o[this.name].push) {
+                    o[this.name] = [o[this.name]];
+                }
+                o[this.name].push(this.value || '');
+            } else {
+                o[this.name] = this.value || '';
+            }
+        });
+        return o;
+    };
+
+</script>
+<script type="text/javascript">
+
+/*$('#datetimedef').jHsDate({
+    defDate: '2019-01-01',
+    defIsShow: true
+});*/
+
+$('.glyphicon-remove-circle').click(function(e) {
+		$(this).parent(".per-top").parent(".per-list").hide(500)
+    })
+
+function change(obj,index){
+    if(obj.value==1||obj.value==2){
+        $("#redordIds"+index).val("0");
+    }else{
+        $("#redordIds"+index).val("1");
+    }
+
+}
+
+</script>
+</body>
+</html>

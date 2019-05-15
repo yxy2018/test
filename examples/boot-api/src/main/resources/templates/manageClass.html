@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+    <link rel="stylesheet" href="../static/pages/css/ace.min.css" id="main-ace-style" />
+    <link rel="stylesheet" href="../static/pages/css/index.css">
+    <link rel="stylesheet" href="../static/pages/css/management.css">
+    <link rel="stylesheet" href="../static/pages/css/student.css">
+    <link rel="stylesheet" href="../static/pages/css/madal.css">
+
+    <!-- <link rel="stylesheet" href="css/syllabus.css"> -->
+    <link rel="stylesheet" href="../static/pages/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../static/pages/css/font-awesome.min.css" />
+
+    <link rel="stylesheet" href="../static/pages/css/fullcalendar.css">
+    <link rel="stylesheet" href="../static/pages/css/lessonTable.css">
+    <link rel="stylesheet" href="../static/pages/css/kd.ui.plugin.css" />
+    <link rel="stylesheet" href="../static/pages/css/loading.css" />
+
+    <script src="../static/pages/js/jquery-1.9.1.min.js"></script>
+    <script src="../static/pages/js/bootstrap.min.js"> </script>
+    <script src="../static/pages/js/ace.min.js"> </script>
+    <script src="../static/pages/js/ace-elements.min.js"></script>
+    <script src="../static/pages/laydate/laydate.js"></script>
+    <script src="../static/pages/js/fullcalendar.min.js"></script>
+    <script src="../static/pages/js/jquery-ui-1.10.2.custom.min.js"></script>
+    <script src="../static/pages/js/kd.ui.plugin.js"></script>
+    <script src="../static/pages/js/loading.js"></script>
+
+
+</head>
+
+<body>
+<div th:replace="layout::top"></div>
+    <div class="main-container" id="main-container">
+        <div th:replace="layout::left('13','32')">
+        </div>
+        <div class="main-content">
+            <div class="breadcrumbs" id="breadcrumbs">
+                <img src="../static/pages/img/line1.png">
+                <span>班级管理</span>
+                <img src="../static/pages/img/line.png">
+            </div>
+            <div class="manage">
+               <!-- th:text="${xbClass.sysOrgans.organName}+${xbclass.xbCourse.xbcoursetype.courseTypeName}+${xbclass.teacher.employeeName}+${xbclass.className}"-->
+                <div class="tabbable">
+                    <ul class="nav nav-tabs" id="myTab">
+                        <li class="active">
+                            <a th:href="@{/feeRelated/enrollClasschoose(classId=${xbClass.id})}"  type="button" data-toggle="modal">添加学员</a>
+                        </li>
+                        <!--<li class="active">
+                            <a th:href="@{/feeRelated/enrollClass(classId=${xbClass.id})}"  type="button" data-toggle="modal">插班</a>
+                        </li>-->
+                        <li class="active">
+                            <a href="#"  type="button" data-toggle="modal" onclick="javascript:history.go(-1)">返回</a>
+                        </li>
+                    </ul>
+                </div>
+                    <div class="stuInfo" style="margin: 15px;">
+                    <p><span>所属课程：</span><th:block th:text="${xbClass.xbCourse.courseName}"></th:block></p>
+                    <!--<p><span>收费标准：</span><th:block th:text="${xbClass.xbCourse.courseName}">按期(3000/期)</th:block></p>-->
+                    <p><span>上课校区：</span>
+                        <th:block th:value="${xbClass.classBeginDate}" th:text="${xbClass.sysOrgans.organName}">
+                        </th:block>
+                    </p>
+                    <p><span>开班日期：</span>
+                        <th:block th:if="${xbClass.classBeginDate==null}"  th:text="${xbClass.classBeginDate}"></th:block>
+                        <th:block th:if="${xbClass.classBeginDate!=null}" th:value="${#dates.format(xbClass.classBeginDate, 'yyyy-MM-dd')}"></th:block>
+                    </p>
+                    <p><span>结班日期：</span><th:block th:text="${xbClass.classEndDate}"></th:block></p>
+                    <p><span>班级人数：</span><th:block th:text="${xbStudentRelationPage.getTotalElements()}"></th:block></p>
+                    <p><span>成班人数：</span><th:block th:text="${xbClass.establishNum}"></th:block></p>
+                    <p><span>任课教师：</span><th:block th:text="${xbClass.teacher.employeeName}"></th:block></p>
+                    <!--<p><span>助教：</span>10</p>-->
+                    <p><span>上课教室：</span><th:block th:text="${xbClass.xbClassroom.classroomName}"></th:block></p>
+                    <!--<p><span>上课时间:</span>每周周日15:30-15:30 每周周四15:30-15:30</p>-->
+                    <p><span>备注：</span><th:block th:text="${xbClass.remarks}"></th:block></p>
+                    <input type="hidden" id="courseTypeId" th:value="${xbClass.xbCourse.courseTypeId}"/>
+                </div>
+                <div class="stuNum">
+                    <img src="../static/pages/img/stu.png">
+                    <span>在读学生：<th:block th:text="${xbStudentRelationPage.getTotalElements()}"></th:block>；</span>
+                    <!--<span>满班率:10%</span>
+                    <span>新生率：60%；</span>
+                    <span>转出率：0%；</span>
+                    <span>退费率：0%；</span>
+                    <span>停课率：0%；</span>
+                    <span>升期率：0%；</span>
+                    <span>出勤率：10%；</span>-->
+                </div>
+            </div>
+            <div class="tabbable">
+                <ul class="nav nav-tabs" id="myTab">
+                    <li class="active">
+                        <a data-toggle="tab" href="#studentList">学员</a>
+                    </li>
+                    <li >
+                        <a data-toggle="tab" href="#divideList">课表</a>
+                    </li>
+                </ul>
+                <div class="tab-content student manageClass">
+                    <!-- 学员 -->
+                    <div id="studentList" class="tab-pane fade in active">
+                        <!--<div class="screen">
+                            <button class="stdEnroll" href="#modal-table2" role="button" class="blue" data-toggle="modal">添加学员</button>
+                            <div class="screenTop">
+                                <div class="nav-search" id="nav-search">
+                                    <form class="form-search">
+                                        <span class="input-icon">
+                                            <input type="text" placeholder="输入名字或关键字搜索" class="nav-search-input" id="nav-search-input"
+                                                autocomplete="off">
+                                            <i class="ace-icon fa fa-search nav-search-icon"></i>
+                                        </span>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>-->
+                        <!--<div class="resultCla">
+                            当前结果：共计<th:block th:text="${xbStudentRelationPage.getTotalElements()}"></th:block>个学员
+                        </div>-->
+                        <div class="orderCon">
+                            <div class="export">
+                            <div class="result">
+                                当前结果：学员共计<span th:text="${xbStudentRelationPage.getTotalElements()}"></span>名<!--，报读课程数总计：<span>111</span>条-->
+                            </div>
+                            <div class="orderTable">
+                                <table class="table table-hover">
+                                    <tr>
+                                        <th>
+                                            <input type="checkbox" id="sel_1" onchange="selectAll()">
+                                        </th>
+                                        <th>学员姓名</th>
+                                        <th>联系电话</th>
+                                        <!--<th>新/老生</th>-->
+                                        <!--<th>已用课时</th>-->
+                                        <th>剩余课时</th>
+                                        <th>剩余金额</th>
+                                        <th>学员状态</th>
+                                        <!--<th>课时有效期</th>-->
+                                        <!--<th>分班日期</th>-->
+                                        <th>操作</th>
+                                    </tr>
+                                    <tr id="choose" th:each="classes:${xbStudentRelationPage.content}">
+                                        <td><input type="checkbox"></td>
+                                        <td th:text="${classes.xbStudent.studentName}"><img src="../static/pages/img/boy.png"></td>
+                                        <td th:text="${classes.xbStudent.contactPhone}"></td>
+                                        <!--<td>老生</td>-->
+                                        <!--<td th:text="${classes.periodNum}"></td>-->
+                                        <td th:text="${classes.periodNum}"></td>
+                                        <td th:text="${classes.receivable}"></td>
+                                        <td style="color:#7fbb57" th:if="${classes.studentStart} eq 0">在读</td>
+                                        <td style="color:#e46054" th:if="${classes.studentStart} eq 1">停课</td>
+                                        <td style="color:#548ee4" th:if="${classes.studentStart} eq 2">转班</td>
+                                        <td style="color:#b0b0b0" th:if="${classes.studentStart} eq 4">结课</td>
+                                        <td style="color:#548ee4" th:if="${classes.studentStart} eq 3">退费</td>
+                                        <td class="classDel">
+                                            <div class="btn-group open" th:if="${classes.periodNum eq 0 && classes.studentStart eq 0} ">
+                                                <p data-toggle="dropdown" class="down" aria-expanded="true" th:onclick="'javascript:finishCourse(\''+${classes.id}+'\')'">
+                                                    结课
+                                                    <span class="ace-icon fa fa-caret-down icon-on-right"></span>
+                                                </p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <div class="orderPage">
+                                    <div class="page">
+                                        单页显示：
+                                        <select id="size" name="size" onchange="getStudentListPage('');">
+                                            <option th:selected="${currentzise eq 20}" value="20">20条/页</option>
+                                            <option th:selected="${currentzise eq 5}" value="5">5条/页</option>
+                                            <option th:selected="${currentzise eq 10}" value="10">10条/页</option>
+                                            <option th:selected="${currentzise eq 15}" value="15">15条/页</option>
+                                        </select>
+                                    </div>
+                                    <ul class="pagination" th:if="${xbStudentRelationPage.getTotalPages()>0}">
+                                        <!-- 上一页 -->
+                                        <li th:if="${xbStudentRelationPage.getNumber()+1 == 1}"><span>上一页</span></li>
+                                        <li th:if="${xbStudentRelationPage.getNumber()+1 > 1}">
+                                            <a  th:onclick="'javascript:getStudentListPage(\''+${xbStudentRelationPage.getNumber()-1}+'\')'">
+                                                <i class="ace-icon fa ">上一页</i>
+                                            </a>
+                                        </li>
+                                        <!-- 首页 -->
+                                        <li th:if="${xbStudentRelationPage.getNumber()+1 == 1}" class="active"><span>1</span></li>
+                                        <li th:if="${xbStudentRelationPage.getNumber()+1 > 1}">
+                                            <a  th:onclick="'javascript:getStudentListPage(\''+${0}+'\')'">1</a>
+                                        </li>
+
+                                        <th:block th:if="${xbStudentRelationPage.getTotalPages()>2 && xbStudentRelationPage.getTotalPages()<=10}">
+                                            <th:block th:each="i:${#numbers.sequence(2,xbStudentRelationPage.getTotalPages()-1)}">
+                                                <li th:if="${xbStudentRelationPage.getNumber()+1 == i}"  class="active"><span th:text="${i}">页码</span></li>
+                                                <li th:if="${xbStudentRelationPage.getNumber()+1 != i}"><a  th:onclick="'javascript:getStudentListPage(\''+${i-1}+'\')'" th:text="${i}"></a></li>
+                                            </th:block>
+                                        </th:block>
+                                        <th:block th:if="${xbStudentRelationPage.getTotalPages() > 10}">
+                                            <th:block th:if="${(xbStudentRelationPage.getNumber()+1-(5/2)) <= 2}" th:each="i:${#numbers.sequence(2,2+5-1)}">
+                                                <li th:if="${xbStudentRelationPage.getNumber()+1 == i}"  class="active"><span th:text="${i}">页码</span></li>
+                                                <li th:if="${xbStudentRelationPage.getNumber()+1 != i}"><a  th:onclick="'javascript:getStudentListPage(\''+${i-1}+'\')'" th:text="${i}"></a></li>
+                                            </th:block>
+                                            <!-- ... -->
+                                            <li th:if="${(xbStudentRelationPage.getNumber()+1-(5/2))>2}"><span>...</span></li>
+
+                                            <th:block th:if="${((xbStudentRelationPage.getNumber()+1-(5/2))>2) && ((xbStudentRelationPage.getNumber()+1+(5/2)-(5%2==0?1:0)) < (xbStudentRelationPage.getTotalPages()-1))}"
+                                                      th:each="i:${#numbers.sequence(xbStudentRelationPage.getNumber()+1-(5/2),xbStudentRelationPage.getNumber()+1+(5/2)-(5%2==0?1:0))}">
+                                                <li th:if="${xbStudentRelationPage.getNumber()+1 == i}"  class="active"><span th:text="${i}">页码</span></li>
+                                                <li th:if="${xbStudentRelationPage.getNumber()+1 != i}"><a  th:onclick="'javascript:getStudentListPage(\''+${i-1}+'\')'" th:text="${i}"></a></li>
+                                            </th:block>
+
+                                            <!-- ... -->
+                                            <li th:if="${(xbStudentRelationPage.getNumber()+1+(5/2)-(5%2==0?1:0)) < (xbStudentRelationPage.getTotalPages()-1)}"><span>...</span></li>
+                                            <th:block th:if="${(xbStudentRelationPage.getNumber()+1+(5/2)-(5%2==0?1:0)) >= (xbStudentRelationPage.getTotalPages()-1)}" th:each="i:${#numbers.sequence(xbStudentRelationPage.getTotalPages()-5,xbStudentRelationPage.getTotalPages()-1)}">
+                                                <li th:if="${xbStudentRelationPage.getNumber()+1 == i}"  class="active"><span th:text="${i}">页码</span></li>
+                                                <li th:if="${xbStudentRelationPage.getNumber()+1 != i}"><a  th:onclick="'javascript:getStudentListPage(\''+${i-1}+'\')'" th:text="${i}"></a></li>
+                                            </th:block>
+                                        </th:block>
+                                        <!-- 最后一页 -->
+                                        <li th:if="${xbStudentRelationPage.getTotalPages()>1 && xbStudentRelationPage.getNumber()+1 == xbStudentRelationPage.getTotalPages()}" class="active"><span th:text="${xbStudentRelationPage.getTotalPages()}">页码</span></li>
+                                        <li th:if="${xbStudentRelationPage.getTotalPages()>1 && xbStudentRelationPage.getNumber()+1 != xbStudentRelationPage.getTotalPages()}">
+
+                                            <a href="#" th:onclick="'javascript:getStudentListPage(\''+${xbStudentRelationPage.getTotalPages()-1}+'\')'"
+                                               th:text="${xbStudentRelationPage.getTotalPages()}"></a>
+                                        </li>
+                                        <!-- 下一页 -->
+                                        <li th:if="${xbStudentRelationPage.getNumber()+1 >= xbStudentRelationPage.getTotalPages()}"><span>下一页</span></li>
+                                        <li th:if="${xbStudentRelationPage.getNumber()+1 < xbStudentRelationPage.getTotalPages()}">
+                                            <a th:onclick="'javascript:getStudentListPage(\''+${xbStudentRelationPage.getNumber()+1}+'\')'">
+                                                <i class="ace-icon fa ">下一页</i>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <span style="color: #020202;" th:text="'共'+${xbStudentRelationPage.getTotalPages()}+'页/'+${xbStudentRelationPage.getTotalElements()}+'条记录'"></span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 课表 -->
+                    <input id="classid" type="hidden" th:value="${xbClass.id}">
+                    <div id="divideList" class="tab-pane fade divideList">
+                        <div id="calendar">
+                            <div class="classStyle">
+                                <p class="state1"><span></span>已记上课</p>
+                                <p class="state2"><span></span>我的日程</p>
+                                <p class="state3"><span></span>正常日程</p>
+                                <p class="state4"><span></span>冲突日程</p>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 自定义选项弹窗 -->
+        <div id="modal-table" class="modal fade in" tabindex="-1" aria-hidden="false">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header no-padding">
+                        <div class="table-header">自定义选项</div>
+                    </div>
+                    <div class="modal-body no-padding">
+                        <div class="checkAll">
+                            <input type="checkbox" id="sel_2" onchange="selectAll()">全选
+                        </div>
+                        <div class="checkList">
+                            <span><input type="checkbox">渠道</span>
+                            <span><input type="checkbox">欠费</span>
+                            <span><input type="checkbox">积分</span>
+                            <span><input type="checkbox">微信号</span>
+                            <span><input type="checkbox">生日</span>
+                            <span><input type="checkbox">年龄</span>
+                            <span><input type="checkbox">公立学校</span>
+                            <span><input type="checkbox">公立校班级</span>
+                            <span><input type="checkbox">居住区域</span>
+                            <span><input type="checkbox">其他信息</span>
+                            <span><input type="checkbox">课程状态</span>
+                            <span><input type="checkbox">上课校区</span>
+                            <span><input type="checkbox">课时有校区</span>
+                        </div>
+                    </div>
+
+
+                    <div class="modal-footer no-margin-top">
+                        <button class="btn pull-left" data-dismiss="modal">
+                            取消
+                        </button>
+                        <button class="btn pull-right" data-dismiss="modal">
+                            确定
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+<!-- 选择已有学员 -->
+<div id="modal-table2" class="modal fade in subsidy" tabindex="-1" aria-hidden="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header no-padding">
+                <div class="table-header">选择已有学员</div>
+            </div>
+            <div class="modalFrom">
+                <div class="form-group" style="margin-right:0 !important;">
+                    <select name="" id="">
+                        <option value="">学员姓名</option>
+                        <!--<option value="">张三</option>
+                    <option value="">李四</option>-->
+                    </select>
+                </div>
+                <form class="form-search">
+                            <span class="input-icon">
+                                <input type="text" oninput="getStudentList()" id="studentNames" placeholder="请输入学员名称">
+                                <!--<i class="ace-icon fa fa-search nav-search-icon"></i>-->
+                            </span>
+                </form>
+                <!--<div class="form-group">
+                <label>校区</label>
+                <select name="" id="">
+                    <option value="">全部校区</option>
+                    <option value="">111</option>
+                    <option value="">222</option>
+                </select>
+            </div>-->
+            </div>
+            <div class="modal-body no-padding" style="height: 200px;overflow-y: auto" id="donghua">
+                <table class="table table-striped  table-hover no-margin-bottom no-border-top">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th>姓名</th>
+                        <th>联系方式</th>
+                        <th>在读课程</th>
+                    </tr>
+                    </thead>
+                    <tbody style="display: none;">
+                    <!--<tr class="none">
+                <td>
+                    <img src="img/none.png">
+                    <span>很抱歉，这里什么都没有</span>
+                </td>
+            </tr>-->
+                    </tbody>
+                    <tbody th:id="userchoose">
+                    <th:block th:if="${xbStudentsList}" th:fragment="studentList">
+                        <tr th:each="stu : ${xbStudentsList}">
+                            <td>
+                                <input name="form-field-checkbox" name="studio" type="radio" th:value="${stu.id}">
+                            </td>
+                            <td th:text="${stu.xbStudent.studentName}"><img src="../static/pages/img/boy.png"></td>
+                            <td th:text="${stu.xbStudent.contactPhone}"></td>
+                            <td th:text="${stu.xbCourse.courseName}+'：'+${stu.receivable}+'元('+${stu.periodNum}+'课时)'"><img src="../static/pages/img/ke.png">在读课程</td>
+                        </tr>
+                    </th:block>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="modal-footer no-margin-top">
+                <button class="btn pull-left" data-dismiss="modal">
+                    取消
+                </button>
+                <button class="btn pull-right" data-dismiss="modal"  type="button" onclick="chooseUser();">
+                    确定
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script type="text/javascript" th:inline="javascript">
+    ! function () {
+        laydate.render({
+            elem: '#demo'
+        }); //绑定元素
+    }();
+
+    $(".down").click(function () {
+        $(this).siblings(".dropdown-menu").toggle();
+    });
+    $(".tag .close").click(function () {
+        $(this).parent(".tag").hide();
+    });
+    var basePath = /*[[${#httpServletRequest.getScheme() + "://" + #httpServletRequest.getServerName() + ":" + #httpServletRequest.getServerPort() + #httpServletRequest.getContextPath()}]]*/;
+    $(function () {
+       /* var load = new Loading();
+        load.init({
+            target: "#main-container"
+        })*/
+        //load.start();
+        var date = new Date();
+        var d = date.getDate();
+        var m = date.getMonth();
+        var y = date.getFullYear();
+        var classid = $("#classid").val();
+        var url = basePath+"/jw_center_arranging_course/to_arranging_course_fullcalendar";
+        $('#calendar').fullCalendar({
+            header: {
+                right: '',
+                center: 'prev,title,next,today',
+                left: 'agendaDay,agendaWeek,month'
+            },
+            //自定义图标
+            buttonIcons:{
+                prev:'left-single-arrow',
+                next: 'right-single-arrow',
+                prevYear: 'left-double-arrow',
+                nextYear: 'right-double-arrow'
+            },
+            currentTimezone: 'Asia/Beijing',
+            height:"700",aspectRatio:1.6,handleWindowResize:true,
+            /*eventLimit: true,
+            views: {
+                agenda: {
+                    eventLimit: 3//最大容纳数量
+                }
+            },*/
+            defaultView:'agendaWeek',
+            editable:false,//是否可拖动
+            monthNames: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+            monthNamesShort: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+            dayNames: ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"],
+            dayNamesShort: ["周日", "周一", "周二", "周三", "周四", "周五", "周六"],
+            firstDay: 1,
+            editable: true,
+            timeFormat: 'H:mm',
+            axisFormat: 'H:mm',
+            events: function(start, end, callback) {
+                //load.start();
+                var fstart = $.fullCalendar.formatDate(start, "yyyy-MM-dd");
+                var fend = $.fullCalendar.formatDate(end, "yyyy-MM-dd");
+                $.ajax({
+                    type: "post",
+                    url: url,//我是用ajax获取后台数据的，这里填写地址
+                    dataType: "json",
+                    data: {
+                        start: fstart,
+                        end: fend,
+                        classid:classid,
+                        type:"bj"
+                    },
+                    success: function(data) {
+                        if (data) {
+                            var event = [];
+                            var listentity = data.listentity;
+                            $.each(listentity, function(i) {
+                                var dd = listentity[i];
+                                var time = dd.timeInterval.split("-");
+                                var date = dd.startDateTime.split("-");
+                                var y = date[0];var m = date[1];var d = date[2];
+                                var starthh = time[0].split(":")[0].trim();
+                                var startmm = time[0].split(":")[1].trim();
+                                var endhh = time[1].split(":")[0].trim();
+                                var endtmm = time[1].split(":")[1].trim();
+                                event.push({
+                                    _id: dd.id,
+                                    title:dd.className,
+                                    start: new Date(y, m-1, d ,starthh,startmm),
+                                    end: new Date(y, m-1, d ,endhh,endtmm),
+                                    allDay: false,
+                                    roomname:dd.classroomName,
+                                    type:dd.organName+dd.courseTypeName+dd.className,
+                                    teachername:dd.employeeName,
+                                    xbClassId:dd.xbClassId,
+                                    startDateTime:dd.startDateTime,
+                                    timeInterval:dd.timeInterval,
+                                    subjectId:dd.subjectId,
+                                    classTheme:dd.classTheme
+
+                                });
+                            });
+                            //load.stop();
+                            callback(event);
+                        }
+                        //load.stop();
+                    },
+                    error:function(){
+                        $.kd.kdAlert("错了")
+                    }
+                });
+            },
+            //点击事件
+            eventClick: function(event) {
+                /*$('#modal-table').modal('show');
+                $("#id").val(event._id);
+                $("#newdayattend").text("编辑日程");
+                $("#classId").val(event.xbClassId);
+                $(":radio[name='scheduleMode'][value='1']").prop("checked", "checked");
+                $("#scheduleModediv").hide();
+                $("#startDateTime").val(event.startDateTime);
+                $("#timeInterval").val(event.timeInterval);
+                $("#subjectId").val(event.subjectId);
+                $("#classTheme").val(event.classTheme);
+                $("#classId").attr("disabled","disabled");
+                $("#classId").css("color","#a29b9b");
+                classToFindAll('edit');*/
+            },
+            loading: function (bool) {
+                if (bool) $('#loading').show();
+                else $('#loading').hide();
+            },
+            //#region 鼠标放上去显示信息
+            eventMouseover: function (calEvent, jsEvent, view) {
+                var fstart = $.fullCalendar.formatDate(calEvent.start, "yyyy年MM月dd号 HH:mm");
+                var fend = $.fullCalendar.formatDate(calEvent.end, "yyyy年MM月dd号 HH:mm");
+                $(this).attr('title', "开始时间："+fstart+"" +
+                    "\r\n结束时间："+fend+"" +
+                    "\r\n教室："+calEvent.roomname+
+                    "\r\n班课/一对一："+calEvent.type+
+                    "\r\n教师："+calEvent.teachername);
+                $(this).css('background',"#66b8b2");
+            },
+            eventMouseout: function (event, jsEvent, view) {
+                $(this).css('background',"");
+            },
+        });
+        $('#calendar'). fullCalendar ( 'refetchEvents' );
+    });
+
+function selectAll() {
+    var isCheck = $("#sel_1").is(':checked'); //获得全选复选框是否选中
+    $("#choose input[type='checkbox']").each(function () {
+        this.checked = isCheck; //循环赋值给每个复选框是否选中
+    });
+
+    var isCheck = $("#sel_2").is(':checked'); //获得全选复选框是否选中
+    $(".checkList input[type='checkbox']").each(function () {
+        this.checked = isCheck; //循环赋值给每个复选框是否选中
+    });
+};
+$(".skList").hover(function () {
+    $(this).siblings(".infoShow").toggle(300);
+});
+
+    function getStudentList() {
+        var courseTypeId = $("#courseTypeId").val();
+        var load = new Loading();
+        load.init({
+            target: "#donghua"
+        });
+        load.start();
+        $.ajax({
+            type: 'get',
+            //dataType: 'json',
+            url: basePath + '/feeRelated/getStudentListByCourseType',
+            data: {
+                studentName: $("#studentNames").val(),
+                courseTypeId:courseTypeId
+            },
+            contentType: "application/json;charset=UTF-8",
+            cache: false,
+            async: true,
+            success: function (data) {
+                load.stop();
+                console.log(data);
+                $("#userchoose").html("");
+                $('#userchoose').append(data);
+            }
+        });
+    };
+
+    function chooseUser() {
+        var load = new Loading();
+        load.init({
+            target: "#donghua"
+        });
+        var val = $('input:radio[name="studio"]:checked').val();
+        var classid = $("#classid").val();
+        if (val == null) {
+            $.kd.kdAlert("什么也没选中!");
+            return false;
+        }
+        load.start();
+        $.ajax({
+            type: 'get',
+            dataType: 'json',
+            url: basePath + '/feeRelated/saveStudentRelationClassId',
+            data: {
+                studentRelationId: val,
+                classid:classid
+            },
+            contentType: "application/json;charset=UTF-8",
+            async: true,
+            success: function (data) {
+                load.stop();
+                console.log(data);
+                $.kd.kdAlert(data.msg,function(){
+                    window.location.href=basePath+"/student/classDetail?classId="+classid;
+                });
+
+            }
+        });
+    };
+
+
+    function getStudentListPage(page) {
+        var classId = $("#classid").val();
+        var load = new Loading();
+        load.init({
+            target: "#main-container"
+        });
+        load.start();
+        var size = $('#size option:selected').val(); //选中的值
+        window.location.href = basePath + '/student/classDetail?classId='+classId+'&page=' + page + '&size=' + size;
+    }
+
+    function finishCourse(id) {
+        var classId = $("#classid").val();
+        $.kd.kdConfirm("确定要进行结课操作吗？",function(){
+            var load = new Loading();
+            load.init({
+                target: "#main-container"
+            });
+            load.start();
+            $.ajax({
+                url: basePath + '/student/finish/course/' + id,
+                type: 'get',
+                dataType: 'json',
+                contentType: 'application/json',
+                async: true,
+                success: function (data) {
+                    load.stop();
+                    var status = data.status;
+                    var msg = data.msg;
+                    $.kd.kdAlert(msg,function () {
+                        window.location.href = basePath + '/student/classDetail?classId='+classId;
+                    });
+                },
+                error: function () {
+                    load.stop();
+                    $.kd.kdMsg("结课失败");
+                    console.log("回调失败")
+                }
+            });
+        })
+    }
+
+</script>
+
+</body>
+
+</html>

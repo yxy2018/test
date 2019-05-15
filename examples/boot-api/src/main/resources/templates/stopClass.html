@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+    <link rel="stylesheet" href="../static/pages/css/ace.min.css" id="main-ace-style" />
+    <link rel="stylesheet" href="../static/pages/css/index.css">
+    <link rel="stylesheet" href="../static/pages/css/enroll.css">
+    <link rel="stylesheet" href="../static/pages/css/madal.css">
+    <link rel="stylesheet" href="../static/pages/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../static/pages/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="../static/pages/css/kd.ui.plugin.css" />
+    <link rel="stylesheet" href="../static/pages/css/loading.css" />
+
+    <script src="../static/pages/js/jquery.min.js"></script>
+    <script src="../static/pages/js/bootstrap.min.js"> </script>
+    <script src="../static/pages/js/ace.min.js"> </script>
+    <script src="../static/pages/js/ace-elements.min.js"></script>
+    <script src="../static/pages/laydate/laydate.js"></script>
+    <script src="../static/pages/js/kd.ui.plugin.js"></script>
+    <script src="../static/pages/js/loading.js"></script>
+
+</head>
+<body>
+<div th:replace="layout::top"></div>
+<form id="stopform">
+<div class="main-container" id="main-container">
+    <div th:replace="layout::left('12','')">
+    </div>
+        <div class="main-content">
+        <div class="breadcrumbs" id="breadcrumbs">
+            <img src="../static/pages/img/line1.png">
+            <span>停课</span>
+            <img src="../static/pages/img/line.png">
+        </div>
+        <div class="enrollCon" id="stopClassId">
+            <button class="choiceStu" type="button" href="#modal-table" data-toggle="modal" id="chooseid" onclick="getStudentList()"
+                    style="margin-bottom:22px;">选择学员</button>
+            <th:block th:if="${xbStudent}" th:fragment="changeClassFragment">
+            <div class="chooseInfo">
+                <p><span>学员姓名：</span>
+                    <th:block th:text="${xbStudent.studentName}"></th:block>
+                </p>
+                <p><span>联系方式：</span>
+                    <th:block th:text="${xbStudent.contactPhone}"></th:block>
+                    <input type="hidden" name="studentId" id="studentId" th:value="${xbStudent.id}"/>
+                </p>
+                <button href="#modal-table" data-toggle="modal" type="button" oninput="getStudentList()">重新选择</button>
+            </div>
+            <div class="stopClass">
+                <div class="form-group">
+                    <label>选择课程</label>
+                    <select name="classId" id="classId" th:onchange="|javascript:chooseCourse('${xbStudent.id}')|">
+                        <option th:each="cla:${xbClassList}" th:selected="${cla.id}eq ${classId}" th:value="${cla.id}" th:text="${cla.sysOrgans.organName}+${cla.xbCourse.courseName}+${cla.employeeName}+${cla.className}"></option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>学费剩余</label>
+                    <span>总学费：<th:block th:text="${xbStudentRelation.totalReceivable}?${xbStudentRelation.totalReceivable}:'0.00'"></th:block><th:block th:text=" '（'+${xbStudentRelation.totalPeriodNum}?${xbStudentRelation.totalPeriodNum}:'0'+'课时）'"></th:block></span>
+                    <span>剩余：<th:block  th:text="${xbStudentRelation.receivable}?${xbStudentRelation.receivable}:'0.00'"></th:block><th:block th:text=" '（'+${xbStudentRelation.periodNum}?${xbStudentRelation.periodNum}:'0'+'课时）'"></th:block></span>
+                </div>
+                <div class="form-group" style="display: none">
+                    <label for="">实际剩余</label>
+                    <!--<input type="text" name="shengyu" id="shengyu" value="0.00"><span>元</span><span>转到学员账户</span>
+                    <input type="hidden" id="receivable" th:value="${xbStudentRelation.receivable}"/>-->
+                </div>
+                <input type="hidden" name="shengyu" id="shengyu" value="0.00">
+                <input type="hidden" id="receivable" th:value="${xbStudentRelation.receivable}"/>
+                <div class="form-group">
+                    <label for="">对内备注</label>
+                    <input type="text" name="remarksIn" placeholder="该备注只有内部操作人员可见" class="remark">
+                </div>
+                <div class="form-group">
+                    <label for="">对外备注</label>
+                    <input type="text" name="remarksOut" placeholder="该备注将会被打印且会在校宝家中显示" class="remark">
+                </div>
+            </div>
+            </th:block>
+        </div>
+        <div class="enrollCon handleInfo subInfo">
+            <h3>经办信息</h3>
+            <div class="pad">
+                <!--<div class="form-group">
+                    <label class="col-sm-1">经办校区</label>
+                    <select name="organId" id="jborganId" onchange="getEmployee();">
+                        <option th:each="orgs:${sysOrgansList}"  th:value="${orgs.id}" th:text="${orgs.organName}"></option>
+                    </select>
+                </div>-->
+                <div class="form-group">
+                    <label class="col-sm-1">销售来源</label>
+                    <input type="text" name="salesSource" placeholder="请输入销售来源">
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-1">经办日期</label>
+                    <input class="laydate-icon" name="handleDate" id="demo" th:value="${#dates.format(new java.util.Date().getTime(), 'yyyy-MM-dd')}">
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-1">经办人</label>
+                    <input type="text" th:value="${sysEmployee.employeeName}" name="handlePerson" disabled="disabled">
+                </div>
+                <div class="form-group" style="margin-right:0 !important;">
+                    <label class="col-sm-1">运营助理</label>
+                    <select name="operationAssistant" id="salesPerson">
+                        <option th:each="emp:${employeeList}" name="operationAssistant" th:value="${emp.employeeName}" th:text="${emp.employeeName}"></option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="enrollCon">
+            <button class="save" type="button" onclick="stopClass();">保存</button>
+            <button class="save" type="button" onclick="javascript:history.go(-1)" style="margin-right:22px;">返回</button>
+        </div>
+    </div>
+    <!-- 选择已有学员 -->
+    <div id="modal-table" class="modal fade in subsidy" tabindex="-1" aria-hidden="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header no-padding">
+                    <div class="table-header">选择已有学员</div>
+                </div>
+                <div class="modalFrom">
+                    <div class="form-group" style="margin-right:0 !important;">
+                        <select name="" id="">
+                            <option value="">学员姓名</option>
+                            <!--<option value="">张三</option>
+                            <option value="">李四</option>-->
+                        </select>
+                    </div>
+                    <form class="form-search">
+                            <span class="input-icon">
+                                <input type="text" oninput="getStudentList()"  id="studentName" placeholder="请输入学员名称">
+                                <!--<i class="ace-icon fa fa-search nav-search-icon"></i>-->
+                            </span>
+                    </form>
+                    <!--<div class="form-group">
+                        <label>校区</label>
+                        <select name="" id="">
+                            <option value="">全部校区</option>
+                            <option value="">111</option>
+                            <option value="">222</option>
+                        </select>
+                    </div>-->
+                </div>
+                <div class="modal-body no-padding" style="height: 200px;overflow-y: auto">
+                    <table class="table table-striped  table-hover no-margin-bottom no-border-top">
+                        <thead>
+                        <tr>
+                            <th></th>
+                            <th>姓名</th>
+                            <th>联系方式</th>
+                            <th>在读课程</th>
+                        </tr>
+                        </thead>
+                        <tbody style="display: none;">
+                        <!--<tr class="none">
+                            <td>
+                                <img src="img/none.png">
+                                <span>很抱歉，这里什么都没有</span>
+                            </td>
+                        </tr>-->
+                        </tbody>
+                        <tbody th:id ="userchoose">
+                            <th:block th:if="${xbStudentPage}" th:fragment="studentList">
+                                <tr  th:each="stu : ${xbStudentPage.content}" >
+                                    <td>
+                                        <input name="form-field-checkbox" name="studio" type="radio" th:value="${stu.id}">
+                                    </td>
+                                    <td th:text="${stu.studentName}"><img src="../static/pages/img/boy.png"></td>
+                                    <td th:text="${stu.contactPhone}"></td>
+                                    <td ></td>
+                                    <!--<td><img src="../static/pages/img/ke.png">在读课程</td>-->
+                                </tr>
+                        </th:block>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="modal-footer no-margin-top">
+                    <button class="btn pull-left" data-dismiss="modal">
+                        取消
+                    </button>
+                    <button class="btn pull-right" data-dismiss="modal" type="button" onclick="chooseUser();" >
+                        确定
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+</form>
+<script>
+    !function(){
+        laydate.render({elem: '#demo'});//绑定元素
+    }();
+</script>
+<script type="text/javascript" th:inline="javascript">
+    var basePath = /*[[${#httpServletRequest.getScheme() + "://" + #httpServletRequest.getServerName() + ":" + #httpServletRequest.getServerPort() + #httpServletRequest.getContextPath()}]]*/;
+    function getStudentList(){
+        var load = new Loading();
+        load.init({
+            target: "#modal-table"
+        });
+        load.start();
+        $.ajax({
+            type: 'get',
+            //dataType: 'json',
+            url: basePath + '/feeRelated/getStopStudentList',
+            data: {studentName:$("#studentName").val()},
+            contentType:"application/json;charset=UTF-8",
+            cache: false,
+            async: true,
+            success: function (data) {
+                load.stop();
+                console.log(data);
+                $("#userchoose").html("");
+                $('#userchoose').append(data);
+            }
+        });
+    };
+
+    function chooseUser(){
+        var load = new Loading();
+        load.init({
+            target: "#modal-table"
+        });
+        var val = $('input:radio[name="studio"]:checked').val();
+        if (val == null) {
+            $.kd.kdAlert("什么也没选中!");
+            return false;
+        }
+        load.start();
+        $.ajax({
+            type: 'get',
+            //dataType: 'json',
+            url: basePath + '/feeRelated/stopchooseStudent',
+            data: {studentId:val},
+            contentType:"application/json;charset=UTF-8",
+            cache: false,
+            async: true,
+            success: function (data) {
+                load.stop();
+                console.log(data);
+                $("#stopClassId").html(data);
+            }
+        });
+    };
+
+    function stopClass(){
+        var studentId = $('#studentId').val();
+        if (studentId) {
+            var receivable = $('#receivable').val();
+            var shengyu = $('#shengyu').val();
+            var classId = $('#classId').val();
+            if(!classId){
+                $.kd.kdAlert("请先选择课程！");
+                return false;
+            }
+            if(parseFloat(receivable)<parseFloat(shengyu)){
+                $.kd.kdAlert("实际金额不能大于剩余金额！");
+                return false;
+            }
+            var data= serializeObject("#stopform");
+            console.log(data);
+            $.ajax({
+                type: 'get',
+                dataType: 'json',
+                url: basePath + '/feeRelated/saveStopClass',
+                data: {studentEntity:JSON.stringify(data)},
+                contentType:"application/json;charset=UTF-8",
+                cache: false,
+                async: true,
+                success: function (data) {
+                    $.kd.kdAlert("停课成功！",function () {
+                        window.location.href = basePath + '/student/getManagementList';
+                    });
+                }
+            });
+        }else{
+            $.kd.kdAlert("请先选择学员！");
+        }
+    }
+
+    function chooseCourse(){
+        var classId = $("#classId").val();
+        var studentId = $("#studentId").val();
+        var load = new Loading();
+        load.init({
+            target: "#modal-table"
+        });
+        var val = $('input:radio[name="studio"]:checked').val();
+        if (val == null) {
+            $.kd.kdAlert("什么也没选中!");
+            return false;
+        }
+        load.start();
+        $.ajax({
+            type: 'get',
+            //dataType: 'json',
+            url: basePath + '/feeRelated/stopchooseStudent',
+            data: {classId:classId,studentId:studentId},
+            contentType:"application/json;charset=UTF-8",
+            cache: false,
+            async: true,
+            success: function (data) {
+                load.stop();
+                console.log(data);
+                $("#stopClassId").html(data);
+            }
+        });
+    };
+
+    function serializeObject(form)
+    {
+        var o = {};
+        var a = $(form).serializeArray();
+        $.each(a, function() {
+            if (o[this.name]) {
+                if (!o[this.name].push) {
+                    o[this.name] = [o[this.name]];
+                }
+                o[this.name].push(this.value || '');
+            } else {
+                o[this.name] = this.value || '';
+            }
+        });
+        return o;
+    };
+</script>
+</body>
+</html>

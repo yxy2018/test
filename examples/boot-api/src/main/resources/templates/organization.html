@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>Document</title>
+    
+    <link rel="stylesheet" href="../static/pages/css/ace.min.css" id="main-ace-style" />
+    <link rel="stylesheet" href="../static/pages/css/index.css"/>
+    <link rel="stylesheet" href="../static/pages/css/management.css"/>
+    <link rel="stylesheet" href="../static/pages/css/student.css"/>
+    <link rel="stylesheet" href="../static/pages/css/madal.css"/>
+    <link rel="stylesheet" href="../static/pages/css/Inmanagement.css"/>
+    <link rel="stylesheet" href="../static/pages/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="../static/pages/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="../static/pages/css/kd.ui.plugin.css" />
+    <link rel="stylesheet" href="../static/pages/css/loading.css" />
+    <script src="../static/pages/js/jquery.min.js"></script>
+    <script src="../static/pages/js/bootstrap.min.js"> </script>
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
+    <script src="../static/pages/js/jquery.validate17.min.js"></script>
+    <script src="../static/pages/js/additiona17l-methods.min.js"></script>
+    <script src="../static/pages/js/messages_zh.min.js"></script>
+    <script src="../static/pages/js/kd.ui.plugin.js"></script>
+    <script src="../static/pages/js/loading.js"></script>
+    <script src="../static/pages/js/ace.min.js"> </script>
+</head>
+<body>
+<div th:replace="layout::top"></div>
+<div class="main-container" id="main-container">
+    <div th:replace="layout::left('14','41')">
+    </div>
+    <div class="main-content">
+        <div class="breadcrumbs" id="breadcrumbs">
+            <img src="../static/pages/img/line1.png">
+            <span>组织架构</span>
+            <img src="../static/pages/img/line.png">
+        </div> 
+        <div class="tabbable">
+            <div class="tab-content student classes">
+                <!-- 学员列表 -->
+                <div  class="tab-pane fade in active" id="student_list_jz">
+                    <div class="screen">
+                        <a href="#modal-table" role="button"  data-toggle="modal"><button class="stdEnroll">新建</button></a> 
+                    </div>
+                    <div class="orderCon">
+                        <div class="orderTable">
+                            <div class="tableTitle" id="donghua">
+                                <div>
+                                    <span class="address">名称</span>
+                                    <span class="type">校区类型</span>
+                                    <span class="tel1">电话1</span>
+                                    <span class="tel2">电话2</span>
+                                    <span class="address">地址</span>
+                                    <span class="operate" style="right: 19px;">操作</span>
+                                </div>
+                            </div>
+                            <div class="info-list">
+                                <ol>
+                                    <li th:each="organs,organsStat:${organsPage.content}">
+                                        <div data-handle="" class="tree-handle">
+                                            <span class="tree-titleWrap" class="cols-120" th:text="${organs.organName}">
+                                            </span>
+                                            <span th:switch="${organs.campusType}">
+                                                <span class="cols-80" th:case="0">直营</span>
+                                                <span class="cols-80" th:case="1">合作</span>
+                                                <span class="cols-80" th:case="2">加盟</span>
+                                                <span class="cols-80" th:case="3">代理</span>
+                                            </span>
+                                            <span title="0472-5208800" class="cols-120" th:text="${organs.phone1}"></span>
+                                            <span title="0472-5208801" class="cols-120" th:text="${organs.phone2}"></span>
+											
+                                            <span title="昆区市府西路科源大厦西门四楼" style="text-align: center;padding-left: 100px;" class="cols-240" th:text="${organs.adds}"></span>
+                                            <span class="tree-fr">
+                                                <!--<span class="tree-btn-wrap">
+                                                    <a href="javascript:;">添加子集</a>
+                                                    <div class="ivu-tooltip">
+                                                        <div class="ivu-tooltip-rel"></div>
+                                                    </div>
+                                                </span>-->
+                                                <span class="tree-btn-wrap guidebtn2">
+                                                    <a href="#modal-table" role="button"  data-toggle="modal"
+                                                       th:onclick="|javascript:sourceEdit('${organs.id}','${organs.organName}','${organs.campusType}','${organs.phone1}','${organs.phone2}','${organs.adds}','${organs.layOrder}','${organs.campusType}')|">编辑
+                                                   </a>
+                                                    <div class="ivu-tooltip">
+                                                        <div class="ivu-tooltip-rel"></div>
+                                                    </div>
+                                                </span>
+                                                <span class="tree-btn-wrap">
+                                                     <a  th:onclick="|javascript:sourceRemove('${organs.id}')|">删除</a>
+                                                    <div class="ivu-tooltip">
+                                                        <div class="ivu-tooltip-rel"></div>
+                                                    </div>
+                                                </span>
+                                            </span>
+                                        </div>
+                                    </li>
+                                </ol>
+                            </div>
+
+                            <div class="orderPage" style="margin-top:30px;">
+                                <div class="page">
+                                    单页显示：
+                                    <select id="size" name="size" onchange="getOrgansListPage('');">
+                                        <option value="20">20条/页</option>
+                                        <option value="5">5条/页</option>
+                                        <option value="10">10条/页</option>
+                                        <option value="15">15条/页</option>
+                                    </select>
+                                    <input type="hidden" id="currentzise" th:value="${currentzise}"/>
+                                </div>
+                                <ul class="pagination" th:if="${organsPage.getTotalPages()>0}">
+                                    <!-- 上一页 -->
+                                    <li th:if="${organsPage.getNumber()+1 == 1}"><span>上一页</span></li>
+                                    <li th:if="${organsPage.getNumber()+1 > 1}">
+                                        <a  th:onclick="'javascript:getOrgansListPage(\''+${organsPage.getNumber()-1}+'\')'">
+                                            <i class="ace-icon fa ">上一页</i>
+                                        </a>
+                                    </li>
+                                    <!-- 首页 -->
+                                    <li th:if="${organsPage.getNumber()+1 == 1}" class="active"><span>1</span></li>
+                                    <li th:if="${organsPage.getNumber()+1 > 1}">
+                                        <a  th:onclick="'javascript:getOrgansListPage(\''+${0}+'\')'">1</a>
+                                    </li>
+
+                                    <th:block th:if="${organsPage.getTotalPages()>2 && organsPage.getTotalPages()<=10}">
+                                        <th:block th:each="i:${#numbers.sequence(2,organsPage.getTotalPages()-1)}">
+                                            <li th:if="${organsPage.getNumber()+1 == i}"  class="active"><span th:text="${i}">页码</span></li>
+                                            <li th:if="${organsPage.getNumber()+1 != i}"><a  th:onclick="'javascript:getOrgansListPage(\''+${i-1}+'\')'" th:text="${i}"></a></li>
+                                        </th:block>
+                                    </th:block>
+                                    <th:block th:if="${organsPage.getTotalPages() > 10}">
+                                        <th:block th:if="${(organsPage.getNumber()+1-(5/2)) <= 2}" th:each="i:${#numbers.sequence(2,2+5-1)}">
+                                            <li th:if="${organsPage.getNumber()+1 == i}"  class="active"><span th:text="${i}">页码</span></li>
+                                            <li th:if="${organsPage.getNumber()+1 != i}"><a  th:onclick="'javascript:getOrgansListPage(\''+${i-1}+'\')'" th:text="${i}"></a></li>
+                                        </th:block>
+                                        <!-- ... -->
+                                        <li th:if="${(organsPage.getNumber()+1-(5/2))>2}"><span>...</span></li>
+
+                                        <th:block th:if="${((organsPage.getNumber()+1-(5/2))>2) && ((organsPage.getNumber()+1+(5/2)-(5%2==0?1:0)) < (organsPage.getTotalPages()-1))}"
+                                                  th:each="i:${#numbers.sequence(organsPage.getNumber()+1-(5/2),organsPage.getNumber()+1+(5/2)-(5%2==0?1:0))}">
+                                            <li th:if="${organsPage.getNumber()+1 == i}"  class="active"><span th:text="${i}">页码</span></li>
+                                            <li th:if="${organsPage.getNumber()+1 != i}"><a  th:onclick="'javascript:getOrgansListPage(\''+${i-1}+'\')'" th:text="${i}"></a></li>
+                                        </th:block>
+
+                                        <!-- ... -->
+                                        <li th:if="${(organsPage.getNumber()+1+(5/2)-(5%2==0?1:0)) < (organsPage.getTotalPages()-1)}"><span>...</span></li>
+                                        <th:block th:if="${(organsPage.getNumber()+1+(5/2)-(5%2==0?1:0)) >= (organsPage.getTotalPages()-1)}" th:each="i:${#numbers.sequence(organsPage.getTotalPages()-5,organsPage.getTotalPages()-1)}">
+                                            <li th:if="${organsPage.getNumber()+1 == i}"  class="active"><span th:text="${i}">页码</span></li>
+                                            <li th:if="${organsPage.getNumber()+1 != i}"><a  th:onclick="'javascript:getOrgansListPage(\''+${i-1}+'\')'" th:text="${i}"></a></li>
+                                        </th:block>
+                                    </th:block>
+                                    <!-- 最后一页 -->
+                                    <li th:if="${organsPage.getTotalPages()>1 && organsPage.getNumber()+1 == organsPage.getTotalPages()}" class="active"><span th:text="${organsPage.getTotalPages()}">页码</span></li>
+                                    <li th:if="${organsPage.getTotalPages()>1 && organsPage.getNumber()+1 != organsPage.getTotalPages()}">
+
+                                        <a href="#" th:onclick="'javascript:getOrgansListPage(\''+${organsPage.getTotalPages()-1}+'\')'"
+                                           th:text="${organsPage.getTotalPages()}"></a>
+                                    </li>
+                                    <!-- 下一页 -->
+                                    <li th:if="${organsPage.getNumber()+1 >= organsPage.getTotalPages()}"><span>下一页</span></li>
+                                    <li th:if="${organsPage.getNumber()+1 < organsPage.getTotalPages()}">
+                                        <a th:onclick="'javascript:getOrgansListPage(\''+${organsPage.getNumber()+1}+'\')'">
+                                            <i class="ace-icon fa ">下一页</i>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <span style="color: #020202;" th:text="'共'+${organsPage.getTotalPages()}+'页/'+${organsPage.getTotalElements()}+'条记录'"></span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>    
+                    </div>
+                </div>                
+            </div>
+        </div>
+
+
+        
+    </div>
+
+    <!-- 新建/编辑 -->
+    <div id="modal-table" class="modal fade in pk" tabindex="-1" aria-hidden="false">
+        <form id="iform" th:action="@{/accounts/save/organs}" th:method="post">
+            <div class="modal-dialog">
+                <div class="modal-content" id="modal-content">
+                    <div class="modal-header no-padding">
+                        <div class="table-header">新建/编辑</div>
+                    </div>
+                        <div class="modal-body no-padding" style="padding: 20px 0 !important;">
+                            <!--<div class="form-group">
+                                <label><i>*</i>上级</label>
+                                <input type="text" value="sehfjksfhbksdjfbh">
+                            </div>-->
+                            <input type="hidden" id="organsid" name="id"/>
+                            <div class="form-group">
+                                <label><i>*</i>类型</label>
+                                <!--<input name="form-field-radio" name="organType"  type="radio" class="ace"><span class="lbl">校区</span>-->
+                                <input type="radio" checked class="ace"><span class="lbl">校区</span>
+                            </div>
+                            <div class="form-group">
+                                <label for="organName"><i>*</i>名称</label>
+                                <input type="text" id="organName" name="organName">
+                            </div>
+                            <div class="form-group">
+                                <label for="phone1"><i>*</i>电话1</label>
+                                <input type="text" id="phone1" name="phone1">
+                            </div>
+                            <div class="form-group">
+                                <label for="phone2"><i>*</i>电话2</label>
+                                <input type="text" id="phone2" name="phone2" value="">
+                            </div>
+                            <div class="form-group">
+                                <label for="adds"><i>*</i>地址</label>
+                                <textarea name="adds" id="adds" cols="50" rows="1"></textarea>
+                            </div>
+                            <div class="grounInline">
+                                <div class="form-group">
+                                    <label for="layOrder"><i>*</i>校区排序</label>
+                                    <input type="text" id="layOrder" name="layOrder">
+                                </div>
+                                <div class="form-group">
+                                    <label for="campusType"><i>*</i>校区类型</label>
+                                    <select name="campusType" id="campusType">
+                                        <option value="0">直营</option>
+                                        <option value="1">合作</option>
+                                        <option value="2">加盟</option>
+                                        <option value="3">代理</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    <div class="modal-footer no-margin-top">
+                        <button class="btn pull-left" data-dismiss="modal">
+                            取消
+                        </button>
+                        <button class="btn pull-right" onclick="saveOrganization();" type="button">
+                            保存
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- 提示信息 -->
+    <div id="modal-infomation" class="modal fade in pk" tabindex="-1" aria-hidden="false">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header no-padding">
+                        <div class="table-header">提示信息</div>
+                    </div>
+                    <div class="modal-body no-padding" style="padding: 20px 0 !important;" id="infomation">
+
+                    </div>
+                    <div class="modal-footer no-margin-top">
+                        <button class="btn pull-left" data-dismiss="modal">
+                            确定
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+</div>
+<script>
+!function(){
+//laydate.render({elem: '#demo'});//绑定元素
+
+}();
+
+$(function(){
+    var a = $("#currentzise").val();
+    if(a!=20){
+        $("#size").val(a);
+    }
+    $("#iform").validate({
+        rules : {
+            organName : {
+                required:true,
+                minlength:2,
+                checkName:true,
+                maxlength:10
+            },
+            phone1 : {
+                required:true,
+                minlength:2,
+                maxlength:12
+            },
+            phone2 : {
+                required:true
+            },
+            layOrder : {
+                required:true,
+                digits:true
+            },
+            adds : {
+                required:true,
+                minlength:2,
+                maxlength:15
+            },
+            messages: {
+                phone1: "电话1不能为空",
+                phone2: "电话2不能为空",
+                organName: {
+                    required: "名称不能为空",
+                    minlength: "用户名最少由两个字符组成",
+                    maxlength:"用户名不能超过10个字符"
+                },
+                layOrder: {
+                    required: "排序不能为空",
+                    digits: "必须输入数字"
+                },
+                adds: {
+                    required: "请输入密码",
+                    minlength: "地址最少由两个字符组成",
+                    maxlength:"地址不能超过10个字符"
+                }
+            },
+            errorPlacement: function(error, element) {
+                if ( element.is(":radio") )
+                    error.appendTo( element.parent().next().next() );
+                else if ( element.is(":checkbox") )
+                    error.appendTo ( element.next() );
+                else
+                    error.appendTo( element.parent().next() );
+            }
+        }
+    });
+    jQuery.validator.addMethod('checkName', function (value, element) {
+        var organsid = $("#organsid").val();
+        if(organsid){
+            return true;
+        }
+        var msgcode=null;
+        $.ajax({
+            url: basePath + "/accounts/checkOrganName",
+            type: "get",
+            dataType: 'json',
+            async:false,
+            contentType:"application/json;charset=UTF-8",
+            data: {"name":value},
+            success: function(result){
+                msgcode= result.code;
+            }
+        })
+        if(msgcode==1001){
+            $(element).data('error-msg','该校区名称已存在！');
+            return false;
+        }
+        return true;
+    }, function(params, element) {
+        return $(element).data('error-msg');
+    });
+});
+
+$(".down").click(function(){
+  $(this).siblings(".dropdown-menu").toggle();
+});
+$(".tag .close").click(function(){
+  $(this).parent(".tag").hide();
+});
+function selectAll(){
+    var isCheck=$("#sel_1").is(':checked');  //获得全选复选框是否选中
+    $("#choose input[type='checkbox']").each(function() {  
+        this.checked = isCheck;       //循环赋值给每个复选框是否选中
+    });
+
+    var isCheck=$("#sel_2").is(':checked');  //获得全选复选框是否选中
+    $(".checkList input[type='checkbox']").each(function() {  
+        this.checked = isCheck;       //循环赋值给每个复选框是否选中
+    });    
+};
+</script>
+
+<script type="text/javascript" th:inline="javascript">
+    var basePath = /*[[${#httpServletRequest.getScheme() + "://" + #httpServletRequest.getServerName() + ":" + #httpServletRequest.getServerPort() + #httpServletRequest.getContextPath()}]]*/;
+
+    function saveOrganization(){
+        if ($("#iform").valid()) {
+            var data= serializeObject("#iform");
+            var load = new Loading();
+            load.init({
+                target: "#modal-content"
+            });
+            load.start();
+            $.ajax({
+                type: 'post',
+                dataType: 'json',
+                url: basePath + '/accounts/save/organs',
+                data: JSON.stringify(data),
+                contentType:"application/json;charset=UTF-8",
+                cache: false,
+                async: true,
+                success: function (data) {
+                    load.stop();
+                    var status = data.status;
+                    var msg = data.msg;
+                    $.kd.kdAlert("编辑成功！",function () {
+                        window.location.href = basePath + '/accounts/getOrgansList';
+                    },"提示");
+                    /*if(status=="0"){
+                        if (confirm(msg)) {
+                            window.location.href(basePath + '/accounts/getOrgansList');
+                        }
+                    }else{
+
+                    }*/
+                }
+            });
+        }
+    }
+
+
+    function getOrgansListPage(page){
+        var load = new Loading();
+        load.init({
+            target: "#student_list_jz"
+        });
+        load.start();
+        var size = $('#size option:selected').val();//选中的值
+        /*if(page){
+            page = page -1;
+        }*/
+        window.location.href = basePath + '/accounts/getOrgansList?page='+page+'&size='+size;
+    }
+
+    function serializeObject(form)
+    {
+        var o = {};
+        var a = $(form).serializeArray();
+        $.each(a, function() {
+            if (o[this.name]) {
+                if (!o[this.name].push) {
+                    o[this.name] = [o[this.name]];
+                }
+                o[this.name].push(this.value || '');
+            } else {
+                o[this.name] = this.value || '';
+            }
+        });
+        return o;
+    };
+
+    //机构编辑赋值
+    function sourceEdit(id,organName,organType,phone1,phone2,adds,layOrder,campusType){
+        $("#organsid").val(id);
+        $("#organName").val(organName);
+        //$("#organType").val(organType);
+        $("#phone1").val(phone1);
+        $("#phone2").val(phone2);
+        $("#adds").val(adds);
+        $("#layOrder").val(layOrder);
+        $("#campusType").val(campusType);
+    }
+
+    //删除课程类别
+    function sourceRemove(id){
+        //if(confirm("确定要删除该校区?")){
+        $.kd.kdConfirm("确定要删除该校区?",function(){
+            var load = new Loading();
+            load.init({
+                target: "#modal-content"
+            });
+            load.start();
+            $.ajax({
+                url: basePath + '/accounts/delete/organs',
+                type: 'get',
+                dataType: 'json',
+                contentType: 'application/json',
+                data: {id:id},
+                async: true,
+                success: function(data) {
+                    load.stop();
+                    var status = data.status;
+                    var msg = data.msg;
+                    $.kd.kdAlert("删除成功！",function () {
+                        window.location.href = basePath + '/accounts/getOrgansList';
+                    });
+                },
+                error:function(){
+                    console.log("回调失败")
+                }
+            });
+        })
+        //}
+    }
+
+</script>
+<style>
+    a{cursor:pointer}
+</style>
+</body>
+</html>

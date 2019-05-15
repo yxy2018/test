@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    
+    <link rel="stylesheet" href="../static/pages/css/ace.min.css" id="main-ace-style" />
+    <link rel="stylesheet" href="../static/pages/css/index.css">
+    <link rel="stylesheet" href="../static/pages/css/enroll.css">
+    <link rel="stylesheet" href="../static/pages/css/madal.css">
+    <link rel="stylesheet" href="../static/pages/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../static/pages/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="../static/pages/css/kd.ui.plugin.css" />
+    <link rel="stylesheet" href="../static/pages/css/loading.css" />
+
+
+    <script src="../static/pages/js/jquery.min.js"></script>
+    <script src="../static/pages/js/bootstrap.min.js"> </script>
+    <script src="../static/pages/js/ace.min.js"> </script>
+    <script src="../static/pages/js/ace-elements.min.js"></script>
+    <script src="../static/pages/laydate/laydate.js"></script>
+    <script src="../static/pages/js/jquery.validate17.min.js"></script>
+    <script src="../static/pages/js/additiona17l-methods.min.js"></script>
+    <script src="../static/pages/js/messages_zh.min.js"></script>
+    <script src="../static/pages/js/kd.ui.plugin.js"></script>
+    <script src="../static/pages/js/loading.js"></script>
+</head>
+<body>
+<div th:replace="layout::top"></div>
+<form id="roomform">
+    <div class="main-container" id="main-container">
+        <div th:replace="layout::left('13','32')">
+        </div>
+        <div class="main-content" id="main-content">
+            <div class="breadcrumbs" id="breadcrumbs">
+                <img src="../static/pages/img/line1.png">
+                <span>新建教室</span>
+                <img src="../static/pages/img/line.png">
+            </div>
+            <div class="enrollCon">
+                <h2>教室信息</h2>
+                <div class="stopClass newClass">
+                    <div class="form-group" style="display: block;">
+                        <label for="classroomName"><span>*</span>教室名称</label>
+                        <input type="text" placeholder="" required th:value="${xbClassroom.classroomName}" name="classroomName" id="classroomName" class="remark">
+                    </div>
+                    <input type="hidden" name="id" id="classroomid" th:value="${xbClassroom.id}">
+                    <div class="form-group" id="donghua">
+                        <label for="organId" style="width:130px;"><span>*</span>校区</label>
+                        <select name="organId" >
+                            <!--<option value="">选择校区</option>-->
+                            <option th:each="orgs:${organsList}" th:selected="${xbClassroom.organId == orgs.id}" th:value="${orgs.id}" th:text="${orgs.organName}"></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="enrollCon">
+                <button class="save" type="button" onclick="saveRoom();">保存</button>
+                <button class="save" type="button" style="margin-right:22px;" onclick="javascript:history.go(-1)">返回</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+!function(){
+laydate.render({elem: '#demo'});//绑定元素
+}();
+
+$(function(){
+    $("#roomform").validate({
+        rules : {
+            classroomName : {
+                required:true,
+                minlength:2,
+                checkName:true,
+                maxlength:15
+            },
+            organId : {
+                required:true
+            },
+            messages: {
+                classroomName: {
+                    required: "教室名称名称不能为空",
+                    minlength: "用户名最少由两个字符组成",
+                    maxlength:"用户名不能超过10个字符"
+                },
+                organId: "校区不能为空"
+            },
+            errorPlacement: function(error, element) {
+                if ( element.is(":radio") )
+                    error.appendTo( element.parent().next().next() );
+                else if ( element.is(":checkbox") )
+                    error.appendTo ( element.next() );
+                else
+                    error.appendTo( element.parent().next() );
+            }
+        }
+    });
+    jQuery.validator.addMethod('checkName', function (value, element) {
+        var id = $("#classroomid").val();
+        if(id){
+                return true;
+        }
+        var msgcode=null;
+        $.ajax({
+            url: basePath + "/student/checkClassRoom",
+            type: "get",
+            dataType: 'json',
+            async:false,
+            contentType:"application/json;charset=UTF-8",
+            data: {"name":value},
+            success: function(result){
+                msgcode= result.code;
+            }
+        })
+        if(msgcode==1001){
+            $(element).data('error-msg','该教室名称已存在！');
+            return false;
+        }
+        return true;
+    }, function(params, element) {
+        return $(element).data('error-msg');
+    });
+});
+</script>
+<script type="text/javascript" th:inline="javascript">
+var basePath = /*[[${#httpServletRequest.getScheme() + "://" + #httpServletRequest.getServerName() + ":" + #httpServletRequest.getServerPort() + #httpServletRequest.getContextPath()}]]*/;
+function saveRoom(){
+    if ($("#roomform").valid()) {
+        var data= serializeObject("#roomform");
+        var load = new Loading();
+        load.init({
+            target: "#main-content"
+        });
+        load.start();
+        $.ajax({
+            type: 'post',
+            dataType: 'json',
+            url: basePath + '/student/save/classroom',
+            data: JSON.stringify(data),
+            contentType:"application/json;charset=UTF-8",
+            cache: false,
+            async: true,
+            success: function (data) {
+                load.stop();
+                //var status = data.status;
+                var msg = data.msg;
+                $.kd.kdAlert("编辑成功！",function () {
+                    window.location.href = basePath + '/student/getXbClassroomList?room=0';
+                },"提示");
+                /*if(status=="0"){
+                    if (confirm(msg)) {
+                        window.location.href(basePath + '/accounts/getOrgansList');
+                    }
+                }else{
+
+                }*/
+            }
+        });
+    }
+}
+
+function serializeObject(form)
+{
+    var o = {};
+    var a = $(form).serializeArray();
+    $.each(a, function() {
+        if (o[this.name]) {
+            if (!o[this.name].push) {
+                o[this.name] = [o[this.name]];
+            }
+            o[this.name].push(this.value || '');
+        } else {
+            o[this.name] = this.value || '';
+        }
+    });
+    return o;
+};
+
+</script> 
+</body>
+</html>

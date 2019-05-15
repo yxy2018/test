@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+
+    <link rel="stylesheet" href="../static/pages/css/ace.min.css" id="main-ace-style" />
+    <link rel="stylesheet" href="../static/pages/css/index.css" />
+    <link rel="stylesheet" href="../static/pages/css/management.css" />
+    <link rel="stylesheet" href="../static/pages/css/student.css" />
+    <link rel="stylesheet" href="../static/pages/css/madal.css" />
+    <link rel="stylesheet" href="../static/pages/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="../static/pages/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="../static/pages/css/kd.ui.plugin.css" />
+    <link rel="stylesheet" href="../static/pages/css/loading.css" />
+
+
+    <script src="../static/pages/js/jquery.min.js"></script>
+    <script src="../static/pages/js/bootstrap.min.js"> </script>
+    <script src="../static/pages/js/ace.min.js"> </script>
+    <script src="../static/pages/js/ace-elements.min.js"></script>
+    <script src="../static/pages/laydate/laydate.js"></script>
+    <script src="../static/pages/js/kd.ui.plugin.js"></script>
+    <script src="../static/pages/js/loading.js"></script>
+    <script src="../static/pages/js/laydate.js"></script>
+
+
+</head>
+
+<body>
+    <div th:replace="layout::top"></div>
+    <div class="main-container" id="main-container">
+        <div th:replace="layout::left('13','36')">
+        </div>
+        <div class="main-content">
+            <div class="breadcrumbs" id="breadcrumbs">
+                <img src="../static/pages/img/line1.png">
+                <span>记上课</span>
+                <img src="../static/pages/img/line.png">
+            </div>
+            <div class="tabbable">
+                <ul class="nav nav-tabs" id="myTab">
+                    <li class="active" style="margin-bottom:22px;">
+                        <a data-toggle="tab" href="#studentList">记上课</a>
+                    </li>
+                    <li>
+                    <a data-toggle="tab" href="#divideList" onclick="getRecordClassListByClass('');">上课记录</a>
+                    </li>
+                <!--<li>
+                    <a data-toggle="tab" href="#expiryStu">补课管理</a>
+                </li>-->
+                </ul>
+                <div class="tab-content student attendClass">
+                    <!-- 记上课 -->
+                    <div id="studentList" class="tab-pane fade in active">
+                        <form id="recordForm">
+                            <div class="screen">
+                                <!--<div class="attendBtn">
+                                    <span>今日上课</span>
+                                    <span>记上课列表</span>
+                                </div>-->
+                                <span tyle="height:30px;"></span>
+                                <div class="screenTop">
+                                    <div class="nav-search" id="nav-search">
+                                        <form class="form-search">
+                                        <span class="input-icon">
+                                            <input type="text" id="classesName" name="classesName" th:value="${classesName}"
+                                                   placeholder="请输入班级名称">
+                                            <i class="ace-icon fa fa-search nav-search-icon"></i>
+                                        </span>
+                                        </form>
+                                    </div>
+                                    <div class="form-group" style="display: inline;">
+                                        <button type="button" th:onclick="'javascript:getClassListPage(\'\')'">搜索</button>
+                                    </div>
+                                </div>
+                                <div class="screenBot tags">
+                                    <!--<span class="tag">所属部门：青山分校<button type="button" class="close">×</button></span>
+                                    <p>清空筛选</p>-->
+                                </div>
+                            </div>
+                            <div class="control-position" id="control-position">
+                                <div class="control-group">
+                                    <label class="control-label">管辖校区</label>
+                                    <input  th:attr ="checked=${organId == '0'?true:false}" name="organId" type="radio" th:value="0" class="ace" th:onclick="'javascript:getClassListPage(\'\')'">
+                                    <span class="lbl" th:text="全部校区"></span>
+                                    <div class="checkbox" style="display: inline-block" th:each="orgs:${organsList}">
+                                        <label>
+                                            <input th:attr ="checked=${organId == orgs.id?true:false}" name="organId" type="radio" th:value="${orgs.id}" class="ace" th:onclick="'javascript:getClassListPage(\'\')'">
+                                            <span class="lbl" th:text="${orgs.organName}"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label">类型</label>
+                                    <div class="checkbox" style="display: inline-block">
+                                        <input  th:attr ="checked=${type == '2'?true:false}" name="type" value="2" type="radio" class="ace"  th:onclick="'javascript:getClassListPage(\'\')'">
+                                        <span class="lbl">全部</span>
+                                        <label>
+                                            <input  th:attr ="checked=${type == '0'?true:false}" name="type" value="0" type="radio" class="ace"  th:onclick="'javascript:getClassListPage(\'\')'">
+                                            <span class="lbl">班课</span>
+                                        </label>
+                                    </div>
+                                    <div class="checkbox" style="display: inline-block">
+                                        <label>
+                                            <input th:attr ="checked=${type == '1'?true:false}" name="type" value="1" type="radio" class="ace" th:onclick="'javascript:getClassListPage(\'\')'">
+                                            <span class="lbl">一对一</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label">课程类别</label>
+                                    <input  th:attr ="checked=${conrseType == ''?true:false}" name="conrseType" type="radio" th:value="0" class="ace" th:onclick="'javascript:getClassListPage(\'\')'">
+                                    <span class="lbl" th:text="全部"></span>
+                                    <div class="checkbox" style="display: inline-block" th:each="types:${coursetypelist}">
+                                        <label>
+                                            <input th:attr ="checked=${conrseType == types.id?true:false}" name="conrseType" type="radio" th:value="${types.id}" class="ace" th:onclick="'javascript:getClassListPage(\'\')'">
+                                            <span class="lbl" th:text="${types.courseTypeName}"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label">收费模式</label>
+                                    <div class="checkbox" style="display: inline-block">
+                                        <input  th:attr ="checked=${chargingMode == '3'?true:false}" name="chargingMode" value="3" type="radio" class="ace"  th:onclick="'javascript:getClassListPage(\'\')'">
+                                        <span class="lbl">全部</span>
+                                        <label>
+                                            <input  th:attr ="checked=${chargingMode == '0'?true:false}" name="chargingMode" value="0" type="radio" class="ace"  th:onclick="'javascript:getClassListPage(\'\')'">
+                                            <span class="lbl">按课时</span>
+                                        </label>
+                                    </div>
+                                    <div class="checkbox" style="display: inline-block">
+                                        <label>
+                                            <input th:attr ="checked=${chargingMode == '2'?true:false}" name="chargingMode" value="2" type="radio" class="ace" th:onclick="'javascript:getClassListPage(\'\')'">
+                                            <span class="lbl">按期</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="orderCon">
+                                    <div class="result">
+                                        当前结果：共<span th:text="${classPage.getTotalElements()}"></span>条记录
+                                    </div>
+                                    <div class="orderTable">
+                                        <table class="table table-hover">
+                                            <tr>
+                                               <!-- <th>星标</th>-->
+                                                <th>班级/一对一</th>
+                                                <th>教师</th>
+                                                <th>课程</th>
+                                                <!--<th>开班/课日期
+                                                <div class="sort">
+                                                    <span class="glyphicon glyphicon-triangle-top"></span>
+                                                    <span class="glyphicon glyphicon-triangle-bottom"></span>
+                                                </div>
+                                            </th>-->
+                                                <th>校区</th>
+                                                <th>教室</th>
+                                                <th>操作</th>
+                                            </tr>
+                                            <tr id="choose" th:each="cls:${classPage}">
+                                                <!--<td>
+                                                    <span class="glyphicon glyphicon-star-empty"></span>
+                                                </td>-->
+                                                <td th:text="${cls.sysOrgans.organName}+${cls.xbCourse.xbcoursetype.courseTypeName}+${cls.teacher.employeeName}+${cls.className}">
+                                                    <img src="../static/pages/img/ban.png">班级/一对一
+                                                </td>
+                                                <td th:text="${cls.teacher.employeeName}">李四</td>
+                                                <td th:text="${cls.xbCourse.courseName}">作文1</td>
+                                                <!--<td>2018-05-20</td>-->
+                                                <td th:text="${cls.sysOrgans.organName}">昆区分校</td>
+                                                <td th:text="${cls.xbClassroom.classroomName}">昆5号教室</td>
+                                                <td><a th:if="${cls.isEnd!='0'}" th:href="@{'/recordClass/classEdit?classesId='+${cls.id}}">
+                                                    <img src="../static/pages/img/jsk.jpg">记上课</a>
+                                                    <span th:if="${cls.isEnd=='0'}">
+                                                    已结课</span>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        <div class="orderPage">
+                                            <div class="page">
+                                                单页显示：
+                                                <select id="size" th:name="size" onchange="getClassListPage('');">
+                                                    <option th:selected="${currentzise eq 20}" th:value="20">20条/页</option>
+                                                    <option th:selected="${currentzise eq 5}" th:value="5">5条/页</option>
+                                                    <option th:selected="${currentzise eq 10}" th:value="10">10条/页</option>
+                                                    <option th:selected="${currentzise eq 15}" th:value="15">15条/页</option>
+                                                </select>
+                                            </div>
+                                            <!--<ul class="pagination" th:if="${classPage.getTotalPages() gt 0}">
+                                                <li class="disabled">
+                                                    <a href="#" th:onclick="'javascript:getClassListPage(\''+0+'\')'">首页</a>
+                                                </li>
+                                                <li class="disabled" th:if="${classPage.getNumber()-1} ge 0">
+                                                    <a href="#" th:onclick="'javascript:getClassListPage(\''+${classPage.getNumber()-1}+'\')'">
+                                                        <i class="ace-icon fa fa-angle-double-left"></i>
+                                                    </a>
+                                                </li>
+                                                <li th:class="${i} eq ${classPage.getNumber()+1}?'active':''" th:each="i:${#numbers.sequence(1,classPage.getTotalPages())}">
+                                                    <a href="#" th:onclick="'javascript:getClassListPage(\''+${i}+'\')'"
+                                                       th:text="${i}"></a>
+                                                </li>
+                                                <li th:if="${classPage.getTotalPages()} ge ${classPage.getNumber()+2} ">
+                                                    <a href="#" th:onclick="'javascript:getClassListPage(\''+${classPage.getNumber()+2}+'\')'">
+                                                        <i class="ace-icon fa fa-angle-double-right"></i>
+                                                    </a>
+                                                </li>
+                                                &lt;!&ndash; <li class="">
+                                                 <a href="#" th:onclick="'javascript:getOrgansListPage(\''+${currentnumber}+'\')'">尾页</a>
+                                             </li>&ndash;&gt;
+                                            </ul>-->
+                                            <ul class="pagination" th:if="${classPage.getTotalPages()>0}">
+                                                <!-- 上一页 -->
+                                                <li th:if="${classPage.getNumber()+1 == 1}"><span>上一页</span></li>
+                                                <li th:if="${classPage.getNumber()+1 > 1}">
+                                                    <a  th:onclick="'javascript:getClassListPage(\''+${classPage.getNumber()-1}+'\')'">
+                                                        <i class="ace-icon fa ">上一页</i>
+                                                    </a>
+                                                </li>
+                                                <!-- 首页 -->
+                                                <li th:if="${classPage.getNumber()+1 == 1}" class="active"><span>1</span></li>
+                                                <li th:if="${classPage.getNumber()+1 > 1}">
+                                                    <a  th:onclick="'javascript:getClassListPage(\''+${0}+'\')'">1</a>
+                                                </li>
+
+                                                <th:block th:if="${classPage.getTotalPages()>2 && classPage.getTotalPages()<=10}">
+                                                    <th:block th:each="i:${#numbers.sequence(2,classPage.getTotalPages()-1)}">
+                                                        <li th:if="${classPage.getNumber()+1 == i}"  class="active"><span th:text="${i}">页码</span></li>
+                                                        <li th:if="${classPage.getNumber()+1 != i}"><a  th:onclick="'javascript:getClassListPage(\''+${i-1}+'\')'" th:text="${i}"></a></li>
+                                                    </th:block>
+                                                </th:block>
+                                                <th:block th:if="${classPage.getTotalPages() > 10}">
+                                                    <th:block th:if="${(classPage.getNumber()+1-(5/2)) <= 2}" th:each="i:${#numbers.sequence(2,2+5-1)}">
+                                                        <li th:if="${classPage.getNumber()+1 == i}"  class="active"><span th:text="${i}">页码</span></li>
+                                                        <li th:if="${classPage.getNumber()+1 != i}"><a  th:onclick="'javascript:getClassListPage(\''+${i-1}+'\')'" th:text="${i}"></a></li>
+                                                    </th:block>
+                                                    <!-- ... -->
+                                                    <li th:if="${(classPage.getNumber()+1-(5/2))>2}"><span>...</span></li>
+
+                                                    <th:block th:if="${((classPage.getNumber()+1-(5/2))>2) && ((classPage.getNumber()+1+(5/2)-(5%2==0?1:0)) < (classPage.getTotalPages()-1))}"
+                                                              th:each="i:${#numbers.sequence(classPage.getNumber()+1-(5/2),classPage.getNumber()+1+(5/2)-(5%2==0?1:0))}">
+                                                        <li th:if="${classPage.getNumber()+1 == i}"  class="active"><span th:text="${i}">页码</span></li>
+                                                        <li th:if="${classPage.getNumber()+1 != i}"><a  th:onclick="'javascript:getClassListPage(\''+${i-1}+'\')'" th:text="${i}"></a></li>
+                                                    </th:block>
+
+                                                    <!-- ... -->
+                                                    <li th:if="${(classPage.getNumber()+1+(5/2)-(5%2==0?1:0)) < (classPage.getTotalPages()-1)}"><span>...</span></li>
+                                                    <th:block th:if="${(classPage.getNumber()+1+(5/2)-(5%2==0?1:0)) >= (classPage.getTotalPages()-1)}" th:each="i:${#numbers.sequence(classPage.getTotalPages()-5,classPage.getTotalPages()-1)}">
+                                                        <li th:if="${classPage.getNumber()+1 == i}"  class="active"><span th:text="${i}">页码</span></li>
+                                                        <li th:if="${classPage.getNumber()+1 != i}"><a  th:onclick="'javascript:getClassListPage(\''+${i-1}+'\')'" th:text="${i}"></a></li>
+                                                    </th:block>
+                                                </th:block>
+                                                <!-- 最后一页 -->
+                                                <li th:if="${classPage.getTotalPages()>1 && classPage.getNumber()+1 == classPage.getTotalPages()}" class="active"><span th:text="${classPage.getTotalPages()}">页码</span></li>
+                                                <li th:if="${classPage.getTotalPages()>1 && classPage.getNumber()+1 != classPage.getTotalPages()}">
+
+                                                    <a href="#" th:onclick="'javascript:getClassListPage(\''+${classPage.getTotalPages()-1}+'\')'"
+                                                       th:text="${classPage.getTotalPages()}"></a>
+                                                </li>
+                                                <!-- 下一页 -->
+                                                <li th:if="${classPage.getNumber()+1 >= classPage.getTotalPages()}"><span>下一页</span></li>
+                                                <li th:if="${classPage.getNumber()+1 < classPage.getTotalPages()}">
+                                                    <a th:onclick="'javascript:getClassListPage(\''+${classPage.getNumber()+1}+'\')'">
+                                                        <i class="ace-icon fa ">下一页</i>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <span style="color: #020202;" th:text="'共'+${classPage.getTotalPages()}+'页/'+${classPage.getTotalElements()}+'条记录'"></span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <!-- 上课记录 -->
+                    <div id="divideList" class="tab-pane fade divideList classjl">
+                        <ul class="nav nav-tabs attendBtn" id="myTab">
+                            <li class="active">
+                                <a data-toggle="tab" href="#classAbo" onclick="getRecordClassListByClass('');" id="classBtn">按班级</a>
+                            </li>
+                            <li>
+                                <a data-toggle="tab" href="#studentAbo" onclick="getaccordingListPage('');"  id="stuBtn">按学员</a>
+                            </li>
+                        </ul>
+                        <!-- 按班级 -->
+                        <div id="classAbo" class="tab-pane fade in active">
+                                <th:block th:fragment="accordingClass" th:if="${recordLists}">
+                                <form id="accordingClassform">
+                                    <!--<div class="control-position" id="control-position">-->
+                                        <script>
+                                            laydate.render({
+                                                elem: '#startclaDateTimeBegin'
+                                            });
+                                            laydate.render({
+                                                elem: '#startclaDateTimeEnd'
+                                            });
+
+                                        </script>
+                                        <div class="control-group">
+                                            <label class="control-label">管辖校区</label>
+                                            <input  th:attr ="checked=${organclaId == '0'?true:false}"
+                                                    name="organclaId" type="radio" th:value="0" class="ace"
+                                                    th:onclick="'javascript:getRecordClassListByClass(\'\')'">
+                                            <span class="lbl" th:text="全部校区"></span>
+                                            <div class="checkbox" style="display: inline-block" th:each="orgs:${sorganList}">
+                                                <label>
+                                                    <input th:attr ="checked=${organclaId == orgs.id?true:false}"
+                                                           name="organclaId" type="radio" th:value="${orgs.id}" class="ace"
+                                                           th:onclick="'javascript:getRecordClassListByClass(\'\')'">
+                                                    <span class="lbl" th:text="${orgs.organName}"></span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    <div class="control-group">
+                                        <label class="control-label">上课日期</label>
+                                        <input id="startclaDateTimeBegin" name="startclaDateTimeBegin" type="text" th:value="${startclaDateTimeBegin}" class="ace"
+                                               style="padding: 3px;border-radius: 5px !important;margin-top: 13px;width: 82px;color: #3c546c">
+                                        <span>至</span>
+                                        <input id="startclaDateTimeEnd" name="startclaDateTimeEnd" type="text" th:value="${startclaDateTimeEnd}" class="ace"
+                                               style="padding: 3px;border-radius: 5px !important;margin-top: 13px;width: 82px;color: #3c546c">
+                                        <div class="form-group" style="display: inline;">
+                                            <button type="button" th:onclick="'javascript:getRecordClassListByClass(\'\')'">搜索</button>
+                                        </div>
+                                    </div>
+                                    <div class="control-group">
+                                        <label class="control-label">教师姓名</label>
+                                        <input id="TeacherNameCla" name="TeacherNameCla" type="text" th:value="${TeacherNameCla}" class="ace"
+                                               style="padding: 3px;border-radius: 5px !important;margin-top: 13px;width: 82px;color: #3c546c">
+                                        <div class="form-group" style="display: inline;">
+                                            <button type="button" th:onclick="'javascript:getRecordClassListByClass(\'\')'">搜索</button>
+                                            <button type="button" th:onclick="'javascript:expRecord()'" >导出当前结果</button>
+                                        </div>
+                                    </div>
+                                        <div class="orderCon" style="margin-top:21px;">
+                                            <div class="result">
+                                                当前结果：共计<span th:text="${totalPeriodnum}"></span>课时<span th:text="${totalReceivables}"></span>金额
+                                            </div>
+                                            <div class="orderTable">
+                                                <table class="table table-hover">
+                                                    <tr>
+                                                        <th>上课时间
+                                                            <div class="sort">
+                                                                <span class="glyphicon glyphicon-triangle-top"></span>
+                                                                <span class="glyphicon glyphicon-triangle-bottom"></span>
+                                                            </div>
+                                                        </th>
+                                                        <th>班级/一对一</th>
+                                                        <th>课程</th>
+                                                        <th>校区</th>
+                                                        <th>教师</th>
+                                                        <th>科目</th>
+                                                        <th>上课</th>
+                                                        <th>请假</th>
+                                                        <th>旷课</th>
+                                                        <th>补课</th>
+                                                        <th>学员课时</th>
+                                                        <th>课时金额</th>
+                                                        <th>
+                                                            操作
+                                                        </th>
+                                                    </tr>
+                                                    <tr th:each="cla:${recordLists.content}">
+                                                        <td th:text="${#dates.format(cla.recordTime, 'yyyy-MM-dd HH:mm:ss')}">上课时间</td>
+                                                        <td th:text="${cla.organName}+${cla.courseTypeNname}+${cla.employeeName}+${cla.className}">
+                                                            <img src="../static/pages/img/ban.png">班级/一对一
+                                                        </td>
+                                                        <td th:text="${cla.courseName}">课程</td>
+                                                        <td th:text="${cla.organName}">校区</td>
+                                                        <td th:text="${cla.employeeName}">教师</td>
+                                                        <td th:text="${cla.courseTypeNname}">科目</td>
+                                                        <td th:text="${cla.sknum}?${cla.sknum}:'0.0'">上课</td>
+                                                        <td th:text="${cla.qjnum}?${cla.qjnum}:'0.0'">请假</td>
+                                                        <td th:text="${cla.kknum}?${cla.kknum}:'0.0'">旷课</td>
+                                                        <td th:text="${cla.bknum}?${cla.bknum}:'0.0'">补课</td>
+                                                        <td th:text="${cla.periodnum}">学员课时</td>
+                                                        <td th:text="${cla.totalReceivable}">课时金额</td>
+                                                        <td class="classDel" >
+                                                            <div class="btn-group open" >
+                                                                <!--<a  class="down" href="#modal-table"  data-toggle="modal"-->
+                                                                <a  class="down"
+                                                                    th:href="@{/recordClass/recordClassUpdate(classesId=${cla.classId},recordTime=${#dates.format(cla.recordTime, 'yyyy-MM-dd HH:mm:ss')})}"
+                                                                    style="border: solid 1px;border-radius: 10px;width: 77px;color: #f0f1f3;
+                                               background: #2f90f3;height: 26px;font-weight: 900;margin-bottom: 2px;">
+                                                                    修改
+                                                                </a>
+                                                                <a  class="down"
+                                                                    th:onclick="|deleteRecord('${cla.classId}','${#dates.format(cla.recordTime, 'yyyy-MM-dd HH:mm:ss')}')|"
+                                                                    style="border: solid 1px;border-radius: 10px;width: 77px;color: #f0f1f3;
+                                               background: #8d05e0;height: 26px;font-weight: 900;margin-bottom: 2px;">
+                                                                    删除
+                                                                </a>
+                                                            </div>
+
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                                <div class="orderPage">
+                                                    <div class="page">
+                                                        单页显示：
+                                                        <select id="size" name="size" onchange="getRecordClassListByClass('')">
+                                                            <option value="5">5条/页</option>
+                                                            <option value="20">20条/页</option>
+                                                            <option value="10">10条/页</option>
+                                                            <option value="15">15条/页</option>
+                                                        </select>
+                                                        <input type="hidden" id="recordListssize" th:value="${recordListssize}"/>
+                                                    </div>
+
+                                                    <ul class="pagination" th:if="${recordLists.getTotalPages()>0}">
+                                                        <!-- 上一页 -->
+                                                        <li th:if="${recordLists.getNumber()+1 == 1}"><span>上一页</span></li>
+                                                        <li th:if="${recordLists.getNumber()+1 > 1}">
+                                                            <a  th:onclick="'javascript:getRecordClassListByClass(\''+${recordLists.getNumber()-1}+'\')'">
+                                                                <i class="ace-icon fa ">上一页</i>
+                                                            </a>
+                                                        </li>
+                                                        <!-- 首页 -->
+                                                        <li th:if="${recordLists.getNumber()+1 == 1}" class="active"><span>1</span></li>
+                                                        <li th:if="${recordLists.getNumber()+1 > 1}">
+                                                            <a  th:onclick="'javascript:getRecordClassListByClass(\''+${0}+'\')'">1</a>
+                                                        </li>
+
+                                                        <th:block th:if="${recordLists.getTotalPages()>2 && recordLists.getTotalPages()<=10}">
+                                                            <th:block th:each="i:${#numbers.sequence(2,recordLists.getTotalPages()-1)}">
+                                                                <li th:if="${recordLists.getNumber()+1 == i}"  class="active"><span th:text="${i}">页码</span></li>
+                                                                <li th:if="${recordLists.getNumber()+1 != i}"><a  th:onclick="'javascript:getRecordClassListByClass(\''+${i-1}+'\')'" th:text="${i}"></a></li>
+                                                            </th:block>
+                                                        </th:block>
+                                                        <th:block th:if="${recordLists.getTotalPages() > 10}">
+                                                            <th:block th:if="${(recordLists.getNumber()+1-(5/2)) <= 2}" th:each="i:${#numbers.sequence(2,2+5-1)}">
+                                                                <li th:if="${recordLists.getNumber()+1 == i}"  class="active"><span th:text="${i}">页码</span></li>
+                                                                <li th:if="${recordLists.getNumber()+1 != i}"><a  th:onclick="'javascript:getRecordClassListByClass(\''+${i-1}+'\')'" th:text="${i}"></a></li>
+                                                            </th:block>
+                                                            <!-- ... -->
+                                                            <li th:if="${(recordLists.getNumber()+1-(5/2))>2}"><span>...</span></li>
+
+                                                            <th:block th:if="${((recordLists.getNumber()+1-(5/2))>2) && ((recordLists.getNumber()+1+(5/2)-(5%2==0?1:0)) < (recordLists.getTotalPages()-1))}"
+                                                                      th:each="i:${#numbers.sequence(recordLists.getNumber()+1-(5/2),recordLists.getNumber()+1+(5/2)-(5%2==0?1:0))}">
+                                                                <li th:if="${recordLists.getNumber()+1 == i}"  class="active"><span th:text="${i}">页码</span></li>
+                                                                <li th:if="${recordLists.getNumber()+1 != i}"><a  th:onclick="'javascript:getRecordClassListByClass(\''+${i-1}+'\')'" th:text="${i}"></a></li>
+                                                            </th:block>
+
+                                                            <!-- ... -->
+                                                            <li th:if="${(recordLists.getNumber()+1+(5/2)-(5%2==0?1:0)) < (recordLists.getTotalPages()-1)}"><span>...</span></li>
+                                                            <th:block th:if="${(recordLists.getNumber()+1+(5/2)-(5%2==0?1:0)) >= (recordLists.getTotalPages()-1)}" th:each="i:${#numbers.sequence(recordLists.getTotalPages()-5,recordLists.getTotalPages()-1)}">
+                                                                <li th:if="${recordLists.getNumber()+1 == i}"  class="active"><span th:text="${i}">页码</span></li>
+                                                                <li th:if="${recordLists.getNumber()+1 != i}"><a  th:onclick="'javascript:getRecordClassListByClass(\''+${i-1}+'\')'" th:text="${i}"></a></li>
+                                                            </th:block>
+                                                        </th:block>
+                                                        <!-- 最后一页 -->
+                                                        <li th:if="${recordLists.getTotalPages()>1 && recordLists.getNumber()+1 == recordLists.getTotalPages()}" class="active"><span th:text="${recordLists.getTotalPages()}">页码</span></li>
+                                                        <li th:if="${recordLists.getTotalPages()>1 && recordLists.getNumber()+1 != recordLists.getTotalPages()}">
+
+                                                            <a href="#" th:onclick="'javascript:getRecordClassListByClass(\''+${recordLists.getTotalPages()-1}+'\')'"
+                                                               th:text="${recordLists.getTotalPages()}"></a>
+                                                        </li>
+                                                        <!-- 下一页 -->
+                                                        <li th:if="${recordLists.getNumber()+1 >= recordLists.getTotalPages()}"><span>下一页</span></li>
+                                                        <li th:if="${recordLists.getNumber()+1 < recordLists.getTotalPages()}">
+                                                            <a th:onclick="'javascript:getRecordClassListByClass(\''+${recordLists.getNumber()+1}+'\')'">
+                                                                <i class="ace-icon fa ">下一页</i>
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <span style="color: #020202;" th:text="'共'+${recordLists.getTotalPages()}+'页/'+${recordLists.getTotalElements()}+'条记录'"></span>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                   <!-- </div>-->
+                                </form>
+                            </th:block>
+                        </div>
+
+                        <!-- 按学员 -->
+                        <div id="studentAbo" class="tab-pane fade studentAbo">
+                                <th:block th:fragment="accordingStudent" th:if="${xbRecordClassPage}">
+                                <form id="accordingStudentform">
+                                    <script>
+                                        laydate.render({
+                                            elem: '#startDateTimeBegin'
+                                        });
+                                        laydate.render({
+                                            elem: '#startDateTimeEnd'
+                                        });
+                                    </script>
+                                    <div class="control-group">
+                                        <label class="control-label">管辖校区</label>
+                                        <input  th:attr ="checked=${organId == '0'?true:false}" name="organId" type="radio" th:value="0" class="ace"
+                                                th:onclick="'javascript:getaccordingListPage(\'\')'">
+                                        <span class="lbl" th:text="全部校区"></span>
+                                        <div class="checkbox" style="display: inline-block" th:each="orgs:${sorganList}">
+                                            <label>
+                                                <input th:attr ="checked=${organId == orgs.id?true:false}"
+                                                       name="organId" type="radio" th:value="${orgs.id}" class="ace"
+                                                       th:onclick="'javascript:getaccordingListPage(\'\')'">
+                                                <span class="lbl" th:text="${orgs.organName}"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="control-group">
+                                        <label class="control-label">上课日期</label>
+                                        <input id="startDateTimeBegin" name="startDateTimeBegin" type="text" th:value="${startDateTimeBegin}" class="ace"
+                                               style="padding: 3px;border-radius: 5px !important;margin-top: 13px;width: 82px;color: #3c546c">
+                                        <span>至</span>
+                                        <input id="startDateTimeEnd" name="startDateTimeEnd" type="text" th:value="${startDateTimeEnd}" class="ace"
+                                               style="padding: 3px;border-radius: 5px !important;margin-top: 13px;width: 82px;color: #3c546c">
+                                        <div class="form-group" style="display: inline;">
+                                            <button type="button" th:onclick="'javascript:getaccordingListPage(\'\')'">搜索</button>
+                                        </div>
+                                    </div>
+                                    <div class="control-group">
+                                        <label class="control-label">教师姓名</label>
+                                        <input id="TeacherName" name="TeacherName" type="text" th:value="${TeacherName}" class="ace"
+                                               style="padding: 3px;border-radius: 5px !important;margin-top: 13px;width: 82px;color: #3c546c">
+                                        <label class="control-label">学员姓名</label>
+                                        <input id="studentName" name="studentName" type="text" th:value="${studentName}" class="ace"
+                                               style="padding: 3px;border-radius: 5px !important;margin-top: 13px;width: 82px;color: #3c546c">
+                                        <div class="form-group" style="display: inline;">
+                                            <button type="button" th:onclick="'javascript:getaccordingListPage(\'\')'">搜索</button>
+                                        </div>
+                                    </div>
+                                    <div class="screen">
+                                    </div>
+                                    <div class="orderCon" style="margin-top:35px;">
+                                        <div class="orderTable">
+                                            <table class="table table-hover">
+                                                <tr>
+                                                    <th>上课时间
+                                                    </th>
+                                                    <th>学员姓名
+                                                    </th>
+                                                    <th>联系电话</th>
+                                                    <th>班级/一对一</th>
+                                                    <th>课程</th>
+                                                    <th>考勤状态</th>
+                                                    <th>学员课时</th>
+                                                    <th>教师</th>
+                                                    <th>教师留言</th>
+                                                    <th>操作</th>
+                                                    <!--<th>
+                                                        <span href="#modal-table" data-toggle="modal" class="glyphicon glyphicon-option-vertical"
+                                                            aria-hidden="true"></span>
+                                                    </th>-->
+                                                </tr>
+                                                <tr id="choose" th:each="record:${xbRecordClassPage.content}">
+                                                    <td th:text="${record.recordTime}"></td>
+                                                    <td th:text="${record.xbStudent.studentName}"></td>
+                                                    <td th:text="${record.xbStudent.contactPhone}"></td>
+                                                    <td th:text="${record.xbClass.sysOrgans.organName}+${record.xbClass.xbCourse.courseName}+${record.xbClass.teacher.employeeName}+${record.xbClass.className}"><img src="../static/pages/img/ban.png"></td>
+                                                    <td th:text="${record.xbClass.xbCourse.courseName}"></td>
+                                                    <td th:if="${record.state} eq 0" class="statesk">
+                                                        <span>上课</span>
+                                                    </td>
+                                                    <td th:if="${record.state} eq 1" class="statesk stateqj">
+                                                        <span>请假</span>
+                                                    </td>
+                                                    <td th:if="${record.state} eq 2" class="statesk stateqj">
+                                                        <span>旷课</span>
+                                                    </td>
+                                                    <td th:if="${record.state} eq 3" class="statesk statebk">
+                                                        <span>补课</span>
+                                                    </td>
+                                                    <td th:text="${record.deductPeriod}"></td>
+                                                    <td th:text="${record.xbClass.teacher.employeeName}"></td>
+                                                    <td th:text="${record.teacherLeave}"></td>
+                                                    <td class="classDel" >
+                                                        <div class="btn-group open" >
+                                                            <!--<a  class="down" href="#modal-table"  data-toggle="modal"-->
+                                                            <a data-toggle="dropdown" class="down" aria-expanded="true"
+                                                               th:onclick="'javascript:deleteRecordByStudent(\''+${record.id}+'\')'"
+                                                               style="border: solid 1px;border-radius: 10px;width: 77px;color: #ffffff;
+                                               background: #f50f0f;height: 26px;font-weight: 900;margin-bottom: 0px;">
+                                                                删除
+                                                            </a>
+                                                        </div>
+
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            <div class="orderPage">
+                                                <div class="page">
+                                                    单页显示：
+                                                    <select id="size" th:name="size" onchange="getaccordingListPage('');">
+                                                        <option th:selected="${accordingcurrentzise eq 20}" th:value="20">20条/页</option>
+                                                        <option th:selected="${accordingcurrentzise eq 5}" th:value="5">5条/页</option>
+                                                        <option th:selected="${accordingcurrentzise eq 10}" th:value="10">10条/页</option>
+                                                        <option th:selected="${accordingcurrentzise eq 15}" th:value="15">15条/页</option>
+                                                    </select>
+                                                </div>
+                                                <ul class="pagination" th:if="${xbRecordClassPage.getTotalPages()>0}">
+                                                    <!-- 上一页 -->
+                                                    <li th:if="${xbRecordClassPage.getNumber()+1 == 1}"><span>上一页</span></li>
+                                                    <li th:if="${xbRecordClassPage.getNumber()+1 > 1}">
+                                                        <a  th:onclick="'javascript:getaccordingListPage(\''+${xbRecordClassPage.getNumber()-1}+'\')'">
+                                                            <i class="ace-icon fa ">上一页</i>
+                                                        </a>
+                                                    </li>
+                                                    <!-- 首页 -->
+                                                    <li th:if="${xbRecordClassPage.getNumber()+1 == 1}" class="active"><span>1</span></li>
+                                                    <li th:if="${xbRecordClassPage.getNumber()+1 > 1}">
+                                                        <a  th:onclick="'javascript:getaccordingListPage(\''+${0}+'\')'">1</a>
+                                                    </li>
+
+                                                    <th:block th:if="${xbRecordClassPage.getTotalPages()>2 && xbRecordClassPage.getTotalPages()<=10}">
+                                                        <th:block th:each="i:${#numbers.sequence(2,xbRecordClassPage.getTotalPages()-1)}">
+                                                            <li th:if="${xbRecordClassPage.getNumber()+1 == i}"  class="active"><span th:text="${i}">页码</span></li>
+                                                            <li th:if="${xbRecordClassPage.getNumber()+1 != i}"><a  th:onclick="'javascript:getaccordingListPage(\''+${i-1}+'\')'" th:text="${i}"></a></li>
+                                                        </th:block>
+                                                    </th:block>
+                                                    <th:block th:if="${xbRecordClassPage.getTotalPages() > 10}">
+                                                        <th:block th:if="${(xbRecordClassPage.getNumber()+1-(5/2)) <= 2}" th:each="i:${#numbers.sequence(2,2+5-1)}">
+                                                            <li th:if="${xbRecordClassPage.getNumber()+1 == i}"  class="active"><span th:text="${i}">页码</span></li>
+                                                            <li th:if="${xbRecordClassPage.getNumber()+1 != i}"><a  th:onclick="'javascript:getaccordingListPage(\''+${i-1}+'\')'" th:text="${i}"></a></li>
+                                                        </th:block>
+                                                        <!-- ... -->
+                                                        <li th:if="${(xbRecordClassPage.getNumber()+1-(5/2))>2}"><span>...</span></li>
+
+                                                        <th:block th:if="${((xbRecordClassPage.getNumber()+1-(5/2))>2) && ((xbRecordClassPage.getNumber()+1+(5/2)-(5%2==0?1:0)) < (xbRecordClassPage.getTotalPages()-1))}"
+                                                                  th:each="i:${#numbers.sequence(xbRecordClassPage.getNumber()+1-(5/2),xbRecordClassPage.getNumber()+1+(5/2)-(5%2==0?1:0))}">
+                                                            <li th:if="${xbRecordClassPage.getNumber()+1 == i}"  class="active"><span th:text="${i}">页码</span></li>
+                                                            <li th:if="${xbRecordClassPage.getNumber()+1 != i}"><a  th:onclick="'javascript:getaccordingListPage(\''+${i-1}+'\')'" th:text="${i}"></a></li>
+                                                        </th:block>
+
+                                                        <!-- ... -->
+                                                        <li th:if="${(xbRecordClassPage.getNumber()+1+(5/2)-(5%2==0?1:0)) < (xbRecordClassPage.getTotalPages()-1)}"><span>...</span></li>
+                                                        <th:block th:if="${(xbRecordClassPage.getNumber()+1+(5/2)-(5%2==0?1:0)) >= (xbRecordClassPage.getTotalPages()-1)}" th:each="i:${#numbers.sequence(xbRecordClassPage.getTotalPages()-5,xbRecordClassPage.getTotalPages()-1)}">
+                                                            <li th:if="${xbRecordClassPage.getNumber()+1 == i}"  class="active"><span th:text="${i}">页码</span></li>
+                                                            <li th:if="${xbRecordClassPage.getNumber()+1 != i}"><a  th:onclick="'javascript:getaccordingListPage(\''+${i-1}+'\')'" th:text="${i}"></a></li>
+                                                        </th:block>
+                                                    </th:block>
+                                                    <!-- 最后一页 -->
+                                                    <li th:if="${xbRecordClassPage.getTotalPages()>1 && xbRecordClassPage.getNumber()+1 == xbRecordClassPage.getTotalPages()}" class="active"><span th:text="${xbRecordClassPage.getTotalPages()}">页码</span></li>
+                                                    <li th:if="${xbRecordClassPage.getTotalPages()>1 && xbRecordClassPage.getNumber()+1 != xbRecordClassPage.getTotalPages()}">
+
+                                                        <a href="#" th:onclick="'javascript:getaccordingListPage(\''+${xbRecordClassPage.getTotalPages()-1}+'\')'"
+                                                           th:text="${xbRecordClassPage.getTotalPages()}"></a>
+                                                    </li>
+                                                    <!-- 下一页 -->
+                                                    <li th:if="${xbRecordClassPage.getNumber()+1 >= xbRecordClassPage.getTotalPages()}"><span>下一页</span></li>
+                                                    <li th:if="${xbRecordClassPage.getNumber()+1 < xbRecordClassPage.getTotalPages()}">
+                                                        <a th:onclick="'javascript:getaccordingListPage(\''+${xbRecordClassPage.getNumber()+1}+'\')'">
+                                                            <i class="ace-icon fa ">下一页</i>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <span style="color: #020202;" th:text="'共'+${xbRecordClassPage.getTotalPages()}+'页/'+${xbRecordClassPage.getTotalElements()}+'条记录'"></span>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </th:block>
+                        </div>
+
+                    </div>
+                    <!-- 补课管理 -->
+                    <div id="expiryStu" class="tab-pane fade expiryStu lesson">
+                        <div class="screen">
+                            <div class="screenTop">
+                                <select class="selectName">
+                                    <option value="AZ">学员姓名</option>
+                                    <option value="AL">手机尾号</option>
+                                    <option value="AK">微信号</option>
+                                </select>
+                                <div class="nav-search" id="nav-search">
+                                    <form class="form-search">
+                                        <span class="input-icon">
+                                            <input type="text" placeholder="请输入姓名、支持拼音缩写" class="nav-search-input" id="nav-search-input"
+                                                autocomplete="off">
+                                            <i class="ace-icon fa fa-search nav-search-icon"></i>
+                                        </span>
+                                    </form>
+                                </div>
+                                <div class="btn-group">
+                                    <button class="btn btn-down">
+                                        筛选
+                                        <i>1</i>
+                                        <span class="ace-icon fa fa-caret-down icon-on-right"></span>
+                                    </button>
+                                    <div class="dropdown-menu">
+                                        <div class="screenData">
+                                            <select>
+                                                <option value="">报读校区</option>
+                                                <option value="y">青山校区</option>
+                                                <option value="n">科源校区</option>
+                                                <option value="n">坤元校区</option>
+                                            </select>
+                                            <select>
+                                                <option value="">教师</option>
+                                                <option value="y">111</option>
+                                                <option value="n">1111</option>
+                                            </select>
+                                        </div>
+                                        <div class="screenData">
+                                            <select>
+                                                <option value="">报读校区</option>
+                                                <option value="y">青山校区</option>
+                                                <option value="n">科源校区</option>
+                                                <option value="n">坤元校区</option>
+                                            </select>
+                                            <select>
+                                                <option value="">课时状态</option>
+                                                <option value="y">在读</option>
+                                                <option value="n">转出</option>
+                                                <option value="y">退费</option>
+                                                <option value="n">停课</option>
+                                                <option value="n">结课</option>
+                                                <option value="n">转课</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="screenBot tags">
+                                课程状况：
+                                <span class="tag">在读<button type="button" class="close">×</button></span>
+                                <span class="tag">在读<button type="button" class="close">×</button></span>
+                                <p>清空筛选</p>
+                            </div>
+                        </div>
+                        <div class="orderCon">
+                            <div class="export">
+                                <!--<button type="button" class="btn btn-primary">导出当前结果</button>
+                                <button type="button" class="btn btn-primary">批量编辑</button>-->
+                            </div>
+                            <div class="result">
+                                当前结果：学员共计<span>111</span>名，报读课程数总计：<span>111</span>条
+                            </div>
+                            <div class="orderTable">
+                                <table class="table table-hover">
+                                    <tr>
+                                        <th>
+                                            <input type="checkbox" id="sel_1" onchange="chooseAll1()">
+                                        </th>
+                                        <th>上课日期</th>
+                                        <th>学员姓名</th>
+                                        <th>联系电话</th>
+                                        <th>班级/一对一</th>
+                                        <th>课程</th>
+                                        <th>状态</th>
+                                        <th>课时</th>
+                                        <th>教师</th>
+                                        <th>补课状态</th>
+                                        <th>操作</th>
+                                    </tr>
+                                    <tr id="choose">
+                                        <td><input type="checkbox"></td>
+                                        <td>2018-10-10</td>
+                                        <td>张三</td>
+                                        <td>18958777777</td>
+                                        <td><img src="../static/pages/img/ban.png">昆区分校作文张三1班</td>
+                                        <td>作文</td>
+                                        <td>未记录</td>
+                                        <td>0</td>
+                                        <td>李四</td>
+                                        <td class="state">
+                                            <span>未安排</span>
+                                        </td>
+                                        <td class="renew">
+                                            <a href="#modal-table1" role="button" class="blue" data-toggle="modal">操作</a>
+                                        </td>
+                                    </tr>
+                                    <tr id="choose">
+                                        <td><input type="checkbox"></td>
+                                        <td>2018-10-10</td>
+                                        <td>张三</td>
+                                        <td>18958777777</td>
+                                        <td><img src="../static/pages/img/ban.png">昆区分校作文张三1班</td>
+                                        <td>作文</td>
+                                        <td>未记录</td>
+                                        <td>0</td>
+                                        <td>李四</td>
+                                        <td class="state">
+                                            <span>未安排</span>
+                                        </td>
+                                        <td class="renew">
+                                            <a href="#modal-table1" role="button" class="blue" data-toggle="modal">操作</a>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <div class="orderPage">
+                                    <div class="page">
+                                        单页显示：
+                                        <select>
+                                            <option>20条/页</option>
+                                            <option>50条/页</option>
+                                            <option>100条/页</option>
+                                        </select>
+                                    </div>
+                                    <ul class="pagination">
+                                        <li class="disabled">
+                                            <a href="#">首页</a>
+                                        </li>
+                                        <li class="disabled">
+                                            <a href="#">
+                                                <i class="ace-icon fa fa-angle-double-left"></i>
+                                            </a>
+                                        </li>
+                                        <li class="active">
+                                            <a href="#">1</a>
+                                        </li>
+
+                                        <li>
+                                            <a href="#">2</a>
+                                        </li>
+
+                                        <li>
+                                            <a href="#">3</a>
+                                        </li>
+
+                                        <li>
+                                            <a href="#">4</a>
+                                        </li>
+
+                                        <li>
+                                            <a href="#">5</a>
+                                        </li>
+
+                                        <li>
+                                            <a href="#">
+                                                <i class="ace-icon fa fa-angle-double-right"></i>
+                                            </a>
+                                        </li>
+                                        <li class="">
+                                            <a href="#">尾页</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 补课弹窗 -->
+                        <div id="modal-table1" class="modal fade in" tabindex="-1" aria-hidden="false">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header no-padding">
+                                        <div class="table-header">补课编辑</div>
+                                    </div>
+                                    <div class="modal-body no-padding">
+                                        <div class="headLesson">
+                                            <img src="../static/pages/img/classboy.png">
+                                            <span>张三</span>
+                                        </div>
+                                        <div class="form-group" style="margin-top:20px">
+                                            <input name="form-field-radio" type="radio" class="ace"><span class="lbl">上课</span>
+                                            <input name="form-field-radio" type="radio" class="ace"><span class="lbl">请假</span>
+                                            <input name="form-field-radio" type="radio" class="ace"><span class="lbl">旷课</span>
+                                        </div>
+                                        <div class="form-group" style="margin: 15px 0 0 20px;">
+                                            <label for="">扣除课时</label>
+                                            <input type="text" value="0">
+                                            <span>可填写小数如0.5</span>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer no-margin-top">
+                                        <button class="btn pull-left" data-dismiss="modal">
+                                            取消
+                                        </button>
+                                        <button class="btn pull-right" data-dismiss="modal">
+                                            确定
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        ! function () {
+            laydate.render({
+                elem: '#demo'
+            }); //绑定元素
+        }();
+
+        $(".down").click(function () {
+            $(this).siblings(".dropdown-menu").toggle();
+        });
+        $(".pull-center").click(function () {
+            $(".modal").hide();
+        });
+        $("#stuBtn").click(function () {
+            $("#classAbo").hide();
+            $("#studentAbo").show();
+        });
+        $("#classBtn").click(function () {
+            $("#studentAbo").hide();
+            $("#classAbo").show();
+        });
+
+        function chooseAll1() {
+            var isCheck = $("#sel_1").is(':checked'); //获得全选复选框是否选中
+            $("#choose input[type='checkbox']").each(function () {
+                this.checked = isCheck; //循环赋值给每个复选框是否选中
+            });
+        };
+
+        $(document).ready(function(){
+            var record = getQueryVariable("record")
+            if(record){
+                $('#myTab a[href="#divideList"]').tab('show')
+                getRecordClassListByClass(0);
+            }
+        });
+
+        function getQueryVariable(variable)
+        {
+            var query = window.location.search.substring(1);
+            var vars = query.split("&");
+            for (var i=0;i<vars.length;i++) {
+                var pair = vars[i].split("=");
+                if(pair[0] == variable){return pair[1];}
+            }
+            return(false);
+        }
+    </script>
+    <script type="text/javascript" th:inline="javascript">
+        var basePath = /*[[${#httpServletRequest.getScheme() + "://" + #httpServletRequest.getServerName() + ":" + #httpServletRequest.getServerPort() + #httpServletRequest.getContextPath()}]]*/ ;
+
+        function getClassListPage(page) {
+            var load = new Loading();
+            load.init({
+                target: "#main-container"
+            });
+            load.start();
+            var data= serializeObject("#recordForm");
+            var size = $('#size option:selected').val(); //选中的值
+            /*if(page){
+                page = page -1;
+            }*/
+            window.location.href = basePath + '/recordClass/getRecordClassList?size=' + size +'&page='+page+'&data='+JSON.stringify(data);
+        }
+
+        function getaccordingListPage(page){
+            var data= serializeObject("#accordingStudentform");
+            var size = $('#qianfeisize option:selected').val();//选中的值
+            /*if(page){
+                page = page -1;
+            }*/
+            var load = new Loading();
+            load.init({
+                target: "#main-container"
+            });
+            load.start();
+            $.ajax({
+                type: 'get',
+                //dataType: 'json',
+                url: basePath + '/recordClass/accordingStudent?page='+page+'&size='+size+'&room=0', //+'&data='+JSON.stringify(data),
+                data: {data:JSON.stringify(data)},
+                contentType:"application/json;charset=UTF-8",
+                cache: false,
+                async: true,
+                success: function (data) {
+                    load.stop();
+                    console.log(data);
+                    $("#studentAbo").html("");
+                    $('#studentAbo').html(data);
+                }
+            });
+        }
+
+
+        function getRecordClassListByClass(page){
+            var data= serializeObject("#accordingClassform");
+            var size = $('#recordsize option:selected').val();//选中的值
+            var load = new Loading();
+            load.init({
+                target: "#main-container"
+            });
+            load.start();
+            $.ajax({
+                type: 'get',
+                //dataType: 'json',
+                url: basePath + '/recordClass/getRecordClassListByClass?page='+page+'&size='+size, //+'&data='+JSON.stringify(data),
+                data: {data:JSON.stringify(data)},
+                contentType:"application/json;charset=UTF-8",
+                cache: false,
+                async: true,
+                success: function (data) {
+                    load.stop();
+                    console.log(data);
+                    $("#classAbo").html("");
+                    $('#classAbo').html(data);
+                }
+            });
+        }
+
+        function expRecord(){
+            var data= serializeObject("#accordingClassform");
+            window.location.href= basePath + '/excel/recordCourseExcel' +'?data='+JSON.stringify(data);
+            /*var load = new Loading();
+            load.init({
+                target: "#main-container"
+            });
+            load.start();
+            $.ajax({
+                type: 'get',
+                //dataType: 'json',
+                url: basePath + '/excel/recordCourseExcel',
+                data: {data:JSON.stringify(data)},
+                contentType:"application/json;charset=UTF-8",
+                cache: false,
+                async: true,
+                success: function (data) {
+                    load.stop();
+                }
+            });*/
+        }
+
+        function serializeObject(form)
+        {
+            var o = {};
+            var a = $(form).serializeArray();
+            $.each(a, function() {
+                if (o[this.name]) {
+                    if (!o[this.name].push) {
+                        o[this.name] = [o[this.name]];
+                    }
+                    o[this.name].push(this.value || '');
+                } else {
+                    o[this.name] = this.value || '';
+                }
+            });
+            return o;
+        };
+
+        //按班级删除
+        function deleteRecord(classId,recordTime){
+            $.kd.kdConfirm("确定要删除该上课记录?",function(){
+                var load = new Loading();
+                load.init({
+                    target: "#main-container"
+                });
+                load.start();
+                $.ajax({
+                    url: basePath + '/recordClass/delete/recrodClass',
+                    type: 'get',
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    data: {classId:classId,recordTime:recordTime},
+                    async: true,
+                    success: function(data) {
+                        load.stop();
+                        var status = data.status;
+                        var msg = data.msg;
+                        $.kd.kdAlert("删除成功！",function () {
+                            getRecordClassListByClass("");
+                        });
+                    },
+                    error:function(){
+                        console.log("回调失败")
+                    }
+                });
+            })
+        }
+
+
+        //按学员删除
+        function deleteRecordByStudent(recordId){
+            $.kd.kdConfirm("确定要删除该上课记录?",function(){
+                var load = new Loading();
+                load.init({
+                    target: "#main-container"
+                });
+                load.start();
+                $.ajax({
+                    url: basePath + '/recordClass/delete/recrodClassByStudent',
+                    type: 'get',
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    data: {recordId:recordId},
+                    async: true,
+                    success: function(data) {
+                        load.stop();
+                        var status = data.status;
+                        var msg = data.msg;
+                        $.kd.kdAlert("删除成功！",function () {
+                            getRecordClassListByClass("");
+                        });
+                    },
+                    error:function(){
+                        console.log("回调失败")
+                    }
+                });
+            })
+        }
+
+
+    </script>
+<style>
+    a{cursor:pointer}
+</style>
+</body>
+
+</html>

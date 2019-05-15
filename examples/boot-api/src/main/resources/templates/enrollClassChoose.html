@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+    <link rel="stylesheet" href="../static/pages/css/ace.min.css" id="main-ace-style" />
+    <link rel="stylesheet" href="../static/pages/css/index.css">
+    <link rel="stylesheet" href="../static/pages/css/enroll.css">
+    <link rel="stylesheet" href="../static/pages/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../static/pages/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="../static/pages/css/madal.css" />
+    <link rel="stylesheet" href="../static/pages/css/kd.ui.plugin.css" />
+    <link rel="stylesheet" href="../static/pages/css/loading.css" />
+
+    <script src="../static/pages/js/jquery.min.js"></script>
+    <script src="../static/pages/js/ace.min.js"> </script>
+    <script src="../static/pages/js/bootstrap.min.js"> </script>
+    <script src="../static/pages/js/ace-elements.min.js"></script>
+    <script src="../static/pages/laydate/laydate.js"></script>
+    <script src="http://static.runoob.com/assets/jquery-validation-1.14.0/lib/jquery.js"></script>
+    <script src="http://static.runoob.com/assets/jquery-validation-1.14.0/dist/jquery.validate.min.js"></script>
+    <script src="http://static.runoob.com/assets/jquery-validation-1.14.0/dist/localization/messages_zh.js"></script>
+    <script src="../static/pages/js/kd.ui.plugin.js"></script>
+    <script src="../static/pages/js/loading.js"></script>
+</head>
+<body>
+<div th:replace="layout::top"></div>
+<form id="enrollform">
+    <div class="main-container" id="main-container">
+        <div th:replace="layout::left('13','31')">
+        </div>
+        <div class="main-content" id="saveEnroll">
+            <div class="breadcrumbs" id="breadcrumbs">
+                <img src="../static/pages/img/line1.png">
+                <span>报名/续费</span>
+                <img src="../static/pages/img/line.png">
+            </div>
+            <div class="enrollCon">
+                <h2>基本信息</h2>
+                <div class="openMore">
+                    <ul class="nav nav-tabs" id="myTab">
+                        <li class="active">
+                            <a th:href="@{/student/classDetail?(classId=${classId})}"  type="button" data-toggle="modal">返回</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="headPic">
+                    <span>头像</span>
+                    <img src="../static/pages/img/headpic.png">
+                </div>
+                <form class="form-horizontal" role="form">
+                    <div class="form-group">
+                        <label class="col-sm-1" for="studentName">学员姓名</label>
+                        <input type="text" name="studentName" id="studentName" placeholder="请输入学生姓名">
+                        <input type="hidden" name="id" id="studentId">
+                        <input type="hidden" id="classId" name="classId" th:value="${classId}">
+                        <input type="hidden" id="studentRelationId" name="studentRelationId">
+                    </div>
+                    <div class="form-group enrollNum">
+                        <label class="col-sm-1">联系电话</label>
+                        <input type="text" name="contactPhone" id="contactPhone"  placeholder="请输入联系电话" >
+                        <select name="contactRelation" id="contactRelation">
+                            <option value="母亲">母亲</option>
+                            <option value="父亲">父亲</option>
+                            <option value="本人">本人</option>
+                            <option value="其他">其他</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-1">学员性别</label>
+                        <label class="sex">
+                            <input name="form-field-radio" checked  value="0" name="sex" type="radio" class="ace">
+                            <span class="lbl"> 男</span>
+                        </label>
+                        <label class="sex">
+                            <input name="form-field-radio" value="1" name="sex" type="radio" class="ace">
+                            <span class="lbl"> 女</span>
+                        </label>
+                        <label class="sex">
+                            <input name="form-field-radio" value="2" name="sex" type="radio" class="ace">
+                            <span class="lbl"> 未知</span>
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-1">咨询渠道</label>
+                        <label class="sex">
+                            <input name="form-field-radio" checked  value="家长转介绍" name="advisoryChannel" type="radio" class="ace">
+                            <span class="lbl">家长转介绍</span>
+                        </label>
+                        <label class="sex">
+                            <input name="form-field-radio"  value="科目转换" name="advisoryChannel" type="radio" class="ace">
+                            <span class="lbl"> 科目转换</span>
+                        </label>
+                        <label class="sex">
+                            <input name="form-field-radio"  value="上门咨询" name="advisoryChannel" type="radio" class="ace">
+                            <span class="lbl"> 上门咨询</span>
+                        </label>
+                        <label class="sex">
+                            <input name="form-field-radio"  value="电话咨询" name="advisoryChannel" type="radio" class="ace">
+                            <span class="lbl"> 电话咨询</span>
+                        </label>
+                    </div>
+
+</form>
+<div class="enrollCon payInfo apply">
+    <h2>报名信息
+        <!--<a href="#modal-table1" role="button" onclick="getClassList('1');" class="blue" data-toggle="modal">选择班级报名</a>-->
+        <a href="#modal-table2" role="button" onclick="getStudentList();" class="blue" data-toggle="modal">选择已有学员</a>
+    </h2>
+    <div class="alert-info" >
+        <button type="button" class="close" data-dismiss="alert">
+            <span class="glyphicon glyphicon-remove-circle" onclick="remove()"></span>
+        </button>
+        <div>
+            <span style="width:300px; display: inline-block;" id="kecheng" ><img src="../static/pages/img/ke.png" style="margin-right:8px;"/></span>
+            <span>
+                <img src="../static/pages/img/ban.png">
+                <div style="width:200px; margin-left: 8px; display: inline-block; ">
+                    <div class="cash">
+                        <!--<select name="classIds">
+                            <option th:each="classes:${course.xbClassList}"  th:value="${classes.id}" th:text="${classes.teacher.employeeName}+${classes.className}"></option>
+                        </select>-->
+                        <span th:text="${xbClass.sysOrgans.organName}+${xbClass.xbCourse.xbcoursetype.courseTypeName}+${xbClass.teacher.employeeName}+${xbClass.className}"></span>
+                        <input type="hidden" id="courseId" name="courseId" >
+                        <input type="hidden" id="receivable" name="receivable" >
+                        <input type="hidden" name="organIds" >
+                        <input type="hidden" name="periodNum">
+                    </div>
+                </div>
+            </span>
+        </div>
+    </div>
+        <div class="income">
+            <div class="" style="margin:10px 0 0 20px; padding-bottom:15px;">
+                <label>定价标准</label>
+            </div>
+            <p class="incomeNum"><b id="tuitionFeess"></b>元</p>
+        </div>
+        <div class="income" style="border:0;">
+            <p class="incomeAll"><img src="../static/pages/img/money.png">应收</p>
+            <p class="incomeNum"><b id="yingshou">0</b>元</p>
+        </div>
+    <div class="">
+        <ul class="normal-ul">
+            <li>
+                <label style="margin-bottom: -30px; float: left;">对内备注</label>
+                <div class="normal-input-inner" style="width: 100%; padding-left: 74px;">
+                    <div class="input-wrapper">
+                        <input  type="text" name="remarksIn" placeholder="该备注只有对内部操作人员可见" maxlength="500" class="ivu-input">
+                    </div>
+                </div>
+            </li>
+            <li>
+                <label style="margin-bottom: -30px; float: left;">对外备注</label>
+                <div class="normal-input-inner" style="width: 100%; padding-left: 74px;">
+                    <div class="input-wrapper ">
+                        <input  type="text" name="remarksOut" placeholder="该备注将会被打印且会在校宝家中显示" maxlength="500" class="ivu-input">
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+    </div>
+
+<div class="enrollCon payInfo" style="display: none">
+    <h2>支付信息</h2>
+    <div class="alert-info">
+        当前的经办校区为<strong id="organName" th:text="${organName}"></strong>，请先确认经办校区后再填写支付信息！
+    </div>
+    <div class="income">
+        <p class="incomeAll"><img src="../static/pages/img/money.png">应收总计</p>
+        <p class="incomeNum"><b id="tuitionFee"></b>元</p>
+    </div>
+    <div class="income actual">
+        <p class="incomeAll"><img src="../static/pages/img/money.png">实收</p>
+        <!-- <p class="incomeNum"><b></b>元</p>-->
+    </div>
+    <div class="cash">
+        <select name="paymentType">
+            <option value="0">现金</option>
+        </select>
+        <div>
+            <!--<input type="text" name="paymentMoney"  id="paymentMoney">
+            <input type="hidden" name="surplusMoney"  id="surplusMoney" th:value="${money}">
+            <input type="hidden" name="totalPeriodNum" id="periodNum" th:value="${periodNum}"/>
+            <span>元</span>-->
+        </div>
+    </div>
+    <input type="hidden" name="paymentMoney"  id="paymentMoney" value="0">
+    <input type="hidden" name="surplusMoney"  id="surplusMoney" th:value="${money}">
+    <input type="hidden" name="totalPeriodNum" id="periodNum" th:value="${periodNum}"/>
+    <!--<div class="cash" style="margin-top: 20px;">
+        <p class="incomeAll"><img src="../static/pages/img/money.png">报名费</p>
+        <div>
+            <input type="text" name="registratioFee" value="0" id="registratioFee">
+            <span>元</span>
+        </div>
+    </div>-->
+</div>
+</div>
+<div class="enrollCon handleInfo" id="enrollCon_jbxq">
+    <h2>经办信息</h2>
+    <!--<div class="form-group">
+        <label class="col-sm-1">经办校区</label>
+        <select name="organId"　id="jborganId" onchange="getEmployee();">
+            <option th:each="orgs:${organsList}"  th:value="${orgs.id}" th:text="${orgs.organName}"></option>
+        </select>
+    </div>-->
+    <div class="form-group">
+        <label class="col-sm-1">销售来源</label>
+        <input type="text" name="salesSource" placeholder="请输入销售来源">
+    </div>
+    <div class="form-group">
+        <label class="col-sm-1">经办日期</label>
+        <input class="laydate-icon" name="handleDate" id="demo" >
+    </div>
+    <div class="form-group">
+        <label class="col-sm-1">经办人</label>
+        <input type="text" th:value="${sysEmployee.employeeName}" name="handlePerson" disabled="disabled">
+    </div>
+    <div class="form-group" style="margin-right:0 !important;">
+        <label class="col-sm-1">运营助理</label>
+        <!--<input type="text" placeholder="" name="">-->
+        <select name="operationAssistant" id="salesPerson">
+            <option th:each="emp:${employeeList}" th:value="${emp.employeeName}" th:text="${emp.employeeName}"></option>
+        </select>
+    </div>
+</div>
+<div class="enrollCon">
+    <button  class="save" type="button" onclick="saveEnroll();">保存</button>
+    <button class="save" onclick="javascript:history.go(-1)" style="margin-right:22px;">返回</button>
+</div>
+</form>
+
+<!-- 选择已有学员 -->
+<div id="modal-table2" class="modal fade in subsidy" tabindex="-1" aria-hidden="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header no-padding">
+                <div class="table-header">选择已有学员</div>
+            </div>
+            <div class="modalFrom">
+                <div class="form-group" style="margin-right:0 !important;">
+                    <select name="" id="">
+                        <option value="">学员姓名</option>
+                        <!--<option value="">张三</option>
+                    <option value="">李四</option>-->
+                    </select>
+                </div>
+                <form class="form-search">
+                            <span class="input-icon">
+                                <input type="text" oninput="getStudentList()" id="studentNames" placeholder="请输入学员名称">
+                                <!--<i class="ace-icon fa fa-search nav-search-icon"></i>-->
+                            </span>
+                </form>
+                <!--<div class="form-group">
+                <label>校区</label>
+                <select name="" id="">
+                    <option value="">全部校区</option>
+                    <option value="">111</option>
+                    <option value="">222</option>
+                </select>
+            </div>-->
+            </div>
+            <div class="modal-body no-padding" style="height: 200px;overflow-y: auto" id="donghua">
+                <table class="table table-striped  table-hover no-margin-bottom no-border-top">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th>姓名</th>
+                        <th>联系方式</th>
+                        <th>在读课程</th>
+                    </tr>
+                    </thead>
+                    <tbody style="display: none;">
+                    <!--<tr class="none">
+                <td>
+                    <img src="img/none.png">
+                    <span>很抱歉，这里什么都没有</span>
+                </td>
+            </tr>-->
+                    </tbody>
+                    <tbody th:id="userchoose">
+                    <th:block th:if="${xbStudentsList}" th:fragment="studentList">
+                        <tr th:each="stu : ${xbStudentsList}">
+                            <td>
+                                <input name="form-field-checkbox" name="studio" type="radio" th:value="${stu.id}">
+                            </td>
+                            <td th:text="${stu.xbStudent.studentName}"><img src="../static/pages/img/boy.png"></td>
+                            <td th:text="${stu.xbStudent.contactPhone}"></td>
+                            <td th:text="${stu.xbCourse.courseName}+'：'+${stu.receivable}+'元('+${stu.periodNum}+'课时)'"><img src="../static/pages/img/ke.png">在读课程</td>
+                        </tr>
+                    </th:block>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="modal-footer no-margin-top">
+                <button class="btn pull-left" data-dismiss="modal">
+                    取消
+                </button>
+                <button class="btn pull-right" data-dismiss="modal"  type="button" onclick="chooseUser();">
+                    确定
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+    !function(){
+        laydate.render({elem:'#demo'});//绑定元素
+        laydate.render({elem:'#demo1'});
+    }();
+    $(function(){
+        //$(".apply").hide();
+        $("#enrollform").validate({
+            rules : {
+                studentName : {
+                    required:true,
+                    minlength:2,
+                    maxlength:10
+                },
+                contactPhone : {
+                    required:true,
+                    minlength:2,
+                    checkName:true,
+                    maxlength:12
+                },
+                classIds : {
+                    required:true
+                },
+                paymentMoney : {
+                    required:true,
+                    digits:true
+                },
+                adds : {
+                    required:true,
+                    minlength:2,
+                    maxlength:15
+                },
+                messages: {
+                    classIds: "还没有选择班级",
+                    studentName: {
+                        required: "名称不能为空",
+                        minlength: "用户名最少由两个字符组成",
+                        maxlength:"用户名不能超过10个字符"
+                    },
+                    contactPhone: {
+                        required: "请输入电话号码",
+                        minlength: "地址最少由两个字符组成",
+
+                        maxlength:"地址不能超过10个字符"
+                    },
+                    paymentMoney: {
+                        required: "请输入实收金额",
+                        digits: "必须输入数字"
+                    }
+                },
+                errorPlacement: function(error, element) {
+                    if ( element.is(":radio") )
+                        error.appendTo( element.parent().next().next() );
+                    else if ( element.is(":checkbox") )
+                        error.appendTo ( element.next() );
+                    else
+                        error.appendTo( element.parent().next() );
+                }
+            }
+        });
+        jQuery.validator.addMethod('checkName', function (value, element) {
+            var studentId = $("#studentId").val();
+            if(studentId){
+                return true;
+            }
+            var msgcode=null;
+            $.ajax({
+                url: basePath + "/student/checkStudentName",
+                type: "get",
+                dataType: 'json',
+                async:false,
+                contentType:"application/json;charset=UTF-8",
+                data: {"name":$("#studentName").val(),"phone":value},
+                success: function(result){
+                    msgcode= result.code;
+                }
+            })
+            if(msgcode==1001){
+                $(element).data('error-msg','该用户已存在！');
+                return false;
+            }
+            return true;
+        }, function(params, element) {
+            return $(element).data('error-msg');
+        });
+
+    });
+
+    $(".btn-down").click(function(){
+        $(this).siblings(".dropdown-menu").toggle();
+    });
+    $(".more").click(function(){
+        $(".openInfo").toggle();
+    });
+    $(".select-selection").click(function(){
+        $(".select-dropdown").show();
+    });
+    $(".glyphicon-remove-circle").click(function(){
+        $(".apply").hide();
+    });
+</script>
+<script type="text/javascript" th:inline="javascript">
+    var basePath = /*[[${#httpServletRequest.getScheme() + "://" + #httpServletRequest.getServerName() + ":" + #httpServletRequest.getServerPort() + #httpServletRequest.getContextPath()}]]*/;
+    function checkedclass(indexs){
+        var val=$('input:radio[name="classId"]:checked').val();
+        var load = new Loading();
+        load.init({
+            target: "#enrollCon"
+        });
+        load.start();
+        $.ajax({
+            url: basePath + '/student/class/'+val,
+            type: 'get',
+            dataType: 'json',
+            contentType: 'application/json',
+            async: false,
+            success: function(data) {
+                load.stop();
+                $(".apply").show();
+                var className = data.className;
+                var courseName = data.courseName;
+                var organName = data.organName;
+                var tuitionFee = data.tuitionFee;
+                var courseId = data.courseId;
+                $("#courseId").val(courseId);
+                $("#className").val(className);
+                $("#organName").html(organName);
+                $("#kecheng").text(courseName+"("+organName+")");
+                $("#tuitionFee").text(tuitionFee);
+                $("#tuitionFees").text(tuitionFee);
+                $("#tuitionFeess").text(tuitionFee);
+                $("#surplusMoney").val(tuitionFee);
+            },
+            error:function(data1,data2,data3){
+                console.log("回调失败")
+            }
+        });
+    }
+
+    function saveEnroll(){
+        if ($("#enrollform").valid()) {
+            var data= serializeObject("#enrollform");
+            console.log(data);
+            var load = new Loading();
+            load.init({
+                target: "#saveEnroll"
+            });
+            load.start();
+            $.ajax({
+                type: 'get',
+                dataType: 'json',
+                url: basePath + '/feeRelated/save/enroll',
+                data: {studentEntity:JSON.stringify(data)},
+                contentType:"application/json;charset=UTF-8",
+                cache: false,
+                async: true,
+                success: function (data) {
+                    //load.stop();
+                    var status = data.status;
+                    var msg = data.msg;
+                    $.kd.kdAlert("编辑成功！",function () {
+                        window.location.href = basePath + '/student/classDetail?classId='+$("#classId").val();
+                    },"提示");
+                },
+                error(){
+                    load.stop();
+                }
+            });
+        }
+    }
+
+    function serializeObject(form)
+    {
+        var o = {};
+        var a = $(form).serializeArray();
+        $.each(a, function() {
+            if (o[this.name]) {
+                if (!o[this.name].push) {
+                    o[this.name] = [o[this.name]];
+                }
+                o[this.name].push(this.value || '');
+            } else {
+                o[this.name] = this.value || '';
+            }
+        });
+        return o;
+    };
+
+    function getCourseList(type){
+        var typename = "";
+        if(type=='1'){
+            typename="main-container"
+        }else{
+            typename="modal-content"
+        }
+        //typename="modal-content";
+        var load = new Loading();
+        load.init({
+            target: "#"+typename
+        });
+        load.start();
+        $.ajax({
+            type: 'get',
+            //dataType: 'json',
+            url: basePath + '/student/getCourseList',
+            data: {orginId:$("#kechengorgan").val(),courseName:$("#courseName").val()},
+            contentType:"application/json;charset=UTF-8",
+            cache: false,
+            async: true,
+            success: function (data) {
+                load.stop();
+                console.log(data);
+                $("#kechengchoose").html("");
+                $('#kechengchoose').append(data);
+            }
+        });
+    };
+
+    function getClassList(type){
+        var typename = "";
+        if(type=='1'){
+            typename="main-container"
+        }else{
+            typename="modal-content-banji"
+        }
+       // typename="modal-content-banji";
+        var load = new Loading();
+        load.init({
+            target: "#"+typename
+        });
+        load.start();
+        $.ajax({
+            type: 'get',
+            //dataType: 'json',
+            url: basePath + '/student/getClassList',
+            data: {orginId:$("#classorgan").val(),classesName:$("#classesName").val(),type:$("#type").val()},
+            contentType:"application/json;charset=UTF-8",
+            cache: false,
+            async: true,
+            success: function (data) {
+                load.stop();
+                console.log(data);
+                $("#classchoose").html("");
+            $('#classchoose').append(data);
+            }
+        });
+    };
+
+    function chooseCourse(){
+        $("#enrollCon").hide();
+        var organName = $("#kechengorgan").find("option:selected").text();
+        $("#organName").html(organName);
+        var courseIds = $("input:radio[name='checkboxname']:checked").map(function(index,elem) {
+            return $(elem).val();
+        }).get().join(',');
+        var load = new Loading();
+        load.init({
+            target: "#modal-content"
+        });
+        load.start();
+        $.ajax({
+            type: 'get',
+            //dataType: 'json',
+        url: basePath + '/student/chooseCourse',
+            data: {courseIds:courseIds},
+        contentType:"application/json;charset=UTF-8",
+            cache: false,
+            async: true,
+            success: function (data) {
+                console.log('成功');
+                load.stop();
+                $(".apply").show();
+                $("#baominginfo").html("");
+                $('#baominginfo').html(data);
+            },
+            error(){
+                console.log('失败');
+                load.stop();
+            }
+    });
+    };
+
+    function chooseClass(){
+        $("#enrollCon").hide();
+        var list = [];
+        var bb = {
+            ids:"",
+            indexs:""
+        };
+        $('input:checkbox[name=\'classcheckboxname\']').each(function (index, domEle) {
+            if(domEle.checked){
+                bb = {};
+                bb.ids = domEle.value;
+                bb.indexs = $("#sfbz"+index).val();
+                list.push(bb);
+            }
+        });
+        console.log(list);
+        var load = new Loading();
+        load.init({
+            target: "#modal-content-banji"
+        });
+        load.start();
+        $.ajax({
+            type: 'get',
+            //dataType: 'json',
+            url: basePath + '/student/chooseClass',
+            data: {xbClassparams:JSON.stringify(list)},
+            contentType:"application/json;charset=UTF-8",
+            cache: false,
+            async: true,
+            success: function (data) {
+                load.stop();
+                $(".apply").show();
+                $("#baominginfo").html("");
+                $('#baominginfo').html(data);
+            },
+            error(){
+                load.stop();
+            }
+        });
+    };
+
+    function kechengbox(){
+        var kechengsum = $("input[name='checkboxname']:checked").length;
+        $("#kechengsum").html(kechengsum);
+    };
+
+    function classbox(){
+        var classsum = $("input[name='classcheckboxname']:checked").length;
+        $("#classsum").html(classsum);
+    };
+
+    function remove(){
+        $("#enrollCon").hide();
+        var load = new Loading();
+        load.init({
+            target: "#enrollCon"
+        });
+        load.start();
+        $.ajax({
+            type: 'get',
+            //dataType: 'json',
+            url: basePath + '/student/removechoose',
+            data: {},
+            contentType:"application/json;charset=UTF-8",
+            cache: false,
+            async: true,
+            success: function (data) {
+                load.stop();
+                $(".apply").show();
+                $("#baominginfo").html("");
+                $('#baominginfo').html(data);
+            }
+        });
+    }
+
+    function getEmployee(){
+        var orgid = $("#jborganId").val();
+        var load = new Loading();
+        load.init({
+            target: "#enrollCon_jbxq"
+        });
+        load.start();
+        $.ajax({
+            type: 'get',
+            dataType: 'json',
+            url: basePath + '/accounts/getXiaoshouList',
+            data: {organId: orgid},
+            contentType:"application/json;charset=UTF-8",
+            cache: false,
+            async: true,
+            success: function (data) {
+                load.stop();
+                $('#salesPerson').empty();
+                for (var i = 0; i < data.sysEmployeePage.length; i++) {
+                    //先创建好select里面的option元素
+                    var option = document.createElement("option");
+                    //转换DOM对象为JQ对象,好用JQ里面提供的方法 给option的value赋值
+                    $(option).val(data.sysEmployeePage[i].employeeName);
+                    //给option的text赋值,这就是你点开下拉框能够看到的东西
+                    $(option).text(data.sysEmployeePage[i].employeeName);
+                    //获取select 下拉框对象,并将option添加进select
+                    $('#salesPerson').append(option);
+                }
+            }
+        });
+    }
+
+    function getStudentList() {
+        var load = new Loading();
+        load.init({
+            target: "#saveEnroll"
+        });
+        load.start();
+        $.ajax({
+            type: 'get',
+            //dataType: 'json',
+            url: basePath + '/feeRelated/getStudentListByCourseType',
+            data: {
+                studentName: $("#studentNames").val(),
+                classId:$("#classId").val()
+            },
+            contentType: "application/json;charset=UTF-8",
+            cache: false,
+            async: true,
+            success: function (data) {
+                load.stop();
+                console.log(data);
+                $("#userchoose").html("");
+                $('#userchoose').append(data);
+            }
+        });
+    };
+
+    function chooseUser() {
+        var load = new Loading();
+        load.init({
+            target: "#saveEnroll"
+        });
+        var val = $('input:radio[name="studio"]:checked').val();
+        if (val == null) {
+            $.kd.kdAlert("什么也没选中!");
+            return false;
+        }
+        load.start();
+        $.ajax({
+            type: 'get',
+            dataType: 'json',
+            url: basePath + '/feeRelated/enrollchooseStudentByClass',
+            data: {
+                studentId: val
+            },
+            contentType: "application/json;charset=UTF-8",
+            async: true,
+            success: function (data) {
+                load.stop();
+                console.log(data);
+                $('#studentName').val(data.data.studentName);
+                $("#studentId").val(data.data.id);
+                $("#contactPhone").val(data.data.contactPhone);
+                $("#contactRelation").val(data.data.contactRelation);
+                $("#kecheng").html(data.courseName+(data.xbStudentRelation.receivable+'/'+data.xbStudentRelation.periodNum));
+                $("#tuitionFeess").html(data.xbStudentRelation.receivable);
+                $("#yingshou").html(data.data.paymentMoney);
+                $("#tuitionFee").html(data.data.paymentMoney);
+                $("#studentRelationId").val(data.xbStudentRelation.id);
+                $("input[name='sex'][value='"+data.data.sex+"']").attr("checked",true);
+                $("input[name='advisoryChannel'][value='"+data.data.advisoryChannel+"']").attr("checked",true);
+            }
+        });
+    };
+
+    </script>
+    </body>
+    </html>
