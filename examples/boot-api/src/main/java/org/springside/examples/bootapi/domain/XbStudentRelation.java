@@ -42,11 +42,14 @@ public class XbStudentRelation {
     @NotNull(message="班级不能为空")
     public String classId;
     public BigDecimal receivable;
+    public BigDecimal yingshou;
+    public BigDecimal shishou;
     public String remarksIn;
     public String remarksOut;
     public BigDecimal periodNum;
     public Date enrollDate;
     public Integer studentStart;
+    public Integer status;
     @Transient
     public String relationId;
     public BigDecimal totalReceivable;

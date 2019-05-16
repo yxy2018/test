@@ -44,6 +44,9 @@ public class XbStudentRelationViewNew {
     public String employeeName;
     public String xbStudentRalationId;
     public String deleteStatus;
+    public BigDecimal shishou;
+    //yxy
+    public Integer status;
     @Transient
     public String relationId;
 

@@ -583,12 +583,18 @@ public class FeeRelatedActivity {
 	 */
 	@RequestMapping("/saveSubsidy")
 	@SystemControllerLog(descrption = "补费",actionType = "1")
-	public void saveSubsidy(@RequestParam String studentEntity, HttpServletResponse resp) {
+	public void saveSubsidy(@RequestParam String studentEntity,String selId,BigDecimal surplusMoney, HttpServletResponse resp) {
 		try {
 			XbSupplementFee xbSupplementFee = com.alibaba.fastjson.JSONObject.parseObject(studentEntity,XbSupplementFee.class);
+			//String subsidyMoney1 = xbSupplementFee.subsidyMoney;
+			BigDecimal paymentMoney1 = xbSupplementFee.paymentMoney;//实收
 			xbSupplementFee.type = "2";//补费
 			String studentId = xbSupplementFee.studentId;
-			String subsidyMoney = xbSupplementFee.subsidyMoney;
+			String subsidyMoney = xbSupplementFee.subsidyMoney;//适用账户余额
+			BigDecimal shishou = paymentMoney1;
+			if(subsidyMoney!=null){
+				shishou = shishou.add(new BigDecimal(subsidyMoney));
+			}
 			XbStudent xbStudent = studentService.getXbStudent(studentId);
 			BigDecimal subsidyMoneyBd = new BigDecimal(subsidyMoney);
 			BigDecimal bd = xbSupplementFee.paymentMoney.add(subsidyMoneyBd);
@@ -601,12 +607,25 @@ public class FeeRelatedActivity {
 				xbStudent.paymentMoney = paymentMoney;
 				xbStudent.surplusMoney = xbStudent.surplusMoney.add(bd.subtract(xbSupplementFee.surplusMoney).subtract(subsidyMoneyBd));
 			}
-			studentService.saveXbStudent(xbStudent);
+			XbStudent xbStudent1 = studentService.saveXbStudent(xbStudent);
+			String StudentId = xbStudent1.id;
 			HttpServletRequest request = ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest();
 			SysEmployee sysEmployee = (SysEmployee)request.getSession().getAttribute("sysEmployee");
 			xbSupplementFee.handlePerson = sysEmployee.employeeName;
 			xbSupplementFee.remarks = "补费"+bd+"元,使用账户余额"+subsidyMoneyBd+"元";
+			xbSupplementFee.studentRelationId = selId;
 			studentService.saveXbSupplementFee(xbSupplementFee);
+
+			//yxy
+			XbStudentRelation xbStudentRelation = studentService.findXbStudentRelationById(selId);
+			BigDecimal shishou1 = xbStudentRelation.shishou;
+			BigDecimal add = shishou1.add(shishou);
+			xbStudentRelation.shishou = add;
+			BigDecimal totalReceivable = xbStudentRelation.totalReceivable;
+			if(totalReceivable.compareTo(add)== 0){
+				xbStudentRelation.status = 1;
+			}
+			XbStudentRelation xbStudentRelation1 = studentService.saveXbStudentRelation(xbStudentRelation);
 			JSONObject jsonObject = new JSONObject();
 			jsonObject.put("status","1");
 			jsonObject.put("msg", "编辑成功");
@@ -618,7 +637,20 @@ public class FeeRelatedActivity {
 			logger.info(e.toString());
 		}
 	}
-
+//	/**
+//	 *
+//	 * @param studentEntity
+//	 * @param resp
+//	 */
+//	@RequestMapping("/getCount")
+//	@SystemControllerLog(descrption = "补费1",actionType = "1")
+//	public void getCount(String selId, HttpServletResponse resp) {
+//		try {
+//			//BigDecimal bd = studentService.getCount(selId);
+//		} catch (Exception e) {
+//			logger.info(e.toString());
+//		}
+//	}
 	/**
 	 * 停课选择学员
 	 * @return

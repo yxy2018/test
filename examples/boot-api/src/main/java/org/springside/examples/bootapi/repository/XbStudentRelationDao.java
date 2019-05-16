@@ -1,11 +1,13 @@
 package org.springside.examples.bootapi.repository;
 
 
+import org.apache.poi.hpsf.Decimal;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springside.examples.bootapi.domain.XbStudentRelation;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -29,5 +31,6 @@ public interface XbStudentRelationDao extends PagingAndSortingRepository<XbStude
     List findAllStudentListByStudentName(String studentname);
 
     List<XbStudentRelation> findByStudentId(String studentId);
-
+    /*@Query(value="SELECT w.class_id FROM xb_student_relation_view w WHERE w.student_name LIKE %?1% AND w.class_id <> ''",nativeQuery = true)*/
+    //XbStudentRelation getCount(String id);
 }

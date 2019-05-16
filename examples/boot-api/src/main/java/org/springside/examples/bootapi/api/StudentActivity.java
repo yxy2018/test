@@ -896,6 +896,7 @@ public class StudentActivity {
 	public String getClass(@RequestParam(required = false) String id, ModelMap model, Pageable pageable){
 		String organId = "";
 		XbClass xbClass = new XbClass();
+		System.out.println(xbClass.id);
 		List<SysOrgans> organsList = organsService.getOrgansList();
 		if(null!=id){
 			xbClass = studentService.getXbClass(id);
@@ -1081,12 +1082,15 @@ public class StudentActivity {
 			XbStudent xbStudent = com.alibaba.fastjson.JSONObject.parseObject(studentEntity,XbStudent.class);
 			XbSupplementFee xbSupplementFee = com.alibaba.fastjson.JSONObject.parseObject(studentEntity,XbSupplementFee.class);
 			List<XbStudentRelation> xbStudentRelationList = com.alibaba.fastjson.JSONArray.parseArray(xbStudentRelation,XbStudentRelation.class);
-			BigDecimal su = (xbStudent.paymentMoney).subtract(xbStudent.surplusMoney);
+			BigDecimal paymentMoney = xbStudent.paymentMoney;
+			BigDecimal su = (xbStudent.paymentMoney).subtract(xbStudent.surplusMoney);//  应收   实收
 			BigDecimal pay = xbStudent.surplusMoney.subtract(xbStudent.paymentMoney);
 			int r=su.compareTo(BigDecimal.ZERO); //和0，Zero比较
 			int r2=pay.compareTo(BigDecimal.ZERO); //和0，Zero比较
+			Integer status = 1;
 			if(r==-1){//小于
 				su = new BigDecimal(0);
+				status = 0;
 			}
 			if(r2==-1){//小于
 				pay = new BigDecimal(0);
@@ -1131,6 +1135,9 @@ public class StudentActivity {
 				studentRelation.receivable = xbSupplementFee.surplusMoney;
 				studentRelation.totalReceivable = xbSupplementFee.surplusMoney;
 				studentRelation.studentStart = 0;//在读
+				studentRelation.shishou = paymentMoney;
+				//看是否欠费
+				studentRelation.status = status;
 				XbStudentRelation xbStudentRelation1 = studentService.saveXbStudentRelation(studentRelation);
 				xbSupplementFee.studentRelationId = xbStudentRelation1.id;
 			}

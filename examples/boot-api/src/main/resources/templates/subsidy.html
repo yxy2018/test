@@ -54,36 +54,43 @@
                     <table class="table table-hover">
                         <tr>
                             <th>
-                                <input type="checkbox" id="sel_3" onchange="chooseAll()">
+                                <!--<input type="checkbox" id="sel_3" onchange="chooseAll()">-->
+                                <input type="checkbox" id="sel_3" >
                             </th>
                             <th>课程</th>
                             <th>课程剩余金额</th>
                             <th>课程剩余课时</th>
                             <th>校区</th>
-                            <!--<th>上课时间</th>-->
                             <th>报名时间</th>
+                            <th>欠费</th>
                         </tr>
-                        <tr id="chooses" th:each="studentrelations,stuSta:${xbStudentPage}">
-                            <td><input type="checkbox"></td>
+                        <tr id="choose" th:each="studentrelations,stuSta:${xbStudentPage}">
+<!--                        <tr class="choose" th:each="studentrelations,stuSta:${xbStudentPage}">-->
+                            <td>
+                                <input type="checkbox" onchange="chooseSinger(this)">
+                                <input type="hidden" th:value="${studentrelations.id}" />
+                            </td>
                             <td th:text="${studentrelations.xbCourse.courseName}"></td>
                             <td th:text="${studentrelations.receivable}"></td>
                             <td th:text="${studentrelations.periodNum}"></td>
                             <td th:text="${studentrelations.sysOrgans.organName}"></td>
                             <td th:if="${studentrelations.enrollDate!=null}" th:text="${#dates.format(studentrelations.enrollDate, 'yyyy-MM-dd')}"></td>
                             <td th:if="${studentrelations.enrollDate==null}" th:text="${studentrelations.enrollDate}"></td>
+                            <td class="qianfei" th:text="${studentrelations.totalReceivable-studentrelations.shishou}"></td>
                         </tr>
                     </table>
                 </div>
 
                 <div class="enrollCon payInfo">
                     <h2>支付信息</h2>
+<!--                    <div class="form-group" style="padding-top: 20px;">-->
+<!--                        <label class="incomeAll"><img src="../static/pages/img/money.png">&nbsp;&nbsp;应收总计：</label>-->
+<!--                        <input type="hidden" id="surplusMoney" name="surplusMoney" th:value="${xbStudent.paymentMoney}" th:text="${xbStudent.paymentMoney}"/>-->
+<!--                    </div>-->
                     <div class="form-group" style="padding-top: 20px;">
-                        <label class="incomeAll"><img src="../static/pages/img/money.png">&nbsp;&nbsp;应收总计：</label>
-                        <input type="hidden" id="surplusMoney" name="surplusMoney" th:value="${xbStudent.paymentMoney}" th:text="${xbStudent.paymentMoney}"/>
-                    </div>
-                    <div class="form-group">
                         <label class="incomeAll"><img src="../static/pages/img/money.png">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;实收：</label>
                         <input type="text" name="paymentMoney" id="paymentMoney" th:value="0.00"/>元
+                        <input style="display: none" id="surplusMoney" name="surplusMoney" th:value="${xbStudent.paymentMoney}"/>
                     </div>
                     <div class="form-group">
                         <label>使用账户余额：</label>
@@ -214,12 +221,39 @@ laydate.render({elem: '#demo'});//绑定元素
 $(".more").click(function(){
   $(".openInfo").toggle();
 });
-
 </script>
 
 <script type="text/javascript" th:inline="javascript">
     var basePath = /*[[${#httpServletRequest.getScheme() + "://" + #httpServletRequest.getServerName() + ":" + #httpServletRequest.getServerPort() + #httpServletRequest.getContextPath()}]]*/ ;
-
+    function chooseSinger(obj){
+        $("#choose input[type='checkbox']").each(function() {
+            this.checked = false;
+        });
+        obj.checked = true;
+       /* var selId = '';
+        $("#choose input[type='checkbox']").each(function() {
+            if(this.checked == true){
+                selId = $(this).next("input").val();
+            }
+        });
+        if(selId != ''){
+            $.ajax({
+                type: 'get',
+                //dataType: 'json',
+                url: basePath + '/feeRelated/getCount',
+                data: {
+                    selId:selId
+                },
+                contentType: "application/json;charset=UTF-8",
+                cache: false,
+                async: true,
+                success: function (data) {
+                    console.log(data);
+                    $("#surplusMoney").val(data)
+                }
+            });
+        }*/
+    };
     function getStudentList() {
         var load = new Loading();
         load.init({
@@ -270,6 +304,7 @@ $(".more").click(function(){
                 load.stop();
                 console.log(data);
                 $("#subsidyId").html(data);
+                $("#choose input[type='checkbox']").eq(0)[0].checked = true;
             }
         });
     };
@@ -277,15 +312,29 @@ $(".more").click(function(){
     function saveSubsidy(){
         var studentId = $('#studentId').val();
         var surplusMoney = $('#surplusMoney').val();
+        var surplusMoney1 = '';
         var paymentMoney = $('#paymentMoney').val();
         var subsidyMoney = $('#subsidyMoney').val();
         var xbStudentSurplusMoney = $('#xbStudentSurplusMoney').val();
+        var selId = '';
+        var flag = false;
+        $("#choose input[type='checkbox']").each(function() {
+            if(this.checked == true){
+                flag = true;
+                selId = $(this).next("input").val();
+                surplusMoney1 = $(this).parents('tr').find('.qianfei').text();
+            }
+        });
+        if(flag == false){
+            $.kd.kdAlert("还未选课程！");
+            return;
+        }
         if(Number(xbStudentSurplusMoney)<Number(subsidyMoney)){
             $.kd.kdAlert("当前可用金额不足！");
             return;
         }
-        if((Number(subsidyMoney)+Number(paymentMoney))>Number(surplusMoney)){
-            $.kd.kdAlert("补费金额不能大于应收总计！");
+        if((Number(subsidyMoney)+Number(paymentMoney))>Number(surplusMoney1)){
+            $.kd.kdAlert("补费金额不能大于欠费总额！");
             return;
         }
         if (studentId) {
@@ -295,7 +344,7 @@ $(".more").click(function(){
                 type: 'get',
                 dataType: 'json',
                 url: basePath + '/feeRelated/saveSubsidy',
-                data: {studentEntity:JSON.stringify(data)},
+                data: {studentEntity:JSON.stringify(data),selId:selId},
                 contentType:"application/json;charset=UTF-8",
                 cache: false,
                 async: true,

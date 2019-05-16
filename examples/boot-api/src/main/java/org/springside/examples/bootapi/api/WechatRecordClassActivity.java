@@ -412,6 +412,7 @@ public class WechatRecordClassActivity {
 		if(null!=classesId){
 			searhMap.put("LIKE_classId",classesId);
 		}
+		searhMap.put("EQ_status",1);
 		List<Integer> studentStartList = new ArrayList();
 		studentStartList.add(1);
 		studentStartList.add(4);

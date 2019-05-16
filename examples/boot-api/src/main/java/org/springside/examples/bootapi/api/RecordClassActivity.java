@@ -192,6 +192,8 @@ public class RecordClassActivity {
 		if(null!=classesId){
 			searhMap.put("LIKE_classId",classesId);
 		}
+		//yxy  查不欠费的学员
+		searhMap.put("EQ_status",1);
 		List<Integer> studentStartList = new ArrayList();
 		studentStartList.add(1);
 		studentStartList.add(4);

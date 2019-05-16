@@ -54,7 +54,7 @@
                         </div>
                         <div class="form-group" style="display:block; margin-top:20px !important">
                             <label for="courseId"><span>*</span>课程</label>
-                            <select name="courseId" id="courseId">
+                            <select name="courseId" id="courseId" readonly="readonly">
                                 <option th:each="course:${xbCourseList}" th:selected="${xbClass.courseId == course.id}"
                                     th:value="${course.id}" th:text="${course.courseName}"></option>
                             </select>

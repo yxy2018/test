@@ -1,5 +1,6 @@
 package org.springside.examples.bootapi.service;
 
+import org.apache.poi.hpsf.Decimal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -191,7 +192,10 @@ public class XbStudentService {
 		studentRelation.enrollDate = new Date();
 		return xbStudentRelationDao.save(studentRelation);
 	}
-
+//	@Transactional
+//	public BigDecimal getCount(String id) {
+//		return xbStudentRelationDao.getCount(id);
+//	}
 	@Transactional
 	public void deleteXbStudent(String id) {
         XbStudent xbStudent = studentDao.findOne(id);
@@ -430,6 +434,9 @@ public class XbStudentService {
 	}
 	public List<XbClass> findByXbStudentRalationId(String id){
 		return xbClassDao.findByXbStudentRalationId(id);
+	}
+	public XbStudentRelation findXbStudentRelationById(String id){
+		return xbStudentRelationDao.findOne(id);
 	}
 
 }

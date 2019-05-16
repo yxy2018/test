@@ -158,21 +158,21 @@
     </div>
 </div>
 <div id="baominginfo">
-<th:block  th:fragment="baoming">
-<div class="enrollCon payInfo apply">
-    <th:block th:if="${xbCourseLists}" th:fragment="baoming">
-    <h2>报名信息
-        <!--<a href="#modal-table1" role="button" onclick="getClassList('1');" class="blue" data-toggle="modal">选择班级报名</a>-->
-        <a href="#modal-table" role="button" onclick="getCourseList('1');" class="blue" data-toggle="modal">选择课程报名</a>
-    </h2>
-    <th:block th:each="course,courseindex:${xbCourseLists}">
-    <div class="alert-info" >
-        <button type="button" class="close" data-dismiss="alert">
-            <span class="glyphicon glyphicon-remove-circle" onclick="remove()"></span>
-        </button>
-        <div>
-            <span style="width:300px; display: inline-block;" id="kecheng" th:text="${course.xbCourse.courseName}" ><img src="../static/pages/img/ke.png" style="margin-right:8px;"/></span>
-            <span>
+    <th:block  th:fragment="baoming">
+        <div class="enrollCon payInfo apply">
+            <th:block th:if="${xbCourseLists}" th:fragment="baoming">
+                <h2>报名信息
+                    <!--<a href="#modal-table1" role="button" onclick="getClassList('1');" class="blue" data-toggle="modal">选择班级报名</a>-->
+                    <a href="#modal-table" role="button" onclick="getCourseList('1');" class="blue" data-toggle="modal">选择课程报名</a>
+                </h2>
+                <th:block th:each="course,courseindex:${xbCourseLists}">
+                    <div class="alert-info" >
+                        <button type="button" class="close" data-dismiss="alert">
+                            <span class="glyphicon glyphicon-remove-circle" onclick="remove()"></span>
+                        </button>
+                        <div>
+                            <span style="width:300px; display: inline-block;" id="kecheng" th:text="${course.xbCourse.courseName}" ><img src="../static/pages/img/ke.png" style="margin-right:8px;"/></span>
+                            <span>
                 <img src="../static/pages/img/ban.png">
                 <div style="width:200px; margin-left: 8px; display: inline-block; ">
                     <div class="cash">
@@ -186,77 +186,77 @@
                     </div>
                 </div>
             </span>
-        </div>
-    </div>
-        <div class="income">
-            <div class="" style="margin:10px 0 0 20px; padding-bottom:15px;">
-                <label>定价标准</label>
-            </div>
-            <p class="incomeNum"><b id="tuitionFeess" th:text="${course.lsmoney}"></b>元</p>
-        </div>
-        <div class="income" style="border:0;">
-            <p class="incomeAll"><img src="../static/pages/img/money.png">应收</p>
-            <p class="incomeNum"><b th:text="${course.lsmoney}">0</b>元</p>
-        </div>
-    <div class="">
-        <ul class="normal-ul">
-            <li>
-                <label style="margin-bottom: -30px; float: left;">对内备注</label>
-                <div class="normal-input-inner" style="width: 100%; padding-left: 74px;">
-                    <div class="input-wrapper">
-                        <input  type="text" name="remarksIn" placeholder="该备注只有对内部操作人员可见" maxlength="500" class="ivu-input">
+                        </div>
                     </div>
-                </div>
-            </li>
-            <li>
-                <label style="margin-bottom: -30px; float: left;">对外备注</label>
-                <div class="normal-input-inner" style="width: 100%; padding-left: 74px;">
-                    <div class="input-wrapper ">
-                        <input  type="text" name="remarksOut" placeholder="该备注将会被打印且会在校宝家中显示" maxlength="500" class="ivu-input">
+                    <div class="income">
+                        <div class="" style="margin:10px 0 0 20px; padding-bottom:15px;">
+                            <label>定价标准</label>
+                        </div>
+                        <p class="incomeNum"><b id="tuitionFeess" th:text="${course.lsmoney}"></b>元</p>
                     </div>
-                </div>
-            </li>
-        </ul>
-    </div>
-    </th:block>
-    </th:block>
-    </div>
+                    <div class="income" style="border:0;">
+                        <p class="incomeAll"><img src="../static/pages/img/money.png">应收</p>
+                        <p class="incomeNum"><b th:text="${course.lsmoney}">0</b>元</p>
+                    </div>
+                    <div class="">
+                        <ul class="normal-ul">
+                            <li>
+                                <label style="margin-bottom: -30px; float: left;">对内备注</label>
+                                <div class="normal-input-inner" style="width: 100%; padding-left: 74px;">
+                                    <div class="input-wrapper">
+                                        <input  type="text" name="remarksIn" placeholder="该备注只有对内部操作人员可见" maxlength="500" class="ivu-input">
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <label style="margin-bottom: -30px; float: left;">对外备注</label>
+                                <div class="normal-input-inner" style="width: 100%; padding-left: 74px;">
+                                    <div class="input-wrapper ">
+                                        <input  type="text" name="remarksOut" placeholder="该备注将会被打印且会在校宝家中显示" maxlength="500" class="ivu-input">
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </th:block>
+            </th:block>
+        </div>
 
-<div class="enrollCon payInfo">
-    <h2>支付信息</h2>
-    <div class="alert-info">
-        当前的经办校区为<strong id="organName" th:text="${organName}"></strong>，请先确认经办校区后再填写支付信息！
-    </div>
-    <div class="income">
-    <p class="incomeAll"><img src="../static/pages/img/money.png">应收总计</p>
-    <p class="incomeNum">
-        <input type="text" name="surplusMoney" id="surplusMoney"  th:value="${money}">
-        元
-    </p>
-</div>
-    <div class="income actual">
-        <p class="incomeAll"><img src="../static/pages/img/money.png">实收</p>
-        <!-- <p class="incomeNum"><b></b>元</p>-->
-    </div>
-    <div class="cash">
-        <select name="paymentType">
-            <option value="0">现金</option>
-        </select>
-        <div>
-            <input type="text" name="paymentMoney"  id="paymentMoney">
-            <input type="hidden" name="totalPeriodNum" id="periodNum" th:value="${periodNum}"/>
-            <span>元</span>
+        <div class="enrollCon payInfo">
+            <h2>支付信息</h2>
+            <div class="alert-info">
+                当前的经办校区为<strong id="organName" th:text="${organName}"></strong>，请先确认经办校区后再填写支付信息！
+            </div>
+            <div class="income">
+                <p class="incomeAll"><img src="../static/pages/img/money.png">应收总计</p>
+                <p class="incomeNum">
+                    <input type="text" name="surplusMoney" id="surplusMoney"  th:value="${money}">
+                    元
+                </p>
+            </div>
+            <div class="income actual">
+                <p class="incomeAll"><img src="../static/pages/img/money.png">实收</p>
+                <!-- <p class="incomeNum"><b></b>元</p>-->
+            </div>
+            <div class="cash">
+                <select name="paymentType">
+                    <option value="0">现金</option>
+                </select>
+                <div>
+                    <input type="text" name="paymentMoney"  id="paymentMoney">
+                    <input type="hidden" name="totalPeriodNum" id="periodNum" th:value="${periodNum}"/>
+                    <span>元</span>
+                </div>
+            </div>
+            <div class="cash" style="margin-top: 20px;">
+                <p class="incomeAll"><img src="../static/pages/img/money.png">报名费</p>
+                <div>
+                    <input type="text" name="registratioFee" value="0" id="registratioFee">
+                    <span>元</span>
+                </div>
+            </div>
         </div>
-    </div>
-    <div class="cash" style="margin-top: 20px;">
-        <p class="incomeAll"><img src="../static/pages/img/money.png">报名费</p>
-        <div>
-            <input type="text" name="registratioFee" value="0" id="registratioFee">
-            <span>元</span>
-        </div>
-    </div>
-</div>
-</th:block>
+    </th:block>
 </div>
 <div class="enrollCon handleInfo" id="enrollCon_jbxq">
     <h2>经办信息</h2>
@@ -334,20 +334,20 @@
                     </tbody>
                     <tbody   th:id ="kechengchoose">
                     <th:block th:if="${xbCoursePage}" th:fragment="courselist">
-                    <tr  th:each="couse : ${xbCoursePage.content}" >
-                        <td>
-                            <!--<input name="form-field-checkbox" name="checkboxname" type="checkbox" th:value="${couse.id}" onchange="kechengbox();">-->
-                            <input name="form-field-checkbox" name="checkboxname" type="radio" th:value="${couse.id}" onchange="kechengbox();">
-                        </td>
-                        <td th:text="${couse.xbCourse.courseName}"><img src="../static/pages/img/man.png"></td>
-                        <td th:text="${couse.xbCourse.xbcoursetype.courseTypeName}"></td>
-                        <td th:if="${couse.xbCourse.chargingMode}eq '0'" class="numberPer">按课时</td>
-                        <td th:if="${couse.xbCourse.chargingMode}eq '2'" class="numberPer">按期</td>
-                        <td th:if="${couse.xbCourse.chargingMode}eq '0'" th:text="${couse.money*couse.periodNum}+'元('+${couse.periodNum}+'课时)'"></td>
-                        <td th:if="${couse.xbCourse.chargingMode}eq '2'" th:text="${couse.money}+'元/期('+${couse.periodNum}+'课时)'"></td>
-                        <td th:if="${couse.xbCourse.type}eq '0'">班课</td>
-                        <td th:if="${couse.xbCourse.type}eq '1'">一对一</td>
-                    </tr>
+                        <tr  th:each="couse : ${xbCoursePage.content}" >
+                            <td>
+                                <!--<input name="form-field-checkbox" name="checkboxname" type="checkbox" th:value="${couse.id}" onchange="kechengbox();">-->
+                                <input name="form-field-checkbox" name="checkboxname" type="radio" th:value="${couse.id}" onchange="kechengbox();">
+                            </td>
+                            <td th:text="${couse.xbCourse.courseName}"><img src="../static/pages/img/man.png"></td>
+                            <td th:text="${couse.xbCourse.xbcoursetype.courseTypeName}"></td>
+                            <td th:if="${couse.xbCourse.chargingMode}eq '0'" class="numberPer">按课时</td>
+                            <td th:if="${couse.xbCourse.chargingMode}eq '2'" class="numberPer">按期</td>
+                            <td th:if="${couse.xbCourse.chargingMode}eq '0'" th:text="${couse.money*couse.periodNum}+'元('+${couse.periodNum}+'课时)'"></td>
+                            <td th:if="${couse.xbCourse.chargingMode}eq '2'" th:text="${couse.money}+'元/期('+${couse.periodNum}+'课时)'"></td>
+                            <td th:if="${couse.xbCourse.type}eq '0'">班课</td>
+                            <td th:if="${couse.xbCourse.type}eq '1'">一对一</td>
+                        </tr>
                     </th:block>
                     </tbody>
                 </table>
@@ -423,27 +423,27 @@
                     </tbody>
                     <tbody th:id ="classchoose">
                     <th:block th:if="${xbClassPage}" th:fragment="classlist">
-                    <tr th:each="clas,clasint:${xbClassPage}" >
-                        <td>
-                            <input name="form-field-checkbox" name="classcheckboxname" type="checkbox" th:value="${clas.id}" onchange="classbox()">
-                        </td>
-                        <td th:text="${clas.className}"><img src="../static/pages/img/man.png"></td>
-                        <td th:text="${clas.xbCourse.courseName}"></td>
-                        <td th:if="${clas.xbCourse.chargingMode== '0'}">按课时</td>
-                        <td th:if="${clas.xbCourse.chargingMode== '2'}">按期</td>
-                        <td class="numberPer" th:text="${clas.establishNum}"></td>
-                        <td>
-                            <select th:name="sfbz" th:id="sfbz+${clasint.index}">
-                                <option th:each="preset:${clas.xbCoursePresetList}"  th:value="${preset.id}" th:text="${clas.xbCourse.chargingMode== '0'}?${preset.money*preset.periodNum}+'元('+${preset.periodNum}+'课时)':${preset.money}+'元('+${preset.periodNum}+'课时)'"></option>
-                            </select>
-                        </td>
-                        <td th:text="${clas.teacher.employeeName}"></td>
-                        <!--<td>10-22</td>
-                        <td>
-                            <span>每周二17:00-18:30</span>
-                            <span>每周四17:00-18:30</span>
-                        </td>-->
-                    </tr>
+                        <tr th:each="clas,clasint:${xbClassPage}" >
+                            <td>
+                                <input name="form-field-checkbox" name="classcheckboxname" type="checkbox" th:value="${clas.id}" onchange="classbox()">
+                            </td>
+                            <td th:text="${clas.className}"><img src="../static/pages/img/man.png"></td>
+                            <td th:text="${clas.xbCourse.courseName}"></td>
+                            <td th:if="${clas.xbCourse.chargingMode== '0'}">按课时</td>
+                            <td th:if="${clas.xbCourse.chargingMode== '2'}">按期</td>
+                            <td class="numberPer" th:text="${clas.establishNum}"></td>
+                            <td>
+                                <select th:name="sfbz" th:id="sfbz+${clasint.index}">
+                                    <option th:each="preset:${clas.xbCoursePresetList}"  th:value="${preset.id}" th:text="${clas.xbCourse.chargingMode== '0'}?${preset.money*preset.periodNum}+'元('+${preset.periodNum}+'课时)':${preset.money}+'元('+${preset.periodNum}+'课时)'"></option>
+                                </select>
+                            </td>
+                            <td th:text="${clas.teacher.employeeName}"></td>
+                            <!--<td>10-22</td>
+                            <td>
+                                <span>每周二17:00-18:30</span>
+                                <span>每周四17:00-18:30</span>
+                            </td>-->
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -797,7 +797,7 @@
         }else{
             typename="modal-content-banji"
         }
-       // typename="modal-content-banji";
+        // typename="modal-content-banji";
         var load = new Loading();
         load.init({
             target: "#"+typename
@@ -815,7 +815,7 @@
                 load.stop();
                 console.log(data);
                 $("#classchoose").html("");
-            $('#classchoose').append(data);
+                $('#classchoose').append(data);
             }
         });
     };
@@ -835,9 +835,9 @@
         $.ajax({
             type: 'get',
             //dataType: 'json',
-        url: basePath + '/student/chooseCourse',
+            url: basePath + '/student/chooseCourse',
             data: {courseIds:courseIds},
-        contentType:"application/json;charset=UTF-8",
+            contentType:"application/json;charset=UTF-8",
             cache: false,
             async: true,
             success: function (data) {
@@ -851,7 +851,7 @@
                 console.log('失败');
                 load.stop();
             }
-    });
+        });
     };
 
     function chooseClass(){
@@ -1019,6 +1019,6 @@
         });
     };
 
-    </script>
-    </body>
-    </html>
+</script>
+</body>
+</html>
