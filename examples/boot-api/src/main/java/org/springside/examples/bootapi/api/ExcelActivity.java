@@ -13,9 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springside.examples.bootapi.ToolUtils.DateUtil;
 import org.springside.examples.bootapi.ToolUtils.ExcelData;
 import org.springside.examples.bootapi.ToolUtils.ExportExcelUtils;
-import org.springside.examples.bootapi.domain.XbClass;
-import org.springside.examples.bootapi.domain.XbRecordClassView;
-import org.springside.examples.bootapi.domain.XbStudentRelationViewNew;
+import org.springside.examples.bootapi.domain.*;
 import org.springside.examples.bootapi.service.XbStudentService;
 
 import javax.servlet.http.HttpServletResponse;
@@ -76,11 +74,10 @@ public class ExcelActivity {
         out.close();*/
 		ExportExcelUtils.exportExcel(response,"记上课.xlsx",datas);
 	}
-
 	@RequestMapping(value = "/studentRecordExcel", method = RequestMethod.GET)
 	public void studentRecordExcel(HttpServletResponse response,@RequestParam(required = false) String data) throws Exception {
 		ExcelData datas = new ExcelData();
-		datas.setName("学员记录");
+		datas.setName("到期学员记录");
 		List<String> titles = new ArrayList();
 		titles.add("姓名");
 		titles.add("手机号");
@@ -114,6 +111,67 @@ public class ExcelActivity {
 				enrollDate = xbStudentRelationViewNewList.get(i).enrollDate.toString().substring(0,10);
 			}
 			xbRecordClassViewList1.add(enrollDate);
+			rows.add(xbRecordClassViewList1);
+		}
+		datas.setRows(rows);
+		//生成本地
+        /*File f = new File("c:/test.xlsx");
+        FileOutputStream out = new FileOutputStream(f);
+        ExportExcelUtils.exportExcel(data, out);
+        out.close();*/
+		ExportExcelUtils.exportExcel(response,"到期学员信息.xlsx",datas);
+	}
+	@RequestMapping(value = "/studentRecordExcel1", method = RequestMethod.GET)
+	public void studentRecordExcel1(HttpServletResponse response,@RequestParam(required = false) String data) throws Exception {
+		ExcelData datas = new ExcelData();
+		datas.setName("学员记录");
+		List<String> titles = new ArrayList();
+		titles.add("学员姓名");
+		titles.add("联系电话");
+		titles.add("其他联系电话");
+		titles.add("所属关系");
+		titles.add("账户余额");
+		titles.add("欠费");
+		titles.add("报名费");
+		titles.add("报读课程");
+		titles.add("剩余课时");
+		titles.add("课时剩余总金额");
+		titles.add("报名时间");
+		titles.add("课程状态");
+		datas.setTitles(titles);
+		List<List<Object>> rows = new ArrayList();
+		List<XbStudentRelationViewNew> xbStudentRelationViewNewList = getStudentList1(data);
+		for (int i = 0; i < xbStudentRelationViewNewList.size(); i++) {
+			List<Object> xbRecordClassViewList1 = new ArrayList();
+			xbRecordClassViewList1.add(xbStudentRelationViewNewList.get(i).xbStudent.studentName);
+			xbRecordClassViewList1.add(xbStudentRelationViewNewList.get(i).xbStudent.contactPhone);
+			xbRecordClassViewList1.add(xbStudentRelationViewNewList.get(i).xbStudent.otherPhone);
+			xbRecordClassViewList1.add(xbStudentRelationViewNewList.get(i).xbStudent.contactRelation);
+			xbRecordClassViewList1.add(xbStudentRelationViewNewList.get(i).xbStudent.surplusMoney);
+			xbRecordClassViewList1.add(xbStudentRelationViewNewList.get(i).xbStudent.paymentMoney);
+			xbRecordClassViewList1.add(xbStudentRelationViewNewList.get(i).xbStudent.registratioFee);
+			xbRecordClassViewList1.add(xbStudentRelationViewNewList.get(i).xbCourse.courseName);
+			xbRecordClassViewList1.add(xbStudentRelationViewNewList.get(i).periodNum);
+			xbRecordClassViewList1.add(xbStudentRelationViewNewList.get(i).receivable);
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			String enrollDate="";
+			if(xbStudentRelationViewNewList.get(i).enrollDate!=null){
+				enrollDate = xbStudentRelationViewNewList.get(i).enrollDate.toString().substring(0,10);
+			}
+			xbRecordClassViewList1.add(enrollDate);
+			if(xbStudentRelationViewNewList.get(i).studentStart == 0 && xbStudentRelationViewNewList.get(i).classId ==""){
+				xbRecordClassViewList1.add("报名");
+			}else if(xbStudentRelationViewNewList.get(i).studentStart == 0 && xbStudentRelationViewNewList.get(i).classId !=""){
+				xbRecordClassViewList1.add("在读");
+			}else if(xbStudentRelationViewNewList.get(i).studentStart == 1 ){
+				xbRecordClassViewList1.add("停课");
+			}else if(xbStudentRelationViewNewList.get(i).studentStart == 2 ){
+				xbRecordClassViewList1.add("转班");
+			}else if(xbStudentRelationViewNewList.get(i).studentStart == 4 ){
+				xbRecordClassViewList1.add("结课");
+			}else if(xbStudentRelationViewNewList.get(i).studentStart == 3 ){
+				xbRecordClassViewList1.add("退费");
+			}
 			rows.add(xbRecordClassViewList1);
 		}
 		datas.setRows(rows);
@@ -285,7 +343,6 @@ public class ExcelActivity {
 		List<XbRecordClassView> recordLists = studentService.getXbRecordClassdViewtoList(searhMap);
 		return recordLists;
 	}
-
 	/*
 	 * 查询学员信息（到期学员模块导出）
 	 * @return
@@ -349,6 +406,87 @@ public class ExcelActivity {
 		}
 		List<XbStudentRelationViewNew> xbStudentPage = studentService.getXbRelationList(searhMap);
 
+		return xbStudentPage;
+	}
+
+	/*
+	 * 查询学员信息（学员列表模块导出）
+	 * @return
+	 */
+	private List<XbStudentRelationViewNew> getStudentList1(String data){
+		Map<String,Object> resultMap = new HashMap<>();
+		Map<String,Object> searhMap = new HashMap<>();
+		Map<String,Object> searchParamsview = new HashMap<>();
+		if(null!=data){
+			resultMap = com.alibaba.fastjson.JSONObject.parseObject(data,searhMap.getClass());
+		}
+		String organId = (String)resultMap.get("organId");
+		String type = (String)resultMap.get("type");
+		String nameormobile = (String)resultMap.get("nameormobile");
+		if(null==organId){
+			organId = "0";
+		}else if(!organId.equals("0")){
+			searhMap.put("EQ_organId",organId);
+			searchParamsview.put("EQ_organId",organId);
+		}
+		if(null==type){
+			type = "AZ";
+		}
+		if(null!=nameormobile&&!nameormobile.equals("")){
+			if(type.equals("AZ")){
+				searhMap.put("LIKE_xbStudent.studentName",nameormobile);
+				searchParamsview.put("LIKE_studentName",nameormobile);
+			}else{
+				searhMap.put("LIKE_xbStudent.contactPhone",nameormobile);
+				searchParamsview.put("LIKE_contactPhone",nameormobile);
+			}
+		}
+		searhMap.put("EQ_xbStudent.deleteStatus","1");
+		String enrollDateSearch = (String)resultMap.get("enrollDateSearch");
+		String enrollDateSearchEnd = (String)resultMap.get("enrollDateSearchEnd");
+		Date startdate = new Date();
+		Date enddate = new Date();
+
+		try {
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			if(StringUtils.isNotEmpty(enrollDateSearch)){
+				startdate = sdf.parse(enrollDateSearch);
+				searhMap.put("GTE_enrollDate",startdate);
+				searchParamsview.put("GTE_enrollDate",startdate);
+			}
+			if(null==enrollDateSearch){
+				enrollDateSearch = DateUtil.weekDateFirstDay();
+				startdate = sdf.parse(DateUtil.weekDateFirstDay());
+				searhMap.put("GTE_enrollDate",startdate);
+				searchParamsview.put("GTE_enrollDate",startdate);
+			}
+			if(StringUtils.isNotEmpty(enrollDateSearchEnd)){
+				enddate = sdf.parse(enrollDateSearchEnd);
+				searhMap.put("LTE_enrollDate",enddate);
+				searchParamsview.put("LTE_enrollDate",enddate);
+			}
+			if(null==enrollDateSearchEnd){
+				enddate = sdf.parse(DateUtil.weekDateLastDay());
+				enrollDateSearchEnd = DateUtil.weekDateLastDay();
+				searhMap.put("LTE_enrollDate",enddate);
+				searchParamsview.put("LTE_enrollDate",enddate);
+			}
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+//		List<XbStudentRelationView> studentlist = studentService.getxbStudentRelationViewList(searchParamsview);
+//		Iterable<SysOrgans> organsList = organsService.getOrgansList();
+		List<XbStudentRelationViewNew> xbStudentPage = studentService.getXbStudentRelationViewNewList(searhMap);
+//		model.addAttribute("studentlistsize",studentlist.size());
+//		model.addAttribute("xbStudentPage",xbStudentPage);
+//		model.addAttribute("organId",organId);
+//		model.addAttribute("organsList",organsList);
+//		model.addAttribute("studentcurrentzise",xbStudentPage.getSize());
+//		model.addAttribute("nameormobile",nameormobile);
+//		model.addAttribute("type",type);
+//		model.addAttribute("enrollDateSearch",enrollDateSearch);
+//		model.addAttribute("enrollDateSearchEnd",enrollDateSearchEnd);
+//		return "student";
 		return xbStudentPage;
 	}
 

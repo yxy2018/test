@@ -104,6 +104,7 @@
                                 <div class="form-group" style="display: inline;">
                                     <button type="button" th:onclick="'javascript:getOrgansListPage(\'\')'">搜索</button>
                                     <button type="button" onclick="$('input[type=text],#enrollDateSearch').val('')">清空</button>
+                                    <button type="button" th:onclick="'javascript:expRecord1()'" >导出当前结果</button>
                                 </div>
                             </div>
 
@@ -1045,6 +1046,10 @@ function studentDetail(id) {
 function expRecord(){
     var data= serializeObject("#expiryStuearchform");
     window.location.href= basePath + '/excel/studentRecordExcel' +'?data='+JSON.stringify(data);
+}
+function expRecord1(){
+    var data= serializeObject("#searchform");
+    window.location.href= basePath + '/excel/studentRecordExcel1' +'?data='+JSON.stringify(data);
 }
 
 </script>

@@ -971,9 +971,14 @@ public class FeeRelatedActivity {
 				xbStudentRelation = xbStudentPage.get(0);
 			}
 			BigDecimal receivable = xbStudentRelation.receivable;
-			BigDecimal paymentMoney = xbStudent.paymentMoney;
-			BigDecimal su = receivable.subtract(paymentMoney);
+//			BigDecimal paymentMoney = xbStudent.paymentMoney;
+//			BigDecimal su = receivable.subtract(paymentMoney);
+			BigDecimal su = receivable.subtract(xbStudentRelation.totalReceivable.subtract(xbStudentRelation.shishou));
+			if(su.compareTo(new BigDecimal("0.00")) == -1){
+				su = new BigDecimal("0.00");
+			}
 			balanceamount = su.toString();
+
 		}
 		//List<XbStudentRelation> xbClassPage = new ArrayList<>();
 		model.addAttribute("xbStudent",xbStudent);
@@ -983,6 +988,7 @@ public class FeeRelatedActivity {
 		model.addAttribute("xbStudentRelationId",xbStudentRelation.id);
 		model.addAttribute("totalReceivable",xbStudentRelation.totalReceivable);
 		model.addAttribute("receivable",xbStudentRelation.receivable);
+		model.addAttribute("qianfei",(xbStudentRelation.totalReceivable.subtract(xbStudentRelation.shishou)));
 		model.addAttribute("balanceamount",balanceamount);
 		return "cancelClass::changeClassFragment";
 	}
@@ -1007,6 +1013,7 @@ public class FeeRelatedActivity {
 			xbStudentRelations.receivable = new BigDecimal("0");
 			xbStudentRelations.periodNum = new BigDecimal("0");
 			xbStudentRelations.studentStart = 3;
+			xbStudentRelations.shishou = xbStudentRelations.shishou.subtract(new BigDecimal(shengyu));
 			XbStudent xbStudent = studentService.getXbStudent(studentId);
 			xbStudent.paymentMoney = new BigDecimal("0");
 			xbStudent.poundage = new BigDecimal(balanceamount).subtract(new BigDecimal(shengyu));
