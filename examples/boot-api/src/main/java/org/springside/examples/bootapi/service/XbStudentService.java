@@ -45,6 +45,21 @@ public class XbStudentService {
 	private XbStudentRelationViewDao xbStudentRelationViewDao;
 	@Autowired
 	private XbStudentRelationViewNewDao xbStudentRelationViewNewDaoDao;
+	@Autowired
+	private XbSupplementFeeViewDao xbSupplementFeeViewDao;
+	//获取费用相关信息
+	@Transactional
+	public Page<XbSupplementFeeView>  getXbSupplementFeeViewList(Pageable pageable, Map<String, Object> searchParams) {
+		HttpServletRequest request = ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest();
+		SysEmployee sysEmployee = (SysEmployee)request.getSession().getAttribute("sysEmployee");
+		if(!"超级管理员".equals(sysEmployee.sysRole.roleName)&&!"总校教务".equals(sysEmployee.sysRole.roleName)){
+			searchParams.put("EQ_organId",sysEmployee.organId);
+		}
+		Map<String, SearchFilter> filters = SearchFilter.parse(searchParams);
+		Specification<XbSupplementFeeView> spec = DynamicSpecifications.bySearchFilter(
+				filters.values(), XbSupplementFeeView.class);
+		return xbSupplementFeeViewDao.findAll(spec,pageable);
+	}
 
 	@Transactional
 	public Page<XbSupplementFee>  getXbSupplementFeeList(Pageable pageable, Map<String, Object> searchParams) {
