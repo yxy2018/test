@@ -61,6 +61,7 @@
                         <span>扣除课时</span>
                         <p><input type="text" value="1" name="deductPeriod" th:id="'redordIds'+${stuindex.index}"
                                   style="width: 37px;padding:1px;text-align: center;">
+                            <span th:id="'period'+${stuindex.index}"  th:text="${stu.periodNum}" style="display: none"></span>
                         </p>
                     </li>
                     <li style="padding-left:10px;">
@@ -93,6 +94,21 @@
     var basePath = /*[[${#httpServletRequest.getScheme() + "://" + #httpServletRequest.getServerName() + ":" + #httpServletRequest.getServerPort() + #httpServletRequest.getContextPath()}]]*/ ;
 
     function saveRecordClass() {
+        for(var i = 0; i < $('.personnel').length; i++){
+            var thisInput = $('#redordIds'+i).val();
+            var thisSpan = $('#period'+i).text();
+            if(Number(thisInput) > Number(thisSpan)){
+                $.kd.kdAlert("扣除课时不能大于剩余课时");
+                return;
+            }
+            if(Number(thisInput) <= Number(0)){
+                $.kd.kdAlert("扣除课时应大于0");
+                return;
+            }
+        }
+
+
+
         var load = new Loading();
         load.init({
             target: "body"

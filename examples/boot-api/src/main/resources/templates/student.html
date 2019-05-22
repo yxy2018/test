@@ -901,6 +901,7 @@ function getOrgansListPage(page){
    /* if(page){
         page = page -1;
     }*/
+
     window.location.href = basePath + '/student/getXbStudentList?page='+page+'&size='+size+'&room=0'+'&data='+JSON.stringify(data);
 }
 
@@ -933,7 +934,6 @@ function getqianfeilist(page){
         target: "#main-content"
     });
     load.start();
-    console.log("qqq"+data);
     $.ajax({
         type: 'get',
         //dataType: 'json',

@@ -108,10 +108,10 @@
                                 </div>
                                 <div class="form-group" th:if="${stu.xbStudentRelation.studentStart==0||stu.xbStudentRelation.studentStart==2}">
                                     <label>扣除课时</label>
-                                    <input type="text" name="deductPeriod" th:value="${stu.deductPeriod}" th:id="'redordIds'+${stuindex.index}">
+                                    <input type="text" id="deductPeriod"  name="deductPeriod" th:value="${stu.deductPeriod}" th:id="'redordIds'+${stuindex.index}">
                                     <input type="hidden" name="id" th:value="${stu.id}">
                                 </div>
-                                <p>剩余<span th:text="${stu.xbStudentRelation.periodNum}"></span>课时;总课时<span th:text="${stu.xbStudentRelation.totalPeriodNum}"></span>;单课时金额<span th:text="${stu.xbStudentRelation.totalReceivable/stu.xbStudentRelation.totalPeriodNum}"></span></p>
+                                <p>剩余<span id="periodNum"  th:text="${stu.xbStudentRelation.periodNum}"></span>课时;总课时<span th:text="${stu.xbStudentRelation.totalPeriodNum}"></span>;单课时金额<span th:text="${stu.xbStudentRelation.totalReceivable/stu.xbStudentRelation.totalPeriodNum}"></span></p>
                                 <th:block style="color:#e46054" th:if="${stu.xbStudentRelation.studentStart} eq 1">（已停课）</th:block>
                                 <th:block style="color:#e46054" th:if="${stu.xbStudentRelation.studentStart} eq 4">（已结课）</th:block>
                                 <th:block style="color:#e46054" th:if="${stu.xbStudentRelation.studentStart} eq 3">（已退费）</th:block>
@@ -215,6 +215,9 @@
         var basePath = /*[[${#httpServletRequest.getScheme() + "://" + #httpServletRequest.getServerName() + ":" + #httpServletRequest.getServerPort() + #httpServletRequest.getContextPath()}]]*/ ;
 
         function saveRecordClass() {
+            // var deductPeriod = $("#deductPeriod").val();
+            // var periodNum = $("#periodNum").val();
+            // debugger;
             var load = new Loading();
             load.init({
                 target: "#main-container"

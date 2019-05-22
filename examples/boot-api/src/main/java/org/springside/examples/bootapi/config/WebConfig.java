@@ -29,7 +29,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     public void addInterceptors(InterceptorRegistry registry) {
         // 日志拦截器
         //registry.addInterceptor(logInterceptor).addPathPatterns("/**");
-        // 登录拦截器
+        // 登录拦截器   yxy
         registry.addInterceptor(loginInterceptor).addPathPatterns("/**").excludePathPatterns(notLoginInterceptPaths);
     }
 

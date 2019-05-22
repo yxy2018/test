@@ -110,7 +110,7 @@
                                 <label>扣除课时</label>
                                 <input type="text" value="1" name="deductPeriod" th:id="'redordIds'+${stuindex.index}">
                             </div>
-                            <p>剩余<span th:text="${stu.periodNum}"></span>课时;总课时<span th:text="${stu.totalPeriodNum}"></span>;单课时金额<span th:text="${stu.totalReceivable/stu.totalPeriodNum}"></span></p>
+                            <p>剩余<span th:id="'period'+${stuindex.index}"  th:text="${stu.periodNum}"></span>课时;总课时<span th:text="${stu.totalPeriodNum}"></span>;单课时金额<span th:text="${stu.totalReceivable/stu.totalPeriodNum}"></span></p>
                             <th:block style="color:#e46054" th:if="${stu.studentStart} eq 1">（已停课）</th:block>
                             <th:block style="color:#e46054" th:if="${stu.studentStart} eq 4">（已结课）</th:block>
                             <th:block style="color:#e46054" th:if="${stu.studentStart} eq 3">（已退费）</th:block>
@@ -214,6 +214,18 @@
     var basePath = /*[[${#httpServletRequest.getScheme() + "://" + #httpServletRequest.getServerName() + ":" + #httpServletRequest.getServerPort() + #httpServletRequest.getContextPath()}]]*/ ;
 
     function saveRecordClass() {
+        for(var i = 0; i < $('.infoList').length; i++){
+            var thisInput = $('#redordIds'+i).val();
+            var thisSpan = $('#period'+i).text();
+            if(Number(thisInput) > Number(thisSpan)){
+                $.kd.kdAlert("扣除课时不能大于剩余课时");
+                return;
+            }
+            if(Number(thisInput) <= 0){
+                $.kd.kdAlert("扣除课时应大于0");
+                return;
+            }
+        }
         var load = new Loading();
         load.init({
             target: "#main-container"

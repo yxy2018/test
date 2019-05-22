@@ -159,9 +159,9 @@ public class ExcelActivity {
 				enrollDate = xbStudentRelationViewNewList.get(i).enrollDate.toString().substring(0,10);
 			}
 			xbRecordClassViewList1.add(enrollDate);
-			if(xbStudentRelationViewNewList.get(i).studentStart == 0 && xbStudentRelationViewNewList.get(i).classId ==""){
+			if(xbStudentRelationViewNewList.get(i).studentStart == 0 && xbStudentRelationViewNewList.get(i).classId .equals("")){
 				xbRecordClassViewList1.add("报名");
-			}else if(xbStudentRelationViewNewList.get(i).studentStart == 0 && xbStudentRelationViewNewList.get(i).classId !=""){
+			}else if(xbStudentRelationViewNewList.get(i).studentStart == 0 && !xbStudentRelationViewNewList.get(i).classId .equals("")){
 				xbRecordClassViewList1.add("在读");
 			}else if(xbStudentRelationViewNewList.get(i).studentStart == 1 ){
 				xbRecordClassViewList1.add("停课");
