@@ -148,7 +148,7 @@
                                 </tr>
                                 <tr id="chooses" th:each="studentrelation:${xbStudentPage.content}">
                                     <td><input type="checkbox"></td>
-                                    <td class="studentName" th:text="${studentrelation.xbStudent.studentName}" th:onclick="'javascript:studentDetail(\''+${studentrelation.xbStudent.id}+'\')'"><a href="#"><img src="../static/pages/img/boy.png"></a></td>
+                                    <td class="studentName" th:text="${studentrelation.xbStudent.studentName}" th:onclick="'javascript:studentDetail(\''+${studentrelation.xbStudent.id}+'\',\''+${studentrelation.xbCourse.id}+'\')'"><a href="#"><img src="../static/pages/img/boy.png"></a></td>
                                     <td th:text="${studentrelation.xbStudent.contactPhone}"></td>
                                     <td th:text="${studentrelation.xbStudent.otherPhone}"></td>
                                     <td th:text="${studentrelation.xbStudent.contactRelation}"></td>
@@ -1008,8 +1008,12 @@ function getDividelist(page){
 }
 
 //跳转到用户详情
-function studentDetail(id) {
-    window.location.href = basePath + '/student/studentDetail?studentId=' + id ;
+function studentDetail(id,id1) {
+    var data= {
+        studentId:id,
+        courseId:id1
+    };
+    window.location.href = basePath + '/student/studentDetail2?data=' + JSON.stringify(data) ;
 }
     //结课
     function finishCourse(id) {

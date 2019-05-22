@@ -221,8 +221,8 @@
                 $.kd.kdAlert("扣除课时不能大于剩余课时");
                 return;
             }
-            if(Number(thisInput) <= 0){
-                $.kd.kdAlert("扣除课时应大于0");
+            if(Number(thisInput) < 0){
+                $.kd.kdAlert("扣除课时应不小于0");
                 return;
             }
         }

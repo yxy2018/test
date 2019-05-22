@@ -286,7 +286,28 @@
             </div>
             <!-- 上课记录 -->
             <div id="conflict" class="tab-pane fade conflict">
-                <div class="orderTable" style="margin-top:30px;">
+                <!--<form id="searchform">
+                    &lt;!&ndash; 搜索 &ndash;&gt;
+                    <div id="schedule" class="tab-pane fade in active">
+                        <div class="control-position">
+                        <div class="control-group">
+                            <label class="control-label">类别</label>
+                            <input  th:attr ="checked=${courseTypeId == '0'?true:false}"
+                                    name="courseTypeId" type="radio" th:value="0" class="ace"
+                                    th:onclick="'javascript:getOrgansListPage(\'' + ${xbStudent.id} + '\')'">
+                            <span class="lbl" th:text="全部"></span>
+                            <div class="checkbox" th:each="type:${xbCourseTypeList}">
+                                <label>
+                                    <input th:attr ="checked=${courseTypeId == type.id?true:false}" name="courseTypeId" type="radio" th:value="${type.id}" class="ace" th:onclick="'javascript:getOrgansListPage(\''+${xbStudent.id}+'\')'">
+                                    <span class="lbl" th:text="${type.courseTypeName}"></span>
+                                </label>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                </form>-->
+
+                <div class="orderTable1" style="margin-top:30px;">
                     <table class="table table-hover">
                         <tr>
                             <th>上课日期</th>
@@ -862,7 +883,31 @@ function editStuinfo(){
       })
 
   };
-
+  function getOrgansListPage(studentId){
+      var load = new Loading();
+      load.init({
+          target: "body"
+      });
+      load.start();
+      var data= serializeObject("#searchform");
+      $.ajax({
+          type: 'get',
+          //dataType: 'json',
+          url: basePath + '/student/studentDetail1?studentId='+studentId+'&data='+JSON.stringify(data),
+          data: {data:data},
+          contentType:"application/json;charset=UTF-8",
+          cache: false,
+          async: true,
+          success: function (data) {
+              debugger
+              load.stop();
+              console.log(data);
+              $("#orderTable1").html("");
+              $('#orderTable1').html(data);
+          }
+      });
+      // window.location.href = basePath + '/student/studentDetail1?studentId='+studentId+'&data='+JSON.stringify(data);
+  };
   function serializeObject(form)
   {
       var o = {};

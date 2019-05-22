@@ -35,6 +35,8 @@ public class XbStudentService {
 	private XbClassDao xbClassDao;
 	@Autowired
 	private XbRecordClassDao xbRecordClassDao;
+    @Autowired
+    private XbRecordClassStudentRelationDao xbRecordClassStudentRelationDao;
 	@Autowired
 	private XbRecordClassViewDao xbRecordClassViewDao;
 	@Autowired
@@ -435,6 +437,22 @@ public class XbStudentService {
 		Specification<XbRecordClass> spec = DynamicSpecifications.bySearchFilter(
 				filters.values(), XbRecordClass.class);
 		return xbRecordClassDao.findAll(spec,pageable);
+	}
+    @Transactional
+    public Page<XbRecordClassStudentRelation>  getRecordClassPage3(Pageable pageable,Map<String, Object> searchParams) {
+        searchParams.put("EQ_deleteStatus","1");
+        Map<String, SearchFilter> filters = SearchFilter.parse(searchParams);
+        Specification<XbRecordClassStudentRelation> spec = DynamicSpecifications.bySearchFilter(
+                filters.values(), XbRecordClassStudentRelation.class);
+        return xbRecordClassStudentRelationDao.findAll(spec,pageable);
+    }
+	@Transactional
+	public List<XbRecordClass>  getRecordClassPage2(String studentId,String courseId) {
+		return xbRecordClassDao.getRecordClassPage2(studentId,courseId);
+	}
+	@Transactional
+	public List<XbRecordClass>  getRecordClassPage1(String studentId,String courseTypeId) {
+		return xbRecordClassDao.getRecordClassPage1(studentId,courseTypeId);
 	}
 
 	@Transactional

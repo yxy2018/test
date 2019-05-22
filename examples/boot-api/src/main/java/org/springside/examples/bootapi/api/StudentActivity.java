@@ -1555,7 +1555,74 @@ public class StudentActivity {
 		Page<XbRecordClass> xbRecordClassPage = studentService.getRecordClassPage(pageable,feeListSearchParams);
 		model.addAttribute("xbRecordClassPage",xbRecordClassPage);//上课记录
 		model.addAttribute("accordingcurrentzise",xbRecordClassPage.getSize());
+		Map<String, Object> searchParams1 = new HashMap<>();
+		model.addAttribute("xbCourseTypeList",xbCourseTypeService.findXbCourseTypeList(searchParams1));
 		return "stuinfoDetail";
+	}
+	/*
+	 * 跳转到详情
+	 * @return
+	 */
+	@RequestMapping("/studentDetail2")
+	public String studentDetail2(@RequestParam(required = false) String data,ModelMap model,Pageable pageable){
+		Map<String,Object> resultMap = new HashMap<>();
+		Map<String,Object> searhMap = new HashMap<>();
+		if(null!=data) {
+			resultMap = com.alibaba.fastjson.JSONObject.parseObject(data, searhMap.getClass());
+		}
+		String studentId = resultMap.get("studentId").toString();
+		String courseId = resultMap.get("courseId").toString();
+		XbStudent xbStudent = studentService.getXbStudent(studentId);
+		Map<String, Object> searchParams = new HashMap<>();
+		Map<String, Object> feeListSearchParams = new HashMap<>();
+		Map<String, Object> feeListSearchParams1 = new HashMap<>();
+		searchParams.put("EQ_studentId",studentId);
+		feeListSearchParams.put("EQ_studentId",studentId);
+		feeListSearchParams1.put("EQ_studentId",studentId);
+		feeListSearchParams1.put("EQ_courseId",courseId);
+		Page<XbStudentRelationViewNew> xbStudentRelationPage = studentService.getXbStudentRelationViewNewList(pageable,searchParams);
+		model.addAttribute("xbStudent",xbStudent);
+		model.addAttribute("xbStudentRelationPage",xbStudentRelationPage);//课程列表
+		Page<XbSupplementFee> XbSupplementFeePage = studentService.getXbSupplementFeeList(pageable,feeListSearchParams);
+		model.addAttribute("XbSupplementFeePage",XbSupplementFeePage);//订单列表
+		model.addAttribute("feecurrentzise",XbSupplementFeePage.getSize());
+		Page<XbRecordClassStudentRelation> xbRecordClassPage= studentService.getRecordClassPage3(pageable,feeListSearchParams1);
+//		List<XbRecordClass> xbRecordClassList= studentService.getRecordClassPage2(studentId,courseId);
+		model.addAttribute("xbRecordClassPage",xbRecordClassPage);//上课记录
+		model.addAttribute("accordingcurrentzise",xbRecordClassPage.getSize());
+		Map<String, Object> searchParams1 = new HashMap<>();
+		model.addAttribute("xbCourseTypeList",xbCourseTypeService.findXbCourseTypeList(searchParams1));
+		return "stuinfoDetail";
+	}
+	/*
+	 * 跳转到详情
+	 * @return
+	 */
+	@RequestMapping("/studentDetail1")
+	public String studentDetail1(@RequestParam(required=false) String studentId,String data,ModelMap model,Pageable pageable){
+		XbStudent xbStudent = studentService.getXbStudent(studentId);
+		Map<String,Object> resultMap = new HashMap<>();
+		Map<String,Object> searhMap = new HashMap<>();
+		if(null!=data) {
+			resultMap = com.alibaba.fastjson.JSONObject.parseObject(data, searhMap.getClass());
+		}
+		String courseTypeId = resultMap.get("courseTypeId").toString();
+		Map<String, Object> searchParams = new HashMap<>();
+		Map<String, Object> feeListSearchParams = new HashMap<>();
+		searchParams.put("EQ_studentId",studentId);
+		feeListSearchParams.put("EQ_studentId",studentId);
+		Page<XbStudentRelationViewNew> xbStudentRelationPage = studentService.getXbStudentRelationViewNewList(pageable,searchParams);
+		model.addAttribute("xbStudent",xbStudent);
+		model.addAttribute("xbStudentRelationPage",xbStudentRelationPage);//课程列表
+		Page<XbSupplementFee> XbSupplementFeePage = studentService.getXbSupplementFeeList(pageable,feeListSearchParams);
+		model.addAttribute("XbSupplementFeePage",XbSupplementFeePage);//订单列表
+		model.addAttribute("feecurrentzise",XbSupplementFeePage.getSize());
+		List<XbRecordClass> xbRecordClassPage = studentService.getRecordClassPage1(studentId,courseTypeId);
+		model.addAttribute("xbRecordClassPage",xbRecordClassPage);//上课记录
+		model.addAttribute("accordingcurrentzise",xbRecordClassPage.size());
+		Map<String, Object> searchParams1 = new HashMap<>();
+		model.addAttribute("xbCourseTypeList",xbCourseTypeService.findXbCourseTypeList(searchParams1));
+		return "stuinfoDetail::orderTable1";
 	}
 
 	/**

@@ -40,4 +40,23 @@ public interface XbRecordClassDao extends PagingAndSortingRepository<XbRecordCla
     int findRecordTotalCount();
 
     List<XbRecordClass> findByStudentId(String studentId);
+
+
+    @Query(value = "SELECT a.* " +
+            "FROM xb_record_class AS a, xb_student_relation AS b, xb_course AS c " +
+            "WHERE a.student_relation_id = b.id " +
+            "AND b.course_id = c.id " +
+            "and a.delete_status = 1 " +
+            "and a.student_id = ?1 " +
+            "and c.course_type_id = ?2 " +
+            "order by record_time desc",nativeQuery = true)
+    List getRecordClassPage1(String studentId,String courseTypeId);
+    @Query(value = "SELECT a.* " +
+            "FROM xb_record_class AS a, xb_student_relation AS b " +
+            "WHERE a.student_relation_id = b.id " +
+            "and a.delete_status = 1 " +
+            "and a.student_id = ?1 " +
+            "and b.course_id = ?2 " +
+            "order by a.record_time desc",nativeQuery = true)
+    List getRecordClassPage2(String studentId,String courseId);
 }
