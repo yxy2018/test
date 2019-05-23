@@ -208,7 +208,7 @@
                                          <a href="#" th:onclick="'javascript:getOrgansListPage(\''+${currentnumber}+'\')'">尾页</a>
                                      </li>&ndash;&gt;
                                 </ul>-->
-                                <<ul class="pagination" th:if="${xbStudentPage.getTotalPages()>0}">
+                                <ul class="pagination" th:if="${xbStudentPage.getTotalPages()>0}">
                                 <!-- 上一页 -->
                                 <li th:if="${xbStudentPage.getNumber()+1 == 1}"><span>上一页</span></li>
                                 <li th:if="${xbStudentPage.getNumber()+1 > 1}">

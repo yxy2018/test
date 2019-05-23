@@ -1592,7 +1592,30 @@ public class StudentActivity {
 		model.addAttribute("accordingcurrentzise",xbRecordClassPage.getSize());
 		Map<String, Object> searchParams1 = new HashMap<>();
 		model.addAttribute("xbCourseTypeList",xbCourseTypeService.findXbCourseTypeList(searchParams1));
+		model.addAttribute("studentId",studentId);
+		model.addAttribute("courseId",courseId);
 		return "stuinfoDetail";
+	}
+	@RequestMapping("/studentDetail4")
+	public String studentDetail4(@RequestParam(required = false) String data,ModelMap model,Pageable pageable){
+		Map<String,Object> resultMap = new HashMap<>();
+		Map<String,Object> searhMap = new HashMap<>();
+		if(null!=data) {
+			resultMap = com.alibaba.fastjson.JSONObject.parseObject(data, searhMap.getClass());
+		}
+		String studentId = resultMap.get("studentId").toString();
+		String courseId = resultMap.get("courseId").toString();
+		Map<String, Object> feeListSearchParams1 = new HashMap<>();
+		feeListSearchParams1.put("EQ_studentId",studentId);
+		feeListSearchParams1.put("EQ_courseId",courseId);
+		Page<XbRecordClassStudentRelation> xbRecordClassPage= studentService.getRecordClassPage3(pageable,feeListSearchParams1);
+//		List<XbRecordClass> xbRecordClassList= studentService.getRecordClassPage2(studentId,courseId);
+		model.addAttribute("xbRecordClassPage",xbRecordClassPage);//上课记录
+		model.addAttribute("accordingcurrentzise",xbRecordClassPage.getSize());
+		Map<String, Object> searchParams1 = new HashMap<>();
+		model.addAttribute("studentId",studentId);
+		model.addAttribute("courseId",courseId);
+		return "stuinfoDetail::orderTable11111";
 	}
 	/*
 	 * 跳转到详情

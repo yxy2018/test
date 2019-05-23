@@ -50,7 +50,7 @@
         <a class="td_edit" href="#modal-table" role="button" data-toggle="modal"><img src="../static/pages/img/edit.png">编辑</a>
         <a class="td_delete" onclick="deleteStuinfo();"><img src="../static/pages/img/del.png">删除</a>
     </div>
-    <div class=" user-infor-r">
+    <div class="user-infor-r">
         <div class="user-inf or-r-con">
             <div class="user-infor-list">
                 <ul class="user-infor-ul clearfix">
@@ -106,7 +106,7 @@
     </div>
 </div>
 
-<div class="main-content">
+<div class="main-content"  id="main-content">
     <div class="tabbable">
         <ul class="nav nav-tabs" id="myTab">
             <li class="active">
@@ -286,28 +286,31 @@
             </div>
             <!-- 上课记录 -->
             <div id="conflict" class="tab-pane fade conflict">
-                <!--<form id="searchform">
-                    &lt;!&ndash; 搜索 &ndash;&gt;
+                <form id="searchform">
+
                     <div id="schedule" class="tab-pane fade in active">
                         <div class="control-position">
                         <div class="control-group">
-                            <label class="control-label">类别</label>
+                            <input type="hidden" id="courseId" th:value="${courseId}"/>
+                            <input type="hidden" id="studentId" th:value="${studentId}"/>
+                           <!-- <label class="control-label">类别</label>
                             <input  th:attr ="checked=${courseTypeId == '0'?true:false}"
                                     name="courseTypeId" type="radio" th:value="0" class="ace"
-                                    th:onclick="'javascript:getOrgansListPage(\'' + ${xbStudent.id} + '\')'">
-                            <span class="lbl" th:text="全部"></span>
-                            <div class="checkbox" th:each="type:${xbCourseTypeList}">
-                                <label>
-                                    <input th:attr ="checked=${courseTypeId == type.id?true:false}" name="courseTypeId" type="radio" th:value="${type.id}" class="ace" th:onclick="'javascript:getOrgansListPage(\''+${xbStudent.id}+'\')'">
-                                    <span class="lbl" th:text="${type.courseTypeName}"></span>
-                                </label>
-                            </div>
+                                    th:onclick="'javascript:studentDetail(\'' + ${xbStudent.id} + '\')'">
+                            <span class="lbl" th:text="全部"></span>-->
+<!--                            <div class="checkbox" th:each="type:${xbCourseTypeList}">-->
+<!--                                <label>-->
+<!--                                    <input th:attr ="checked=${courseTypeId == type.id?true:false}" name="courseTypeId" type="radio" th:value="${type.id}" class="ace" th:onclick="'javascript:studentDetail(\''+${xbStudent.id}+'\')'">-->
+<!--                                    <span class="lbl" th:text="${type.courseTypeName}"></span>-->
+<!--                                </label>-->
+<!--                            </div>-->
                         </div>
                         </div>
                     </div>
-                </form>-->
+                </form>
 
-                <div class="orderTable1" style="margin-top:30px;">
+                <div class="orderTable11111" id="orderTable11111" style="margin-top:30px;">
+                    <th:block  th:fragment="orderTable11111">
                     <table class="table table-hover">
                         <tr>
                             <th>上课日期</th>
@@ -341,54 +344,77 @@
                             <td th:text="${record.xbClass.className}"></td>
                         </tr>
                     </table>
-                    <div class="orderPage">
-                        <!--<div class="page">
+                    <div class="orderPage" style="margin-top:30px;">
+                        <div class="page">
                             单页显示：
-                            <select>
-                                <option>20条/页</option>
-                                <option>50条/页</option>
-                                <option>100条/页</option>
+                            <select id="size" name="size" onchange="studentDetail('');">
+                                <option th:selected="${accordingcurrentzise eq 20}" value="20">20条/页</option>
+                                <option th:selected="${accordingcurrentzise eq 5}" value="5">5条/页</option>
+                                <option th:selected="${accordingcurrentzise eq 10}" value="10">10条/页</option>
+                                <option th:selected="${accordingcurrentzise eq 15}" value="15">15条/页</option>
                             </select>
                         </div>
-                        <ul class="pagination">
-                            <li class="disabled">
-                                <a href="#">首页</a>
-                            </li>
-                            <li class="disabled">
-                                <a href="#">
-                                    <i class="ace-icon fa fa-angle-double-left"></i>
+                        <ul class="pagination" th:if="${xbRecordClassPage.getTotalPages()>0}">
+                            <!-- 上一页 -->
+                            <li th:if="${xbRecordClassPage.getNumber()+1 == 1}"><span>上一页</span></li>
+                            <li th:if="${xbRecordClassPage.getNumber()+1 > 1}">
+                                <a  th:onclick="'javascript:studentDetail(\''+${xbRecordClassPage.getNumber()-1}+'\')'">
+                                    <i class="ace-icon fa ">上一页</i>
                                 </a>
                             </li>
-                            <li class="active">
-                                <a href="#">1</a>
+                            <!-- 首页 -->
+                            <li th:if="${xbRecordClassPage.getNumber()+1 == 1}" class="active"><span>1</span></li>
+                            <li th:if="${xbRecordClassPage.getNumber()+1 > 1}">
+                                <a  th:onclick="'javascript:studentDetail(\''+${0}+'\')'">1</a>
                             </li>
 
-                            <li>
-                                <a href="#">2</a>
-                            </li>
+                            <th:block th:if="${xbRecordClassPage.getTotalPages()>2 && xbRecordClassPage.getTotalPages()<=10}">
+                                <th:block th:each="i:${#numbers.sequence(2,xbRecordClassPage.getTotalPages()-1)}">
+                                    <li th:if="${xbRecordClassPage.getNumber()+1 == i}"  class="active"><span th:text="${i}">页码</span></li>
+                                    <li th:if="${xbRecordClassPage.getNumber()+1 != i}"><a  th:onclick="'javascript:studentDetail(\''+${i-1}+'\')'" th:text="${i}"></a></li>
+                                </th:block>
+                            </th:block>
+                            <th:block th:if="${xbRecordClassPage.getTotalPages() > 10}">
+                                <th:block th:if="${(xbRecordClassPage.getNumber()+1-(5/2)) <= 2}" th:each="i:${#numbers.sequence(2,2+5-1)}">
+                                    <li th:if="${xbRecordClassPage.getNumber()+1 == i}"  class="active"><span th:text="${i}">页码</span></li>
+                                    <li th:if="${xbRecordClassPage.getNumber()+1 != i}"><a  th:onclick="'javascript:studentDetail(\''+${i-1}+'\')'" th:text="${i}"></a></li>
+                                </th:block>
+                                <!-- ... -->
+                                <li th:if="${(xbRecordClassPage.getNumber()+1-(5/2))>2}"><span>...</span></li>
 
-                            <li>
-                                <a href="#">3</a>
-                            </li>
+                                <th:block th:if="${((xbRecordClassPage.getNumber()+1-(5/2))>2) && ((xbRecordClassPage.getNumber()+1+(5/2)-(5%2==0?1:0)) < (xbRecordClassPage.getTotalPages()-1))}"
+                                          th:each="i:${#numbers.sequence(xbRecordClassPage.getNumber()+1-(5/2),xbRecordClassPage.getNumber()+1+(5/2)-(5%2==0?1:0))}">
+                                    <li th:if="${xbRecordClassPage.getNumber()+1 == i}"  class="active"><span th:text="${i}">页码</span></li>
+                                    <li th:if="${xbRecordClassPage.getNumber()+1 != i}"><a  th:onclick="'javascript:studentDetail(\''+${i-1}+'\')'" th:text="${i}"></a></li>
+                                </th:block>
 
-                            <li>
-                                <a href="#">4</a>
-                            </li>
+                                <!-- ... -->
+                                <li th:if="${(xbRecordClassPage.getNumber()+1+(5/2)-(5%2==0?1:0)) < (xbRecordClassPage.getTotalPages()-1)}"><span>...</span></li>
+                                <th:block th:if="${(xbRecordClassPage.getNumber()+1+(5/2)-(5%2==0?1:0)) >= (xbRecordClassPage.getTotalPages()-1)}" th:each="i:${#numbers.sequence(xbRecordClassPage.getTotalPages()-5,xbRecordClassPage.getTotalPages()-1)}">
+                                    <li th:if="${xbRecordClassPage.getNumber()+1 == i}"  class="active"><span th:text="${i}">页码</span></li>
+                                    <li th:if="${xbRecordClassPage.getNumber()+1 != i}"><a  th:onclick="'javascript:studentDetail(\''+${i-1}+'\')'" th:text="${i}"></a></li>
+                                </th:block>
+                            </th:block>
+                            <!-- 最后一页 -->
+                            <li th:if="${xbRecordClassPage.getTotalPages()>1 && xbRecordClassPage.getNumber()+1 == xbRecordClassPage.getTotalPages()}" class="active"><span th:text="${xbRecordClassPage.getTotalPages()}">页码</span></li>
+                            <li th:if="${xbRecordClassPage.getTotalPages()>1 && xbRecordClassPage.getNumber()+1 != xbRecordClassPage.getTotalPages()}">
 
-                            <li>
-                                <a href="#">5</a>
+                                <a href="#" th:onclick="'javascript:studentDetail(\''+${xbRecordClassPage.getTotalPages()-1}+'\')'"
+                                   th:text="${xbRecordClassPage.getTotalPages()}"></a>
                             </li>
-
-                            <li>
-                                <a href="#">
-                                    <i class="ace-icon fa fa-angle-double-right"></i>
+                            <!-- 下一页 -->
+                            <li th:if="${xbRecordClassPage.getNumber()+1 >= xbRecordClassPage.getTotalPages()}"><span>下一页</span></li>
+                            <li th:if="${xbRecordClassPage.getNumber()+1 < xbRecordClassPage.getTotalPages()}">
+                                <a th:onclick="'javascript:studentDetail(\''+${xbRecordClassPage.getNumber()+1}+'\')'">
+                                    <i class="ace-icon fa ">下一页</i>
                                 </a>
                             </li>
-                            <li class="">
-                                <a href="#">尾页</a>
+                            <li>
+                                <span style="color: #020202;" th:text="'共'+${xbRecordClassPage.getTotalPages()}+'页/'+${xbRecordClassPage.getTotalElements()}+'条记录'"></span>
                             </li>
-                        </ul>-->
+                        </ul>
                     </div>
+                    </th:block>
                 </div>
             </div>
         </div>
@@ -883,7 +909,7 @@ function editStuinfo(){
       })
 
   };
-  function getOrgansListPage(studentId){
+  function studentDetail2(studentId){
       var load = new Loading();
       load.init({
           target: "body"
@@ -924,6 +950,42 @@ function editStuinfo(){
       });
       return o;
   };
+  //跳转到用户详情
+  function studentDetail(page) {
+
+      var load = new Loading();
+      load.init({
+          target: "#main-content"
+      });
+      load.start();
+      // var data= serializeObject("#searchform");
+      var size = $('#size option:selected').val();//选中的值
+      var id= $('#studentId').val();
+      var id1= $('#courseId').val();
+      var data= {
+          studentId:id,
+          courseId:id1
+      };
+
+      $.ajax({
+          type: 'get',
+          //dataType: 'json',
+          url: basePath + '/student/studentDetail4?page='+page+'&size='+size+'&data=' + JSON.stringify(data),
+          // data: {data:data},
+          contentType:"application/json;charset=UTF-8",
+          cache: false,
+          async: true,
+          success: function (data) {
+              load.stop();
+              console.log(data);
+              $(".orderTable11111").html("");
+              $('.orderTable11111').html(data);
+          }
+      });
+
+
+      // window.location.href = basePath + '/student/studentDetail4?page='+page+'&size='+size+'&data=' + JSON.stringify(data) ;
+  }
 </script>
 </body>
 </html>
