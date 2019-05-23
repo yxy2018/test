@@ -159,11 +159,14 @@ public class ExcelActivity {
 				enrollDate = xbStudentRelationViewNewList.get(i).enrollDate.toString().substring(0,10);
 			}
 			xbRecordClassViewList1.add(enrollDate);
-			if(xbStudentRelationViewNewList.get(i).studentStart == 0 && xbStudentRelationViewNewList.get(i).classId .equals("")){
-				xbRecordClassViewList1.add("报名");
-			}else if(xbStudentRelationViewNewList.get(i).studentStart == 0 && !xbStudentRelationViewNewList.get(i).classId .equals("")){
-				xbRecordClassViewList1.add("在读");
-			}else if(xbStudentRelationViewNewList.get(i).studentStart == 1 ){
+			if(xbStudentRelationViewNewList.get(i).studentStart == 0) {
+                String classId = xbStudentRelationViewNewList.get(i).classId;
+                if(classId == null||classId.equals("")){
+                    xbRecordClassViewList1.add("报名");
+                }else{
+                    xbRecordClassViewList1.add("在读");
+                }
+            }else if(xbStudentRelationViewNewList.get(i).studentStart == 1 ){
 				xbRecordClassViewList1.add("停课");
 			}else if(xbStudentRelationViewNewList.get(i).studentStart == 2 ){
 				xbRecordClassViewList1.add("转班");
