@@ -156,6 +156,10 @@
                             <td th:text="${order.orderNumber}"></td>
                             <td th:if="${order.type} eq 0">报名</td>
                             <td th:if="${order.type} eq 1">转班</td>
+                            <td th:if="${order.type} eq 2">补费</td>
+                            <td th:if="${order.type} eq 3">停课</td>
+                            <td th:if="${order.type} eq 4">复课</td>
+                            <td th:if="${order.type} eq 5">退费</td>
                             <td style="line-height: inherit;" th:text="${order.remarks}"></td>
                             <td th:text="${order.surplusMoney}"></td>
                             <td th:text="${order.paymentMoney}"></td>
@@ -227,7 +231,21 @@
                             <th>剩余课时</th>
                         </tr>
                         <tr id="choose" th:each="course:${xbStudentRelationPage.content}">
-                            <td></td>
+                            <td th:if="${course.studentStart} eq 0">
+                                <span>在读</span>
+                            </td>
+                            <td th:if="${course.studentStart} eq 1">
+                                <span>停课</span>
+                            </td>
+                            <td th:if="${course.studentStart} eq 2">
+                                <span>转班</span>
+                            </td>
+                            <td th:if="${course.studentStart} eq 3">
+                                <span>退费</span>
+                            </td>
+                            <td th:if="${course.studentStart} eq 4">
+                                <span>结课</span>
+                            </td>
                             <td th:text="${course.className}"></td>
                             <td th:text="${course.employeeName}"></td>
                             <td th:text="${course.classBeginDate}"></td>
@@ -309,7 +327,7 @@
                     </div>
                 </form>
 
-                <div class="orderTable11111" id="orderTable11111" style="margin-top:30px;">
+                <div class="orderTable" id="orderTable11111" style="margin-top:30px;">
                     <th:block  th:fragment="orderTable11111">
                     <table class="table table-hover">
                         <tr>
@@ -978,8 +996,8 @@ function editStuinfo(){
           success: function (data) {
               load.stop();
               console.log(data);
-              $(".orderTable11111").html("");
-              $('.orderTable11111').html(data);
+              $("#orderTable11111").html("");
+              $('#orderTable11111').html(data);
           }
       });
 
