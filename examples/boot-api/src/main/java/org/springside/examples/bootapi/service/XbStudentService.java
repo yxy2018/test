@@ -40,6 +40,8 @@ public class XbStudentService {
 	@Autowired
 	private XbRecordClassViewDao xbRecordClassViewDao;
 	@Autowired
+	private XbRecordClassViewsDao xbRecordClassViewsDao;
+	@Autowired
 	private XbSupplementFeeDao xbSupplementFeeDao;
 	@Autowired
 	private XbClassViewDao xbClassViewDao;
@@ -467,6 +469,14 @@ public class XbStudentService {
 				filters.values(), XbRecordClassView.class);
 		return xbRecordClassViewDao.findAll(spec,pageable);
 	}
+	@Transactional
+	public Page<XbRecordClassViews> getXbRecordClassdViewstoList(Pageable pageable,Map<String, Object> searchParams){
+		searchParams = HttpServletUtil.getRoleDateForXbRecordClassdView(searchParams);
+		Map<String, SearchFilter> filters = SearchFilter.parse(searchParams);
+		Specification<XbRecordClassViews> spec = DynamicSpecifications.bySearchFilter(
+				filters.values(), XbRecordClassViews.class);
+		return xbRecordClassViewsDao.findAll(spec,pageable);
+	}
 
 	@Transactional
 	public List<XbRecordClassView> getXbRecordClassdViewtoList(Map<String, Object> searchParams){
@@ -475,6 +485,14 @@ public class XbStudentService {
 		Specification<XbRecordClassView> spec = DynamicSpecifications.bySearchFilter(
 				filters.values(), XbRecordClassView.class);
 		return xbRecordClassViewDao.findAll(spec);
+	}
+	@Transactional
+	public List<XbRecordClassViews> getXbRecordClassdViewstoList(Map<String, Object> searchParams){
+		searchParams = HttpServletUtil.getRoleDateForXbRecordClassdView(searchParams);
+		Map<String, SearchFilter> filters = SearchFilter.parse(searchParams);
+		Specification<XbRecordClassViews> spec = DynamicSpecifications.bySearchFilter(
+				filters.values(), XbRecordClassViews.class);
+		return xbRecordClassViewsDao.findAll(spec);
 	}
 
 	@Transactional
@@ -487,5 +505,32 @@ public class XbStudentService {
 	public XbStudentRelation findXbStudentRelationById(String id){
 		return xbStudentRelationDao.findOne(id);
 	}
+
+
+
+	@Transactional
+	public long findstudentCount(String attendId, Date recordTime){
+		return xbRecordClassDao.findstudentCount(attendId,recordTime);
+	}
+	@Transactional
+	public BigDecimal findSknum(String attendId, Date recordTime){
+		return xbRecordClassDao.findSknum(attendId,recordTime);
+	}
+	@Transactional
+	public BigDecimal findQjnum(String attendId, Date recordTime){
+		return xbRecordClassDao.findQjnum(attendId,recordTime);
+	}
+	@Transactional
+	public BigDecimal findKknum(String attendId, Date recordTime){
+		return xbRecordClassDao.findKknum(attendId,recordTime);
+	}@Transactional
+	public BigDecimal findBknum(String attendId, Date recordTime){
+		return xbRecordClassDao.findBknum(attendId,recordTime);
+	}
+	@Transactional
+	public BigDecimal findTotalReceivable(String attendId, Date recordTime){
+		return xbRecordClassDao.findTotalReceivable(attendId,recordTime);
+	}
+
 
 }

@@ -153,7 +153,8 @@
                                     <td th:text="${studentrelation.xbStudent.otherPhone}"></td>
                                     <td th:text="${studentrelation.xbStudent.contactRelation}"></td>
                                     <td th:text="${studentrelation.xbStudent.surplusMoney}"></td>
-                                    <td th:text="${studentrelation.xbStudent.paymentMoney}"><a href="#">补费</a></td>
+<!--                                    <td th:text="${studentrelation.xbStudent.paymentMoney}"><a href="#">补费</a></td>-->
+                                    <td th:text="${studentrelation.yingshou}"><a href="#">补费</a></td>
                                     <td th:text="${studentrelation.xbStudent.registratioFee}"><a href="#">补费</a></td>
                                     <td th:text="${studentrelation.xbCourse.courseName}"></td>
                                     <td th:text="${studentrelation.periodNum}"></td>
@@ -694,7 +695,7 @@
                                     <td th:text="${couse.xbCourse.courseName}"></td>
                                     <td th:text="${couse.periodNum}"></td>
                                     <td th:text="${couse.receivable}"></td>
-                                    <td th:text="${couse.xbStudent.paymentMoney}"></td>
+                                    <td th:text="${couse.yingshou}"></td>
                                     <td></td>
                                 </tr>
                             </table>

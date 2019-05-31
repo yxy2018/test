@@ -348,6 +348,9 @@ public class StudentActivity {
 		List<XbStudentRelationView> studentlist = studentService.getxbStudentRelationViewList(searchParamsview);
 		Iterable<SysOrgans> organsList = organsService.getOrgansList();
 		Page<XbStudentRelationViewNew> xbStudentPage = studentService.getXbStudentRelationViewNewList(pageable,searhMap);
+        for (XbStudentRelationViewNew obj:xbStudentPage.getContent()) {
+            obj.yingshou = obj.totalReceivable.subtract(obj.shishou);
+        }
 		model.addAttribute("studentlistsize",studentlist.size());
 		model.addAttribute("xbStudentPage",xbStudentPage);
 		model.addAttribute("organId",organId);
@@ -1378,7 +1381,12 @@ public class StudentActivity {
 		}
 		Iterable<SysOrgans> organsList = organsService.getOrgansList();
 		searhMap.put("NEQ_xbStudent.paymentMoney","0");
+        Map<String,Object> searhMaps = searhMap;
+        searhMaps.put("EQ_status",0);
 		Page<XbStudentRelationViewNew> xbStudentPage = studentService.getXbStudentRelationViewNewList(pageable,searhMap);
+        for (XbStudentRelationViewNew obj:xbStudentPage.getContent()) {
+            obj.yingshou = obj.totalReceivable.subtract(obj.shishou);
+        }
 		Map<String,Object> studentMap = new HashMap<>();
 		studentMap.put( "GT_paymentMoney","0");
 		Page<XbStudent> xbStudentsPage = studentService.getXbStudentList(pageable,studentMap);

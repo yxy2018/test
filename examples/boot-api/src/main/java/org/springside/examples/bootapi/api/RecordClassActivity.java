@@ -293,7 +293,7 @@ public class RecordClassActivity {
 	 * 查询上课记录按班级
 	 * @return
 	 */
-	@RequestMapping("/getRecordClassListByClass")
+	/*@RequestMapping("/getRecordClassListByClass")
 	public String getRecordClassListByClass(@RequestParam(required = false) String data, ModelMap model,
 											@PageableDefault(value = 10) Pageable pageable){
 		Map<String,Object> resultMap = new HashMap<>();
@@ -358,6 +358,195 @@ public class RecordClassActivity {
 		model.addAttribute("TeacherNameCla",TeacherNameCla);
 
 
+		List<XbRecordClassView> recordList = studentService.getXbRecordClassdViewtoList(searhMap);
+		BigDecimal totalPeriodnum = new BigDecimal("0");
+		BigDecimal totalReceivables = new BigDecimal("0");
+		for (int i = 0; i < recordList.size(); i++) {
+			BigDecimal periodnum = recordList.get(i).periodnum;
+			totalPeriodnum = totalPeriodnum.add(periodnum);
+			String rece = recordList.get(i).totalReceivable;
+			rece = rece.replaceAll(",","");
+			totalReceivables = totalReceivables.add(new BigDecimal(rece));
+		}
+		model.addAttribute("totalPeriodnum",totalPeriodnum);
+		model.addAttribute("totalReceivables",totalReceivables);
+		return "attendClass::accordingClass";
+	}*/
+	/*
+	 * 查询上课记录按班级
+	 * @return
+	 */
+	@RequestMapping("/getRecordClassListByClass")
+	public String getRecordClassListByClass(@RequestParam(required = false) String data, ModelMap model,
+											@PageableDefault(value = 10) Pageable pageable){
+		Map<String,Object> resultMap = new HashMap<>();
+		Map<String,Object> searhMap = new HashMap<>();
+		if(null!=data){
+			resultMap = com.alibaba.fastjson.JSONObject.parseObject(data,Map.class);
+		}
+		String classesName  = (String)resultMap.get("classesName");
+		String organclaId = (String)resultMap.get("organclaId");
+		if(null==organclaId){
+			organclaId = "0";
+		}else if(!organclaId.equals("0")){
+			searhMap.put("EQ_orgid",organclaId);
+		}
+		//教师名称
+		String TeacherNameCla = (String)resultMap.get("TeacherNameCla");
+		if(StringUtils.isNotEmpty(TeacherNameCla)){
+			searhMap.put("LIKE_employeeName",TeacherNameCla);
+		}
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String startDateTimeBegin = (String)resultMap.get("startclaDateTimeBegin");
+		//开课结束日期
+		String startDateTimeEnd = (String)resultMap.get("startclaDateTimeEnd");
+		try {
+			Date date = new Date();
+			if(StringUtils.isEmpty(startDateTimeBegin)){
+				startDateTimeBegin = DateUtil.weekDateFirstDay();
+				searhMap.put("GTE_recordTime",DateUtil.weekDateTimeFirstDayDA());
+			}else{
+				searhMap.put("GTE_recordTime",sdf.parse(startDateTimeBegin+" 00:00:00"));
+			}
+			if(StringUtils.isEmpty(startDateTimeEnd)){
+				startDateTimeEnd = DateUtil.weekDateLastDay();
+				searhMap.put("LTE_recordTime",DateUtil.weekDateTimeLastDayDA());
+			}else{
+				searhMap.put("LTE_recordTime",sdf.parse(startDateTimeEnd+" 23:59:59"));
+			}
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+
+		int totalElements = studentService.findRecordTotalCount();
+		int size = pageable.getPageSize();
+		int number = pageable.getPageNumber();
+		int totalPages = totalElements/size;
+		if(totalPages==0){
+			number = 1;
+		}
+		totalPages = totalPages + 1;
+		model.addAttribute("recordcurrentzise",size);
+		model.addAttribute("number",number);
+		model.addAttribute("totalPages",totalPages);
+		model.addAttribute("totalElements",totalElements);
+		//查询所有校区
+		Map<String,Object> sorgsearmap = new HashMap<>();
+		List<SysOrgans> sorganList = organsService.getOrgansListAll(sorgsearmap);
+		model.addAttribute("sorganList",sorganList);
+		model.addAttribute("organclaId",organclaId);
+		model.addAttribute("startclaDateTimeBegin",startDateTimeBegin);
+		model.addAttribute("startclaDateTimeEnd",startDateTimeEnd);
+		model.addAttribute("TeacherNameCla",TeacherNameCla);
+
+		Page<XbRecordClassViews> recordLists = studentService.getXbRecordClassdViewstoList(pageable,searhMap);
+		List<XbRecordClassViews> content = recordLists.getContent();
+		for (XbRecordClassViews org:content) {
+			String attendId = org.attendId;
+			Date recordTime = org.recordTime;
+			Long bigDecimal1 = studentService.findstudentCount(attendId, recordTime);
+			org.studentCount=bigDecimal1;
+			BigDecimal bigDecimal2 = studentService.findSknum(attendId, recordTime);
+			org.sknum=bigDecimal2;
+			BigDecimal bigDecimal3 = studentService.findQjnum(attendId, recordTime);
+			org.qjnum=bigDecimal3;
+			BigDecimal bigDecimal4 = studentService.findKknum(attendId, recordTime);
+			org.kknum=bigDecimal4;
+			BigDecimal bigDecimal5 = studentService.findBknum(attendId, recordTime);
+			org.bknum=bigDecimal5;
+			BigDecimal bigDecimal6 = studentService.findTotalReceivable(attendId, recordTime);
+			org.totalReceivable=bigDecimal6;
+		}
+		//后台实现数据得查询
+		model.addAttribute("recordLists",recordLists);
+		List<XbRecordClassViews> recordList = studentService.getXbRecordClassdViewstoList(searhMap);
+		BigDecimal totalPeriodnum = new BigDecimal("0");
+		BigDecimal totalReceivables = new BigDecimal("0");
+		for (int i = 0; i < recordList.size(); i++) {
+			BigDecimal periodnum = recordList.get(i).periodnum;
+			totalPeriodnum = totalPeriodnum.add(periodnum);
+
+
+			String attendId = recordList.get(i).attendId;
+			Date recordTime = recordList.get(i).recordTime;
+			//String rece = recordList.get(i).totalReceivable;
+			BigDecimal rece = studentService.findTotalReceivable(attendId, recordTime);
+			//rece = rece.replaceAll(",","");
+			totalReceivables = totalReceivables.add(rece);
+		}
+		model.addAttribute("totalPeriodnum",totalPeriodnum);
+		model.addAttribute("totalReceivables",totalReceivables);
+		return "attendClass::accordingClass";
+	}
+	/*
+	 * 查询上课记录按班级
+	 * @return
+	 */
+	@RequestMapping("/getRecordClassListByClass2")
+	public String getRecordClassListByClass2(@RequestParam(required = false) String data, ModelMap model,
+											@PageableDefault(value = 10) Pageable pageable){
+		Map<String,Object> resultMap = new HashMap<>();
+		Map<String,Object> searhMap = new HashMap<>();
+		if(null!=data){
+			resultMap = com.alibaba.fastjson.JSONObject.parseObject(data,Map.class);
+		}
+		String classesName  = (String)resultMap.get("classesName");
+		String organclaId = (String)resultMap.get("organclaId");
+		if(null==organclaId){
+			organclaId = "0";
+		}else if(!organclaId.equals("0")){
+			searhMap.put("EQ_orgid",organclaId);
+		}
+		//教师名称
+		String TeacherNameCla = (String)resultMap.get("TeacherNameCla");
+		if(StringUtils.isNotEmpty(TeacherNameCla)){
+			searhMap.put("LIKE_employeeName",TeacherNameCla);
+		}
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String startDateTimeBegin = (String)resultMap.get("startclaDateTimeBegin");
+		//开课结束日期
+		String startDateTimeEnd = (String)resultMap.get("startclaDateTimeEnd");
+		try {
+			Date date = new Date();
+			if(StringUtils.isEmpty(startDateTimeBegin)){
+				startDateTimeBegin = DateUtil.weekDateFirstDay();
+				searhMap.put("GTE_recordTime",DateUtil.weekDateTimeFirstDayDA());
+			}else{
+				searhMap.put("GTE_recordTime",sdf.parse(startDateTimeBegin+" 00:00:00"));
+			}
+			if(StringUtils.isEmpty(startDateTimeEnd)){
+				startDateTimeEnd = DateUtil.weekDateLastDay();
+				searhMap.put("LTE_recordTime",DateUtil.weekDateTimeLastDayDA());
+			}else{
+				searhMap.put("LTE_recordTime",sdf.parse(startDateTimeEnd+" 23:59:59"));
+			}
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+
+		int totalElements = studentService.findRecordTotalCount();
+		int size = pageable.getPageSize();
+		int number = pageable.getPageNumber();
+		int totalPages = totalElements/size;
+		if(totalPages==0){
+			number = 1;
+		}
+		totalPages = totalPages + 1;
+		model.addAttribute("recordcurrentzise",size);
+		model.addAttribute("number",number);
+		model.addAttribute("totalPages",totalPages);
+		model.addAttribute("totalElements",totalElements);
+		//查询所有校区
+		Map<String,Object> sorgsearmap = new HashMap<>();
+		List<SysOrgans> sorganList = organsService.getOrgansListAll(sorgsearmap);
+		model.addAttribute("sorganList",sorganList);
+		model.addAttribute("organclaId",organclaId);
+		model.addAttribute("startclaDateTimeBegin",startDateTimeBegin);
+		model.addAttribute("startclaDateTimeEnd",startDateTimeEnd);
+		model.addAttribute("TeacherNameCla",TeacherNameCla);
+
+		Page<XbRecordClassView> recordLists = studentService.getXbRecordClassdViewtoList(pageable,searhMap);
+		model.addAttribute("recordLists",recordLists);
 		List<XbRecordClassView> recordList = studentService.getXbRecordClassdViewtoList(searhMap);
 		BigDecimal totalPeriodnum = new BigDecimal("0");
 		BigDecimal totalReceivables = new BigDecimal("0");

@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springside.examples.bootapi.domain.XbRecordClass;
 
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -36,7 +38,7 @@ public interface XbRecordClassDao extends PagingAndSortingRepository<XbRecordCla
     List findRecordLists(int page,int pagesize);
 
 
-    @Query(value = " select count(*) from (select x.attend_id  from xb_record_class x   GROUP BY x.attend_id,x.record_time)as a ",nativeQuery = true)
+    @Query(value = " select count(*) from (select x.*  from xb_record_class x   GROUP BY x.attend_id,x.record_time)as a ",nativeQuery = true)
     int findRecordTotalCount();
 
     List<XbRecordClass> findByStudentId(String studentId);
@@ -59,4 +61,49 @@ public interface XbRecordClassDao extends PagingAndSortingRepository<XbRecordCla
             "and b.course_id = ?2 " +
             "order by a.record_time desc",nativeQuery = true)
     List getRecordClassPage2(String studentId,String courseId);
+
+
+
+    @Query(value = " SELECT count(`c`.`student_id`) " +
+            "FROM `xb_record_class` `c` " +
+            "WHERE `c`.`state` = '0' || `c`.`state` = '3' " +
+            "AND `c`.`delete_status` = '1' " +
+            "AND `c`.`attend_id` = ?1 " +
+            "AND `c`.`record_time` = ?2 ",nativeQuery = true)
+    long findstudentCount(String attendId, Date recordTime);
+    @Query(value = " SELECT count(`c`.`student_id`) " +
+            "FROM `xb_record_class` `c` " +
+            "WHERE `c`.`state` = '0' " +
+            "AND `c`.`delete_status` = '1' " +
+            "AND `c`.`attend_id` = ?1 " +
+            "AND `c`.`record_time` = ?2 ",nativeQuery = true)
+    BigDecimal findSknum(String attendId, Date recordTime);
+    @Query(value = " SELECT count(`c`.`student_id`) " +
+            "FROM `xb_record_class` `c` " +
+            "WHERE `c`.`state` = '1' " +
+            "AND `c`.`delete_status` = '1' " +
+            "AND `c`.`attend_id` = ?1 " +
+            "AND `c`.`record_time` = ?2 ",nativeQuery = true)
+    BigDecimal findQjnum(String attendId, Date recordTime);
+
+    @Query(value = " SELECT count(`c`.`student_id`) " +
+            "FROM `xb_record_class` `c` " +
+            "WHERE `c`.`state` = '2'  " +
+            "AND `c`.`delete_status` = '1' " +
+            "AND `c`.`attend_id` = ?1 " +
+            "AND `c`.`record_time` = ?2 ",nativeQuery = true)
+    BigDecimal findKknum(String attendId, Date recordTime);
+    @Query(value = " SELECT count(`c`.`student_id`) " +
+            "FROM `xb_record_class` `c` " +
+            "WHERE `c`.`state` = '3' " +
+            "AND `c`.`delete_status` = '1' " +
+            "AND `c`.`attend_id` = ?1 " +
+            "AND `c`.`record_time` = ?2 ",nativeQuery = true)
+    BigDecimal findBknum(String attendId, Date recordTime);
+    @Query(value = " SELECT sum((r.total_receivable-r.receivable) / (r.total_period_num-r.period_num)) " +
+            "FROM `xb_record_class` `c` LEFT JOIN xb_student_relation r ON r.id = c.student_relation_id " +
+            "WHERE  `c`.`delete_status` = '1' " +
+            "AND `c`.`attend_id` = ?1 " +
+            "AND `c`.`record_time` = ?2 ",nativeQuery = true)
+    BigDecimal findTotalReceivable(String attendId, Date recordTime);
 }

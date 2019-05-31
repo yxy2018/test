@@ -354,7 +354,7 @@ public class WechatRecordClassActivity {
         }
         return "wechat_classRecord::classRecordFra";
     }
-	@RequestMapping("/getRecordClassRecordListByClassReloding2")
+	/*@RequestMapping("/getRecordClassRecordListByClassReloding2")
 	public String getRecordClassRecordListByClassReloding2(@RequestParam(required = false) String startDateTimeBegin,@RequestParam(required = false) String startDateTimeEnd, ModelMap model,
 														  @PageableDefault(value = 10) Pageable pageable){
 		Map<String,Object> resultMap = new HashMap<>();
@@ -393,6 +393,75 @@ public class WechatRecordClassActivity {
 				String rece = recordList.get(i).totalReceivable;
 				rece = rece.replaceAll(",","");
 				totalReceivables = totalReceivables.add(new BigDecimal(rece));
+			}
+			model.addAttribute("totalPeriodnum",totalPeriodnum);
+			model.addAttribute("totalReceivables",totalReceivables);
+		}catch (Exception e) {
+			e.printStackTrace();
+			logger.info(e.toString());
+		}
+		return "wechat_classRecord::classRecordFra2";
+	}*/
+	@RequestMapping("/getRecordClassRecordListByClassReloding2")
+	public String getRecordClassRecordListByClassReloding2(@RequestParam(required = false) String startDateTimeBegin,@RequestParam(required = false) String startDateTimeEnd, ModelMap model,
+														   @PageableDefault(value = 10) Pageable pageable){
+		Map<String,Object> resultMap = new HashMap<>();
+		Map<String,Object> searhMap = new HashMap<>();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		try {
+			if(null!=startDateTimeBegin&&!startDateTimeBegin.equals("")){
+				startDateTimeBegin = startDateTimeBegin+" 00:00:00";
+				searhMap.put("GTE_recordTime",sdf.parse(startDateTimeBegin));
+			}
+			if(null!=startDateTimeEnd&&!startDateTimeEnd.equals("")){
+				startDateTimeEnd = startDateTimeEnd+" 23:59:59";
+				searhMap.put("LTE_recordTime",sdf.parse(startDateTimeEnd));
+			}
+			List<Integer> list = new ArrayList<Integer>();
+			list.add(1);
+			list.add(3);
+			list.add(4);
+			searhMap.put("NEQINT_studentStart",list);
+
+			int totalElements = studentService.findRecordTotalCount();
+			int size = pageable.getPageSize();
+			int number = pageable.getPageNumber();
+			int totalPages = totalElements/size;
+			if(totalPages==0){
+				number = 1;
+			}
+			totalPages = totalPages + 1;
+			Page<XbRecordClassViews> recordLists = studentService.getXbRecordClassdViewstoList(pageable,searhMap);
+			List<XbRecordClassViews> content = recordLists.getContent();
+			for (XbRecordClassViews org:content) {
+				String attendId = org.attendId;
+				Date recordTime = org.recordTime;
+				Long bigDecimal1 = studentService.findstudentCount(attendId, recordTime);
+				org.studentCount=bigDecimal1;
+				BigDecimal bigDecimal2 = studentService.findSknum(attendId, recordTime);
+				org.sknum=bigDecimal2;
+				BigDecimal bigDecimal3 = studentService.findQjnum(attendId, recordTime);
+				org.qjnum=bigDecimal3;
+				BigDecimal bigDecimal4 = studentService.findKknum(attendId, recordTime);
+				org.kknum=bigDecimal4;
+				BigDecimal bigDecimal5 = studentService.findBknum(attendId, recordTime);
+				org.bknum=bigDecimal5;
+				BigDecimal bigDecimal6 = studentService.findTotalReceivable(attendId, recordTime);
+				org.totalReceivable=bigDecimal6;
+			}
+			model.addAttribute("recordLists",recordLists);
+			List<XbRecordClassViews> recordList = studentService.getXbRecordClassdViewstoList(searhMap);
+			BigDecimal totalPeriodnum = new BigDecimal("0");
+			BigDecimal totalReceivables = new BigDecimal("0");
+			for (int i = 0; i < recordList.size(); i++) {
+				BigDecimal periodnum = recordList.get(i).periodnum;
+				totalPeriodnum = totalPeriodnum.add(periodnum);
+				String attendId = recordList.get(i).attendId;
+				Date recordTime = recordList.get(i).recordTime;
+				//String rece = recordList.get(i).totalReceivable;
+				BigDecimal rece = studentService.findTotalReceivable(attendId, recordTime);
+				//rece = rece.replaceAll(",","");
+				totalReceivables = totalReceivables.add(rece);
 			}
 			model.addAttribute("totalPeriodnum",totalPeriodnum);
 			model.addAttribute("totalReceivables",totalReceivables);

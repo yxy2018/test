@@ -316,6 +316,7 @@ $(".more").click(function(){
         var paymentMoney = $('#paymentMoney').val();
         var subsidyMoney = $('#subsidyMoney').val();
         var xbStudentSurplusMoney = $('#xbStudentSurplusMoney').val();
+
         var selId = '';
         var flag = false;
         $("#choose input[type='checkbox']").each(function() {
@@ -335,6 +336,10 @@ $(".more").click(function(){
         }
         if((Number(subsidyMoney)+Number(paymentMoney))>Number(surplusMoney1)){
             $.kd.kdAlert("补费金额不能大于欠费总额！");
+            return;
+        }
+        if((Number(subsidyMoney)+Number(paymentMoney)) <= 0 ){
+            $.kd.kdAlert("补费金额需大于0,请重新填写金额！");
             return;
         }
         if (studentId) {
