@@ -66,7 +66,7 @@ public interface XbRecordClassDao extends PagingAndSortingRepository<XbRecordCla
 
     @Query(value = " SELECT count(`c`.`student_id`) " +
             "FROM `xb_record_class` `c` " +
-            "WHERE `c`.`state` = '0' || `c`.`state` = '3' " +
+            "WHERE (`c`.`state` = '0' || `c`.`state` = '3') " +
             "AND `c`.`delete_status` = '1' " +
             "AND `c`.`attend_id` = ?1 " +
             "AND `c`.`record_time` = ?2 ",nativeQuery = true)
@@ -100,10 +100,129 @@ public interface XbRecordClassDao extends PagingAndSortingRepository<XbRecordCla
             "AND `c`.`attend_id` = ?1 " +
             "AND `c`.`record_time` = ?2 ",nativeQuery = true)
     BigDecimal findBknum(String attendId, Date recordTime);
-    @Query(value = " SELECT sum((r.total_receivable-r.receivable) / (r.total_period_num-r.period_num)) " +
+    @Query(value = " SELECT sum(r.total_receivable/r.total_period_num*c.deduct_period) " +
             "FROM `xb_record_class` `c` LEFT JOIN xb_student_relation r ON r.id = c.student_relation_id " +
             "WHERE  `c`.`delete_status` = '1' " +
             "AND `c`.`attend_id` = ?1 " +
             "AND `c`.`record_time` = ?2 ",nativeQuery = true)
     BigDecimal findTotalReceivable(String attendId, Date recordTime);
+
+
+
+
+    @Query(value = " SELECT\n" +
+            "\t\tsum(\n" +
+            "\t\t\t(\n" +
+            "\t\t\t\tr.total_receivable / r.total_period_num * c.deduct_period\n" +
+            "\t\t\t)\n" +
+            "\t\t)\n" +
+            "FROM\n" +
+            "\t`xb_record_class` `c`\n" +
+            "LEFT JOIN xb_student_relation r ON r.id = c.student_relation_id\n" +
+            "LEFT JOIN `xb_class` `d` ON `d`.`id` = `c`.`attend_id`\n" +
+            "LEFT JOIN `sys_organs` `l` ON `d`.`organ_id` = `l`.`id`\n" +
+            "LEFT JOIN `sys_employee` `e` ON `e`.`id` = `d`.`teacher_id`\n" +
+            "WHERE\n" +
+            "\t`c`.`delete_status` = '1'\n" +
+            "AND c.record_time >= ?1\n" +
+            "AND c.record_time <= ?2 ",nativeQuery = true)
+    BigDecimal findAll1(String s1, String s2);
+    @Query(value = " SELECT\n" +
+            "\t\tsum(\n" +
+            "\t\t\t(\n" +
+            "\t\t\t\tr.total_receivable / r.total_period_num * c.deduct_period\n" +
+            "\t\t\t)\n" +
+            "\t\t)\n" +
+            "FROM\n" +
+            "\t`xb_record_class` `c`\n" +
+            "LEFT JOIN xb_student_relation r ON r.id = c.student_relation_id\n" +
+            "LEFT JOIN `xb_class` `d` ON `d`.`id` = `c`.`attend_id`\n" +
+            "LEFT JOIN `sys_organs` `l` ON `d`.`organ_id` = `l`.`id`\n" +
+            "LEFT JOIN `sys_employee` `e` ON `e`.`id` = `d`.`teacher_id`\n" +
+            "WHERE\n" +
+            "\t`c`.`delete_status` = '1'\n" +
+            "and e.employee_name like %?3%\n" +
+            "AND c.record_time >= ?1\n" +
+            "AND c.record_time <= ?2 ",nativeQuery = true)
+    BigDecimal findAll2(String s1, String s2,String s3);
+    @Query(value = " SELECT\n" +
+            "\t\tsum(\n" +
+            "\t\t\t(\n" +
+            "\t\t\t\tr.total_receivable / r.total_period_num * c.deduct_period\n" +
+            "\t\t\t)\n" +
+            "\t\t)\n" +
+            "FROM\n" +
+            "\t`xb_record_class` `c`\n" +
+            "LEFT JOIN xb_student_relation r ON r.id = c.student_relation_id\n" +
+            "LEFT JOIN `xb_class` `d` ON `d`.`id` = `c`.`attend_id`\n" +
+            "LEFT JOIN `sys_organs` `l` ON `d`.`organ_id` = `l`.`id`\n" +
+            "LEFT JOIN `sys_employee` `e` ON `e`.`id` = `d`.`teacher_id`\n" +
+            "WHERE\n" +
+            "\t`c`.`delete_status` = '1'\n" +
+            "and l.id = ?3\n" +
+            "AND c.record_time >= ?1\n" +
+            "AND c.record_time <= ?2 ",nativeQuery = true)
+    BigDecimal findAll3(String s1, String s2,String s3);
+    @Query(value = " SELECT\n" +
+            "\t\tsum(\n" +
+            "\t\t\t(\n" +
+            "\t\t\t\tr.total_receivable / r.total_period_num * c.deduct_period\n" +
+            "\t\t\t)\n" +
+            "\t\t)\n" +
+            "FROM\n" +
+            "\t`xb_record_class` `c`\n" +
+            "LEFT JOIN xb_student_relation r ON r.id = c.student_relation_id\n" +
+            "LEFT JOIN `xb_class` `d` ON `d`.`id` = `c`.`attend_id`\n" +
+            "LEFT JOIN `sys_organs` `l` ON `d`.`organ_id` = `l`.`id`\n" +
+            "LEFT JOIN `sys_employee` `e` ON `e`.`id` = `d`.`teacher_id`\n" +
+            "WHERE\n" +
+            "\t`c`.`delete_status` = '1'\n" +
+            "and l.id = ?3\n" +
+            "and e.employee_name like %?4%\n" +
+            "AND c.record_time >= ?1\n" +
+            "AND c.record_time <= ?2 ",nativeQuery = true)
+    BigDecimal findAll4(String s1, String s2 ,String s3, String s4);
+    @Query(value = " SELECT\n" +
+            "\t\tsum(\n" +
+            "\t\t\t(\n" +
+            "\t\t\t\tr.total_receivable / r.total_period_num * c.deduct_period\n" +
+            "\t\t\t)\n" +
+            "\t\t)\n" +
+            "FROM\n" +
+            "\t`xb_record_class` `c`\n" +
+            "LEFT JOIN xb_student_relation r ON r.id = c.student_relation_id\n" +
+            "LEFT JOIN `xb_class` `d` ON `d`.`id` = `c`.`attend_id`\n" +
+            "WHERE\n" +
+            "\t`c`.`delete_status` = '1'" ,nativeQuery = true)
+    BigDecimal findAll5();
+    @Query(value = " SELECT\n" +
+            "\t\tsum(\n" +
+            "\t\t\t(\n" +
+            "\t\t\t\tr.total_receivable / r.total_period_num * c.deduct_period\n" +
+            "\t\t\t)\n" +
+            "\t\t)\n" +
+            "FROM\n" +
+            "\t`xb_record_class` `c`\n" +
+            "LEFT JOIN xb_student_relation r ON r.id = c.student_relation_id\n" +
+            "LEFT JOIN `xb_class` `d` ON `d`.`id` = `c`.`attend_id`\n" +
+            "WHERE\n" +
+            "\t`c`.`delete_status` = '1'\n" +
+            "AND c.record_time >= ?1" ,nativeQuery = true)
+    BigDecimal findAll6(String s1);
+
+    @Query(value = " SELECT\n" +
+            "\t\tsum(\n" +
+            "\t\t\t(\n" +
+            "\t\t\t\tr.total_receivable / r.total_period_num * c.deduct_period\n" +
+            "\t\t\t)\n" +
+            "\t\t)\n" +
+            "FROM\n" +
+            "\t`xb_record_class` `c`\n" +
+            "LEFT JOIN xb_student_relation r ON r.id = c.student_relation_id\n" +
+            "LEFT JOIN `xb_class` `d` ON `d`.`id` = `c`.`attend_id`\n" +
+            "WHERE\n" +
+            "\t`c`.`delete_status` = '1'\n" +
+            "AND c.record_time <= ?2 ",nativeQuery = true)
+    BigDecimal findAll7(String s1);
+
 }

@@ -19,6 +19,7 @@ import org.springside.examples.bootapi.repository.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
@@ -494,7 +495,40 @@ public class XbStudentService {
 				filters.values(), XbRecordClassViews.class);
 		return xbRecordClassViewsDao.findAll(spec);
 	}
+	@Transactional
+	public BigDecimal getXbRecordClassdViewstoList2(Map<String, Object> searchParams){
+		String recordTime1 = searchParams.get("recordTime1").toString();
+		String recordTime2 = searchParams.get("recordTime2").toString();
+		return xbRecordClassDao.findAll1(recordTime1,recordTime2);
+	}
+	@Transactional
+	public BigDecimal getXbRecordClassdViewstoList1(Map<String, Object> searchParams){
 
+		String orgid = searchParams.get("orgid").toString();
+		String employeeName = searchParams.get("employeeName").toString();
+		try {
+			String recordTime1 = searchParams.get("recordTime1").toString();
+			String recordTime2 = searchParams.get("recordTime2").toString();
+			if(orgid.equals("0")&&employeeName.equals("0")){
+				return xbRecordClassDao.findAll1(recordTime1,recordTime2);
+			}else if(orgid.equals("0")&&!employeeName.equals("0")){
+				return xbRecordClassDao.findAll2(recordTime1,recordTime2,employeeName);
+			}else if(!orgid.equals("0")&&employeeName.equals("0")){
+				return xbRecordClassDao.findAll3(recordTime1,recordTime2,orgid);
+			}else{
+				return xbRecordClassDao.findAll4(recordTime1,recordTime2,orgid,employeeName);
+			}
+		}catch (Exception e){
+			e.printStackTrace();
+			return new BigDecimal('0');
+		}
+
+//		searchParams = HttpServletUtil.getRoleDateForXbRecordClassdView(searchParams);
+//		Map<String, SearchFilter> filters = SearchFilter.parse(searchParams);
+//		Specification<XbRecordClassViews> spec = DynamicSpecifications.bySearchFilter(
+//				filters.values(), XbRecordClassViews.class);
+//		return xbRecordClassViewsDao.findAll(spec);
+	}
 	@Transactional
 	public int findRecordTotalCount(){
 		return xbRecordClassDao.findRecordTotalCount();

@@ -967,7 +967,6 @@
             });
         }
 
-
         function getRecordClassListByClass(page){
             var data= serializeObject("#accordingClassform");
             var size = $('#recordsize option:selected').val();//选中的值
@@ -979,7 +978,7 @@
             $.ajax({
                 type: 'get',
                 //dataType: 'json',
-                url: basePath + '/recordClass/getRecordClassListByClass?page='+page+'&size='+size, //+'&data='+JSON.stringify(data),
+                url: basePath + '/recordClass/getRecordClassListByClass1?page='+page+'&size='+size, //+'&data='+JSON.stringify(data),
                 data: {data:JSON.stringify(data)},
                 contentType:"application/json;charset=UTF-8",
                 cache: false,
