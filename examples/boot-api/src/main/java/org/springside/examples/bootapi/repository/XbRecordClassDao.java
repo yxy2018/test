@@ -103,6 +103,7 @@ public interface XbRecordClassDao extends PagingAndSortingRepository<XbRecordCla
     @Query(value = " SELECT sum(r.total_receivable/r.total_period_num*c.deduct_period) " +
             "FROM `xb_record_class` `c` LEFT JOIN xb_student_relation r ON r.id = c.student_relation_id " +
             "WHERE  `c`.`delete_status` = '1' " +
+            "AND r.student_start in ('0','2') " +
             "AND `c`.`attend_id` = ?1 " +
             "AND `c`.`record_time` = ?2 ",nativeQuery = true)
     BigDecimal findTotalReceivable(String attendId, Date recordTime);
@@ -125,6 +126,7 @@ public interface XbRecordClassDao extends PagingAndSortingRepository<XbRecordCla
             "WHERE\n" +
             "\t`c`.`delete_status` = '1'\n" +
             "AND c.record_time >= ?1\n" +
+            "AND r.student_start in ('0','2')\n" +
             "AND c.record_time <= ?2 ",nativeQuery = true)
     BigDecimal findAll1(String s1, String s2);
     @Query(value = " SELECT\n" +
@@ -141,7 +143,8 @@ public interface XbRecordClassDao extends PagingAndSortingRepository<XbRecordCla
             "LEFT JOIN `sys_employee` `e` ON `e`.`id` = `d`.`teacher_id`\n" +
             "WHERE\n" +
             "\t`c`.`delete_status` = '1'\n" +
-            "and e.employee_name like %?3%\n" +
+            "and e.employee_name =?3\n" +
+            "AND r.student_start in ('0','2')\n" +
             "AND c.record_time >= ?1\n" +
             "AND c.record_time <= ?2 ",nativeQuery = true)
     BigDecimal findAll2(String s1, String s2,String s3);
@@ -159,7 +162,27 @@ public interface XbRecordClassDao extends PagingAndSortingRepository<XbRecordCla
             "LEFT JOIN `sys_employee` `e` ON `e`.`id` = `d`.`teacher_id`\n" +
             "WHERE\n" +
             "\t`c`.`delete_status` = '1'\n" +
+            "and e.id =?3\n" +
+            "AND r.student_start in ('0','2')\n" +
+            "AND c.record_time >= ?1\n" +
+            "AND c.record_time <= ?2 ",nativeQuery = true)
+    BigDecimal findAll22(String s1, String s2,String s3);
+    @Query(value = " SELECT\n" +
+            "\t\tsum(\n" +
+            "\t\t\t(\n" +
+            "\t\t\t\tr.total_receivable / r.total_period_num * c.deduct_period\n" +
+            "\t\t\t)\n" +
+            "\t\t)\n" +
+            "FROM\n" +
+            "\t`xb_record_class` `c`\n" +
+            "LEFT JOIN xb_student_relation r ON r.id = c.student_relation_id\n" +
+            "LEFT JOIN `xb_class` `d` ON `d`.`id` = `c`.`attend_id`\n" +
+            "LEFT JOIN `sys_organs` `l` ON `d`.`organ_id` = `l`.`id`\n" +
+            "LEFT JOIN `sys_employee` `e` ON `e`.`id` = `d`.`teacher_id`\n" +
+            "WHERE\n" +
+            "\t`c`.`delete_status` = '1'\n" +
             "and l.id = ?3\n" +
+            "AND r.student_start in ('0','2')\n" +
             "AND c.record_time >= ?1\n" +
             "AND c.record_time <= ?2 ",nativeQuery = true)
     BigDecimal findAll3(String s1, String s2,String s3);
@@ -178,7 +201,8 @@ public interface XbRecordClassDao extends PagingAndSortingRepository<XbRecordCla
             "WHERE\n" +
             "\t`c`.`delete_status` = '1'\n" +
             "and l.id = ?3\n" +
-            "and e.employee_name like %?4%\n" +
+            "and e.employee_name=?4\n" +
+            "AND r.student_start in ('0','2')\n" +
             "AND c.record_time >= ?1\n" +
             "AND c.record_time <= ?2 ",nativeQuery = true)
     BigDecimal findAll4(String s1, String s2 ,String s3, String s4);
@@ -193,7 +217,8 @@ public interface XbRecordClassDao extends PagingAndSortingRepository<XbRecordCla
             "LEFT JOIN xb_student_relation r ON r.id = c.student_relation_id\n" +
             "LEFT JOIN `xb_class` `d` ON `d`.`id` = `c`.`attend_id`\n" +
             "WHERE\n" +
-            "\t`c`.`delete_status` = '1'" ,nativeQuery = true)
+            "\t`c`.`delete_status` = '1'\n" +
+            "AND r.student_start in ('0','2')" ,nativeQuery = true)
     BigDecimal findAll5();
     @Query(value = " SELECT\n" +
             "\t\tsum(\n" +
@@ -207,7 +232,8 @@ public interface XbRecordClassDao extends PagingAndSortingRepository<XbRecordCla
             "LEFT JOIN `xb_class` `d` ON `d`.`id` = `c`.`attend_id`\n" +
             "WHERE\n" +
             "\t`c`.`delete_status` = '1'\n" +
-            "AND c.record_time >= ?1" ,nativeQuery = true)
+            "AND c.record_time >= ?1\n" +
+            "AND r.student_start in ('0','2')",nativeQuery = true)
     BigDecimal findAll6(String s1);
 
     @Query(value = " SELECT\n" +
@@ -222,7 +248,8 @@ public interface XbRecordClassDao extends PagingAndSortingRepository<XbRecordCla
             "LEFT JOIN `xb_class` `d` ON `d`.`id` = `c`.`attend_id`\n" +
             "WHERE\n" +
             "\t`c`.`delete_status` = '1'\n" +
-            "AND c.record_time <= ?2 ",nativeQuery = true)
+            "AND c.record_time <= ?2\n "+
+            "AND r.student_start in ('0','2')",nativeQuery = true)
     BigDecimal findAll7(String s1);
 
 }

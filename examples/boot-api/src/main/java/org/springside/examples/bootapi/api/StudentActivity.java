@@ -288,6 +288,7 @@ public class StudentActivity {
 		Map<String,Object> resultMap = new HashMap<>();
 		Map<String,Object> searhMap = new HashMap<>();
 		Map<String,Object> searchParamsview = new HashMap<>();
+		Map<String,Object> searchParamsviews = new HashMap<>();
 		if(null!=data){
 			resultMap = com.alibaba.fastjson.JSONObject.parseObject(data,searhMap.getClass());
 		}
@@ -299,6 +300,7 @@ public class StudentActivity {
 		}else if(!organId.equals("0")){
 			searhMap.put("EQ_organId",organId);
 			searchParamsview.put("EQ_organId",organId);
+			searchParamsviews.put("organId",organId);
 		}
 		if(null==type){
 			type = "AZ";
@@ -307,9 +309,11 @@ public class StudentActivity {
 			if(type.equals("AZ")){
 				searhMap.put("LIKE_xbStudent.studentName",nameormobile);
 				searchParamsview.put("LIKE_studentName",nameormobile);
+				searchParamsviews.put("studentName",nameormobile);
 			}else{
 				searhMap.put("LIKE_xbStudent.contactPhone",nameormobile);
 				searchParamsview.put("LIKE_contactPhone",nameormobile);
+				searchParamsviews.put("contactPhone",nameormobile);
 			}
 		}
 		searhMap.put("EQ_xbStudent.deleteStatus","1");
@@ -324,34 +328,39 @@ public class StudentActivity {
 				startdate = sdf.parse(enrollDateSearch);
 				searhMap.put("GTE_enrollDate",startdate);
 				searchParamsview.put("GTE_enrollDate",startdate);
+				searchParamsviews.put("enrollDate1",enrollDateSearch);
 			}
 			if(null==enrollDateSearch){
 				enrollDateSearch = DateUtil.weekDateFirstDay();
 				startdate = sdf.parse(DateUtil.weekDateFirstDay());
 				searhMap.put("GTE_enrollDate",startdate);
 				searchParamsview.put("GTE_enrollDate",startdate);
+				searchParamsviews.put("enrollDate1",sdf.format(DateUtil.weekDateTimeFirstDayDA().getTime()));
 			}
 			if(StringUtils.isNotEmpty(enrollDateSearchEnd)){
 				enddate = sdf.parse(enrollDateSearchEnd);
 				searhMap.put("LTE_enrollDate",enddate);
 				searchParamsview.put("LTE_enrollDate",enddate);
+				searchParamsviews.put("enrollDate2",enrollDateSearchEnd);
 			}
 			if(null==enrollDateSearchEnd){
 				enddate = sdf.parse(DateUtil.weekDateLastDay());
 				enrollDateSearchEnd = DateUtil.weekDateLastDay();
 				searhMap.put("LTE_enrollDate",enddate);
 				searchParamsview.put("LTE_enrollDate",enddate);
+				searchParamsviews.put("enrollDate2",sdf.format(DateUtil.weekDateTimeLastDayDA().getTime()));
 			}
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
-		List<XbStudentRelationView> studentlist = studentService.getxbStudentRelationViewList(searchParamsview);
+		//List<XbStudentRelationView> studentlist = studentService.getxbStudentRelationViewList(searchParamsview);
+		long count = studentService.getCount(searchParamsviews);
 		Iterable<SysOrgans> organsList = organsService.getOrgansList();
 		Page<XbStudentRelationViewNew> xbStudentPage = studentService.getXbStudentRelationViewNewList(pageable,searhMap);
         for (XbStudentRelationViewNew obj:xbStudentPage.getContent()) {
             obj.yingshou = obj.totalReceivable.subtract(obj.shishou);
         }
-		model.addAttribute("studentlistsize",studentlist.size());
+		model.addAttribute("studentlistsize",count);
 		model.addAttribute("xbStudentPage",xbStudentPage);
 		model.addAttribute("organId",organId);
 		model.addAttribute("organsList",organsList);

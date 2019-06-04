@@ -31,7 +31,7 @@ public class XbRecordClassViews {
     @Column(name="employee_name")
     public String employeeName;
     @Column(name="course_type_name")
-    public String courseTypeNname;
+    public String courseTypeName;
     @Column(name="periodnum")
     public BigDecimal periodnum;
     @Column(name="establish_num")
@@ -54,4 +54,13 @@ public class XbRecordClassViews {
     public BigDecimal kknum;
     @Transient
     public BigDecimal bknum;
+
+
+
+    @Transient
+    public long bjrs;
+    @Transient
+    public long skrs;
+    @Transient
+    public BigDecimal ksf;
 }

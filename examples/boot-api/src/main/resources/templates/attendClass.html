@@ -365,13 +365,13 @@
                                                     </tr>
                                                     <tr th:each="cla:${recordLists.content}">
                                                         <td th:text="${#dates.format(cla.recordTime, 'yyyy-MM-dd HH:mm:ss')}">上课时间</td>
-                                                        <td th:text="${cla.organName}+${cla.courseTypeNname}+${cla.employeeName}+${cla.className}">
+                                                        <td th:text="${cla.organName}+${cla.courseTypeName}+${cla.employeeName}+${cla.className}">
                                                             <img src="../static/pages/img/ban.png">班级/一对一
                                                         </td>
                                                         <td th:text="${cla.courseName}">课程</td>
                                                         <td th:text="${cla.organName}">校区</td>
                                                         <td th:text="${cla.employeeName}">教师</td>
-                                                        <td th:text="${cla.courseTypeNname}">科目</td>
+                                                        <td th:text="${cla.courseTypeName}">科目</td>
                                                         <td th:text="${cla.sknum}?${cla.sknum}:'0.0'">上课</td>
                                                         <td th:text="${cla.qjnum}?${cla.qjnum}:'0.0'">请假</td>
                                                         <td th:text="${cla.kknum}?${cla.kknum}:'0.0'">旷课</td>

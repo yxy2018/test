@@ -382,6 +382,11 @@ public class RecordClassActivity {
 		Map<String,Object> resultMap = new HashMap<>();
 		Map<String,Object> searhMap = new HashMap<>();
 		Map<String,Object> searhMaps = new HashMap<>();
+//		List<Integer> list = new ArrayList<Integer>();
+//		list.add(1);
+//		list.add(3);
+//		list.add(4);
+//		searhMap.put("NEQINT_studentStart",list);
 		if(null!=data){
 			resultMap = com.alibaba.fastjson.JSONObject.parseObject(data,Map.class);
 		}
@@ -392,14 +397,12 @@ public class RecordClassActivity {
 			organclaId = "0";
 		}else if(!organclaId.equals("0")){
 			searhMap.put("EQ_orgid",organclaId);
-			searhMaps.put("orgid",organclaId);
+			//searhMaps.put("orgid",organclaId);
 		}
 		//教师名称
-		searhMaps.put("employeeName","0");
 		String TeacherNameCla = (String)resultMap.get("TeacherNameCla");
 		if(StringUtils.isNotEmpty(TeacherNameCla)){
 			searhMap.put("LIKE_employeeName",TeacherNameCla);
-			searhMaps.put("employeeName",TeacherNameCla);
 		}
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String startDateTimeBegin = (String)resultMap.get("startclaDateTimeBegin");
@@ -452,7 +455,20 @@ public class RecordClassActivity {
 		model.addAttribute("TeacherNameCla",TeacherNameCla);
 
 		Page<XbRecordClassViews> recordLists = studentService.getXbRecordClassdViewstoList(pageable,searhMap);
+
+         if(searhMap.containsKey("EQ_orgid")){
+			 searhMaps.put("orgid",searhMap.get("EQ_orgid"));
+		 }else{
+			 searhMaps.put("orgid","0");
+		 }
+		if(searhMap.containsKey("EQ_teacherId")){
+			searhMaps.put("employeeId",searhMap.get("EQ_teacherId"));
+		}else{
+			searhMaps.put("employeeId","0");
+		}
+
 		List<XbRecordClassViews> content = recordLists.getContent();
+        BigDecimal ss = new BigDecimal("0");
 		for (XbRecordClassViews org:content) {
 			String attendId = org.attendId;
 			Date recordTime = org.recordTime;
@@ -480,7 +496,7 @@ public class RecordClassActivity {
 		BigDecimal totalPeriodnum = new BigDecimal("0");
 
 		for (int i = 0; i < recordList.size(); i++) {
-			BigDecimal periodnum = recordList.get(i).periodnum;
+			BigDecimal periodnum = recordList.get(i).periodnum.setScale(0, RoundingMode.HALF_UP);
 			totalPeriodnum = totalPeriodnum.add(periodnum);
 
 
@@ -493,6 +509,10 @@ public class RecordClassActivity {
 		}
 		model.addAttribute("totalPeriodnum",totalPeriodnum);
 		BigDecimal totalReceivables = new BigDecimal("0");
+        searhMaps.put("employeeName","0");
+        if(StringUtils.isNotEmpty(TeacherNameCla)){
+            searhMaps.put("employeeName",TeacherNameCla);
+        }
 		totalReceivables = studentService.getXbRecordClassdViewstoList1(searhMaps).setScale(2, RoundingMode.HALF_UP);
 		model.addAttribute("totalReceivables",totalReceivables);
 		return "attendClass::accordingClass";

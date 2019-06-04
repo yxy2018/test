@@ -326,8 +326,9 @@
     };
 
     function change(obj,index){
-        if(obj.value==1||obj.value==2){
+        if(obj.value==1||obj.value==4){
             $("#redordIds"+index).val("0");
+           // $("#redordIds"+index).disabled="true";
         }else{
             $("#redordIds"+index).val("1");
         }

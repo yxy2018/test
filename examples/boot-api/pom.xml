@@ -222,6 +222,7 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
 					<mainClass>org.springside.examples.bootapi.BootApiApplication</mainClass>
+
 				</configuration>
 			</plugin>
 		</plugins>

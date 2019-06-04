@@ -116,6 +116,38 @@ public class XbStudentService {
 				filters.values(), XbStudentRelationView.class);
 		return xbStudentRelationViewDao.findAll(spec);
 	}
+	public long getCount(Map<String, Object> searchParams){
+		String enrollDate1 = searchParams.get("enrollDate1").toString();
+		String enrollDate2 = searchParams.get("enrollDate2").toString();
+		Long l = 0l;
+		if(searchParams.containsKey("organId")){
+			String organId = searchParams.get("organId").toString();
+			if(searchParams.containsKey("studentName")){
+				String studentName = searchParams.get("studentName").toString();
+				l = xbStudentRelationViewDao.findAll4(enrollDate1,enrollDate2,studentName,organId);
+			}else{
+				if(searchParams.containsKey("contactPhone")){
+					String contactPhone = searchParams.get("contactPhone").toString();
+					l = xbStudentRelationViewDao.findAll5(enrollDate1,enrollDate2,contactPhone,organId);
+				}else{
+					l = xbStudentRelationViewDao.findAll6(enrollDate1,enrollDate2,organId);
+				}
+			}
+		}else{
+			if(searchParams.containsKey("studentName")){
+				String studentName = searchParams.get("studentName").toString();
+				l = xbStudentRelationViewDao.findAll3(enrollDate1,enrollDate2,studentName);
+			}else{
+				if(searchParams.containsKey("contactPhone")){
+					String contactPhone = searchParams.get("contactPhone").toString();
+					l = xbStudentRelationViewDao.findAll2(enrollDate1,enrollDate2,contactPhone);
+				}else{
+					l = xbStudentRelationViewDao.findAll1(enrollDate1,enrollDate2);
+				}
+			}
+		}
+		return l;
+	}
 	public List getAllStudentList(Date enroll_date){
 		return xbStudentRelationDao.findAllStudentList(enroll_date);
 	}
@@ -158,6 +190,22 @@ public class XbStudentService {
 		Specification<XbStudentRelationViewNew> spec = DynamicSpecifications.bySearchFilter(
 				filters.values(), XbStudentRelationViewNew.class);
 		return xbStudentRelationViewNewDaoDao.findAll(spec,pageable);
+	}
+	@Transactional
+	public Long getBjrs(String classesId) {
+		HttpServletRequest request = ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest();
+		SysEmployee sysEmployee = (SysEmployee)request.getSession().getAttribute("sysEmployee");
+		String organId = "0";
+		String teacherId = "0";
+		if(!"超级管理员".equals(sysEmployee.sysRole.roleName)&&!"总校教务".equals(sysEmployee.sysRole.roleName)){
+			organId = sysEmployee.organId;
+		}
+		if("教师".equals(sysEmployee.sysRole.roleName)){
+			teacherId = sysEmployee.id;
+		}
+		Long l = 0L;
+		l = xbStudentRelationViewNewDaoDao.findAll1(classesId);
+		return l;
 	}
 	@Transactional
 	public List<XbStudentRelationViewNew>  getXbStudentRelationViewNewList(Map<String, Object> searchParams) {
@@ -503,26 +551,64 @@ public class XbStudentService {
 	}
 	@Transactional
 	public BigDecimal getXbRecordClassdViewstoList1(Map<String, Object> searchParams){
-
-		String orgid = searchParams.get("orgid").toString();
-		String employeeName = searchParams.get("employeeName").toString();
-		try {
-			String recordTime1 = searchParams.get("recordTime1").toString();
-			String recordTime2 = searchParams.get("recordTime2").toString();
-			if(orgid.equals("0")&&employeeName.equals("0")){
-				return xbRecordClassDao.findAll1(recordTime1,recordTime2);
-			}else if(orgid.equals("0")&&!employeeName.equals("0")){
-				return xbRecordClassDao.findAll2(recordTime1,recordTime2,employeeName);
-			}else if(!orgid.equals("0")&&employeeName.equals("0")){
-				return xbRecordClassDao.findAll3(recordTime1,recordTime2,orgid);
-			}else{
-				return xbRecordClassDao.findAll4(recordTime1,recordTime2,orgid,employeeName);
+		BigDecimal a  = new BigDecimal("0");
+		String employeeId = searchParams.get("employeeId").toString();
+		String recordTime1 = searchParams.get("recordTime1").toString();
+		String recordTime2 = searchParams.get("recordTime2").toString();
+		if(!employeeId.equals("0")){
+			BigDecimal b = xbRecordClassDao.findAll22(recordTime1,recordTime2,employeeId);
+			if(b!=null){
+				a = b;
 			}
-		}catch (Exception e){
-			e.printStackTrace();
-			return new BigDecimal('0');
+		}else{
+			String orgid = searchParams.get("orgid").toString();
+			if(orgid!="0"){
+				if(searchParams.containsKey("employeeName")){
+					String employeeName = searchParams.get("employeeName").toString();
+					if(employeeName.equals("0")){
+						BigDecimal b = xbRecordClassDao.findAll3(recordTime1,recordTime2,orgid);
+						if(b!=null){
+							a = b;
+						}
+					}else{
+						BigDecimal b = xbRecordClassDao.findAll4(recordTime1,recordTime2,orgid,employeeName);
+						if(b!=null){
+							a = b;
+						}
+					}
+
+				}else{
+					BigDecimal b = xbRecordClassDao.findAll3(recordTime1,recordTime2,orgid);
+					if(b!=null){
+						a = b;
+					}
+				}
+			}else{
+				if(searchParams.containsKey("employeeName")){
+					String employeeName = searchParams.get("employeeName").toString();
+					if(employeeName.equals("0")){
+						BigDecimal b = xbRecordClassDao.findAll1(recordTime1, recordTime2);
+						if(b!=null){
+							a = b;
+						}
+					}else if(!employeeName.equals("0")){
+						BigDecimal b = xbRecordClassDao.findAll2(recordTime1,recordTime2,employeeName);
+						if(b!=null){
+							a = b;
+						}
+					}
+				}else{
+					BigDecimal b = xbRecordClassDao.findAll1(recordTime1, recordTime2);
+					if(b!=null){
+						a = b;
+					}
+				}
+			}
+
 		}
 
+
+		return a;
 //		searchParams = HttpServletUtil.getRoleDateForXbRecordClassdView(searchParams);
 //		Map<String, SearchFilter> filters = SearchFilter.parse(searchParams);
 //		Specification<XbRecordClassViews> spec = DynamicSpecifications.bySearchFilter(

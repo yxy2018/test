@@ -19,6 +19,7 @@ import org.springside.examples.bootapi.service.XbStudentService;
 import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -46,24 +47,56 @@ public class ExcelActivity {
 		titles.add("课时费");
 		datas.setTitles(titles);
 		List<List<Object>> rows = new ArrayList();
-		List<XbRecordClassView> xbRecordClassViewList = getRecordClassListByClass(data);
+		List<XbRecordClassViews> xbRecordClassViewList = getRecordClassListByClass(data);
 		for (int i = 0; i < xbRecordClassViewList.size(); i++) {
-			List<Object> xbRecordClassViewList1 = new ArrayList();
-			xbRecordClassViewList1.add(xbRecordClassViewList.get(i).organName);
-			xbRecordClassViewList1.add(xbRecordClassViewList.get(i).courseTypeNname);
-			xbRecordClassViewList1.add(xbRecordClassViewList.get(i).employeeName);
-			xbRecordClassViewList1.add(xbRecordClassViewList.get(i).className);
-			xbRecordClassViewList1.add(xbRecordClassViewList.get(i).recordTime);
+//			List<Object> xbRecordClassViewList1 = new ArrayList();
+//			xbRecordClassViewList1.add(xbRecordClassViewList.get(i).organName);
+//			xbRecordClassViewList1.add(xbRecordClassViewList.get(i).courseTypeName);
+//			xbRecordClassViewList1.add(xbRecordClassViewList.get(i).employeeName);
+//			xbRecordClassViewList1.add(xbRecordClassViewList.get(i).className);
+//			xbRecordClassViewList1.add(xbRecordClassViewList.get(i).recordTime);
 			String classesId = xbRecordClassViewList.get(i).classId;
-			Map<String,Object> searhMap = new HashMap<>();
-			searhMap.put("EQ_classId",classesId);
-			searhMap.put("GTE_periodNum", new BigDecimal("0"));
-			Pageable pageable = new PageRequest(0, 1, null);
-			Page<XbStudentRelationViewNew> classPage = studentService.getXbStudentRelationViewNewList(pageable,searhMap);
-			xbRecordClassViewList1.add(classPage.getTotalElements());
-			xbRecordClassViewList1.add(xbRecordClassViewList.get(i).studentCount);
-			xbRecordClassViewList1.add(xbRecordClassViewList.get(i).periodnum);
-			xbRecordClassViewList1.add(xbRecordClassViewList.get(i).totalReceivable);
+//			Map<String,Object> searhMap = new HashMap<>();
+//			searhMap.put("EQ_classId",classesId);
+//			searhMap.put("GTE_periodNum", new BigDecimal("0"));
+//			List<Integer> list = new ArrayList<Integer>();
+//			list.add(1);
+//			list.add(3);
+//			list.add(4);
+//			searhMap.put("NEQINT_studentStart",list);
+//			Pageable pageable = new PageRequest(0, 1, null);
+//			Page<XbStudentRelationViewNew> classPage = studentService.getXbStudentRelationViewNewList(pageable,searhMap);
+//			long totalElements = classPage.getTotalElements();
+			long totalElements = studentService.getBjrs(classesId);
+			xbRecordClassViewList.get(i).bjrs = totalElements;
+//			xbRecordClassViewList1.add(classPage.getTotalElements());
+			String attendId = xbRecordClassViewList.get(i).attendId;
+			Date recordTime = xbRecordClassViewList.get(i).recordTime;
+			Long bigDecimal1 = studentService.findstudentCount(attendId, recordTime);
+			xbRecordClassViewList.get(i).skrs = bigDecimal1;
+//			xbRecordClassViewList1.add(bigDecimal1);
+//			xbRecordClassViewList1.add(xbRecordClassViewList.get(i).periodnum);
+			BigDecimal bigDecimal6 = studentService.findTotalReceivable(attendId, recordTime);
+			if(bigDecimal6==null){
+				bigDecimal6=new BigDecimal("0") ;
+			}else{
+				bigDecimal6=bigDecimal6.setScale(2, RoundingMode.HALF_UP);
+			}
+			xbRecordClassViewList.get(i).ksf = bigDecimal6;
+//			xbRecordClassViewList1.add(bigDecimal6);
+//			rows.add(xbRecordClassViewList1);
+		}
+		for (XbRecordClassViews obj:xbRecordClassViewList) {
+			List<Object> xbRecordClassViewList1 = new ArrayList();
+			xbRecordClassViewList1.add(obj.organName);
+			xbRecordClassViewList1.add(obj.courseTypeName);
+			xbRecordClassViewList1.add(obj.employeeName);
+			xbRecordClassViewList1.add(obj.className);
+			xbRecordClassViewList1.add(obj.recordTime);
+			xbRecordClassViewList1.add(obj.bjrs);
+			xbRecordClassViewList1.add(obj.skrs);
+			xbRecordClassViewList1.add(obj.periodnum);
+			xbRecordClassViewList1.add(obj.ksf);
 			rows.add(xbRecordClassViewList1);
 		}
 		datas.setRows(rows);
@@ -305,9 +338,14 @@ public class ExcelActivity {
 	 * 查询上课记录按班级
 	 * @return
 	 */
-	private List<XbRecordClassView> getRecordClassListByClass(String data){
+	private List<XbRecordClassViews> getRecordClassListByClass(String data){
 		Map<String,Object> resultMap = new HashMap<>();
 		Map<String,Object> searhMap = new HashMap<>();
+		List<Integer> list = new ArrayList<Integer>();
+		list.add(1);
+		list.add(3);
+		list.add(4);
+		searhMap.put("NEQINT_studentStart",list);
 		if(null!=data){
 			resultMap = com.alibaba.fastjson.JSONObject.parseObject(data,Map.class);
 		}
@@ -343,7 +381,7 @@ public class ExcelActivity {
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
-		List<XbRecordClassView> recordLists = studentService.getXbRecordClassdViewtoList(searhMap);
+		List<XbRecordClassViews> recordLists = studentService.getXbRecordClassdViewstoList(searhMap);
 		return recordLists;
 	}
 	/*

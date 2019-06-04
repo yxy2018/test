@@ -281,12 +281,24 @@ public class WechatRecordClassActivity {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		searhMaps.put("recordTime1",sdf.format(DateUtil.weekDateTimeFirstDayDA().getTime()));
 		searhMaps.put("recordTime2",sdf.format(DateUtil.weekDateTimeLastDayDA().getTime()));
+		searhMap.put("GTE_recordTime",DateUtil.weekDateTimeFirstDayDA());
+		searhMap.put("LTE_recordTime",DateUtil.weekDateTimeLastDayDA());
 		List<Integer> list = new ArrayList<Integer>();
 		list.add(1);
 		list.add(3);
 		list.add(4);
 		searhMap.put("NEQINT_studentStart",list);
 		Page<XbRecordClassViews> recordLists = studentService.getXbRecordClassdViewstoList(pageable,searhMap);
+		if(searhMap.containsKey("EQ_orgid")){
+			searhMaps.put("orgid",searhMap.get("EQ_orgid"));
+		}else{
+			searhMaps.put("orgid","0");
+		}
+		if(searhMap.containsKey("EQ_teacherId")){
+			searhMaps.put("employeeId",searhMap.get("EQ_teacherId"));
+		}else{
+			searhMaps.put("employeeId","0");
+		}
 		List<XbRecordClassViews> content = recordLists.getContent();
 		for (XbRecordClassViews org:content) {
 			String attendId = org.attendId;
@@ -321,11 +333,11 @@ public class WechatRecordClassActivity {
         BigDecimal totalPeriodnum = new BigDecimal("0");
         BigDecimal totalReceivables = new BigDecimal("0");
         for (int i = 0; i < recordList.size(); i++) {
-            BigDecimal periodnum = recordList.get(i).periodnum;
+            BigDecimal periodnum = recordList.get(i).periodnum.setScale(0, RoundingMode.HALF_UP);
             totalPeriodnum = totalPeriodnum.add(periodnum);
         }
         model.addAttribute("totalPeriodnum",totalPeriodnum);
-		totalReceivables = studentService.getXbRecordClassdViewstoList2(searhMaps).setScale(2, RoundingMode.HALF_UP);
+		totalReceivables = studentService.getXbRecordClassdViewstoList1(searhMaps).setScale(2, RoundingMode.HALF_UP);
         model.addAttribute("totalReceivables",totalReceivables);
 		return "wechat_classRecord";
 	}
@@ -345,10 +357,10 @@ public class WechatRecordClassActivity {
                 searhMap.put("LTE_recordTime",sdf.parse(startDateTimeEnd));
             }
 			List<Integer> list = new ArrayList<Integer>();
-			list.add(1);
+			/*list.add(1);
 			list.add(3);
 			list.add(4);
-			searhMap.put("NEQINT_studentStart",list);
+			searhMap.put("NEQINT_studentStart",list);*/
             Page<XbRecordClassView> recordLists = studentService.getXbRecordClassdViewtoList(pageable,searhMap);
             int totalElements = studentService.findRecordTotalCount();
             int size = pageable.getPageSize();
@@ -459,11 +471,11 @@ public class WechatRecordClassActivity {
 				searhMap.put("LTE_recordTime",sdf.parse(startDateTimeEnd+" 23:59:59"));
 				searhMaps.put("recordTime2",startDateTimeEnd+" 23:59:59");
 			}
-			List<Integer> list = new ArrayList<Integer>();
-			list.add(1);
-			list.add(3);
-			list.add(4);
-			searhMap.put("NEQINT_studentStart",list);
+//			List<Integer> list = new ArrayList<Integer>();
+//			list.add(1);
+//			list.add(3);
+//			list.add(4);
+//			searhMap.put("NEQINT_studentStart",list);
 
 			int totalElements = studentService.findRecordTotalCount();
 			int size = pageable.getPageSize();
@@ -474,6 +486,16 @@ public class WechatRecordClassActivity {
 			}
 			totalPages = totalPages + 1;
 			Page<XbRecordClassViews> recordLists = studentService.getXbRecordClassdViewstoList(pageable,searhMap);
+			if(searhMap.containsKey("EQ_orgid")){
+				searhMaps.put("orgid",searhMap.get("EQ_orgid"));
+			}else{
+				searhMaps.put("orgid","0");
+			}
+			if(searhMap.containsKey("EQ_teacherId")){
+				searhMaps.put("employeeId",searhMap.get("EQ_teacherId"));
+			}else{
+				searhMaps.put("employeeId","0");
+			}
 			List<XbRecordClassViews> content = recordLists.getContent();
 			for (XbRecordClassViews org:content) {
 				String attendId = org.attendId;
@@ -500,17 +522,17 @@ public class WechatRecordClassActivity {
 			BigDecimal totalPeriodnum = new BigDecimal("0");
 			BigDecimal totalReceivables = new BigDecimal("0");
 			for (int i = 0; i < recordList.size(); i++) {
-				BigDecimal periodnum = recordList.get(i).periodnum;
+				BigDecimal periodnum = recordList.get(i).periodnum.setScale(0, RoundingMode.HALF_UP);
 				totalPeriodnum = totalPeriodnum.add(periodnum);
 			}
 			model.addAttribute("totalPeriodnum",totalPeriodnum);
-			totalReceivables = studentService.getXbRecordClassdViewstoList2(searhMaps).setScale(2, RoundingMode.HALF_UP);
+			totalReceivables = studentService.getXbRecordClassdViewstoList1(searhMaps).setScale(2, RoundingMode.HALF_UP);
 			model.addAttribute("totalReceivables",totalReceivables);
 		}catch (Exception e) {
 			e.printStackTrace();
 			logger.info(e.toString());
 		}
-		return "wechat_classRecord::classRecordFra2";
+		return "wechat_classRecord::classRecordFra";
 	}
 	/*
 	 * 跳转到记上课
